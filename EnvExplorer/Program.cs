@@ -16,6 +16,9 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services.Configure<AWSConfig>(config.GetSection("AWSConfig"));
+services.Configure<ParameterStoreConfig>(config.GetSection("ParameterStoreConfig"));
+
+var parameterStoreConfig = config.GetSection("ParameterStoreConfig").Get<ParameterStoreConfig>();
 
 services.AddSingleton<IParameterStoreService, ParameterStoreService>();
 

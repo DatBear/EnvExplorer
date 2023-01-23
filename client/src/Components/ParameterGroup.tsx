@@ -7,7 +7,7 @@ type ParameterGroupProps = {
 
 function ParameterGroup(props: ParameterGroupProps) {
   const { group } = props;
-  
+
   const getId = (name: string) => {
     return name.replace(/^[^a-z]+|[^\w:.-]+/gi, "");
   }
@@ -30,7 +30,7 @@ function ParameterGroup(props: ParameterGroupProps) {
           <div className="accordion-body">
             {group.parameters.map((param, idx) => <ParameterValue name={param.name} value={param.value} key={idx} />)}
             {group.children.map((child, idx) => {
-              return <div className="accordion nested"><ParameterGroup group={child} key={idx} /></div>
+              return <div className="accordion nested" key={idx}><ParameterGroup group={child} /></div>
             })}
           </div>
         </div>

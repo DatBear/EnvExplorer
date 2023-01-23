@@ -17,17 +17,19 @@ public class ParameterStoreService : IParameterStoreService
 {
     private readonly IMapper _mapper;
     private readonly AmazonSimpleSystemsManagementClient _ssmClient;
+    private readonly ParameterStoreConfig _psConfig;
 
     private List<CachedParameter>? _cachedParameters;
 
     private Regex _templatePartRegex = new("\\{(\\w+)\\}");
 
-    public ParameterStoreService(IOptions<AWSConfig> awsConfig, IMapper mapper)
+    public ParameterStoreService(IOptions<AWSConfig> awsConfigOptions, IMapper mapper, IOptions<ParameterStoreConfig> psConfig)
     {
         _mapper = mapper;
-        var awsConfig1 = awsConfig.Value;
-        var credentials = new BasicAWSCredentials(awsConfig1.AccessKeyId, awsConfig1.AccessKeySecret);
-        _ssmClient = new AmazonSimpleSystemsManagementClient(credentials, RegionEndpoint.GetBySystemName(awsConfig1.Region));
+        _psConfig = psConfig.Value;
+        var awsConfig = awsConfigOptions.Value;
+        var credentials = new BasicAWSCredentials(awsConfig.AccessKeyId, awsConfig.AccessKeySecret);
+        _ssmClient = new AmazonSimpleSystemsManagementClient(credentials, RegionEndpoint.GetBySystemName(awsConfig.Region));
     }
 
     public async Task<List<CachedParameter>> RefreshCache()
@@ -40,21 +42,43 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<List<Parameter>> GetAllParameters()
     {
         var parameters = new List<Parameter>();
-        string token = null;
-        do
+
+        foreach (var prefix in _psConfig.AllowedPrefixesList)
         {
-            var getParametersResponse = await _ssmClient.GetParametersByPathAsync(new GetParametersByPathRequest()
-            {
-                Path = "/",
-                Recursive = true,
-                WithDecryption = true,
-                NextToken = token
-            });
-            parameters.AddRange(getParametersResponse.Parameters);
-            token = getParametersResponse.NextToken;
-        } while (token != null);
+            parameters.AddRange(await GetParameters(prefix));
+        }
 
         return parameters.DistinctBy(x => x.Name).ToList();
+    }
+
+    private async Task<List<Parameter>> GetParameters(string path)
+    {
+        try
+        {
+            var parameters = new List<Parameter>();
+            string token = null;
+
+            do
+            {
+                var getParametersResponse = await _ssmClient.GetParametersByPathAsync(new GetParametersByPathRequest()
+                {
+                    Path = path,
+                    Recursive = true,
+                    WithDecryption = true,
+                    NextToken = token
+                });
+                parameters.AddRange(getParametersResponse.Parameters);
+                token = getParametersResponse.NextToken;
+            } while (token != null);
+
+            return parameters;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting parameters: {ex}");
+        }
+
+        return new List<Parameter>();
     }
 
     public async Task<ParameterGroupResponse> ListParameters(string template, Dictionary<string, string> templateValues)

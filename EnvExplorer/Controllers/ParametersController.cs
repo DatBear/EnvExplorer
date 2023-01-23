@@ -34,7 +34,7 @@ public class ParametersController : ControllerBase
             return Ok(templateParams);
         }
 
-        var parameters = await _parameterStoreService.ListParameters();
+        var parameters = await _parameterStoreService.GetAllParameters();
         var response = _mapper.Map<List<ParameterMetadataResponse>>(parameters);
         return Ok(response);
     }

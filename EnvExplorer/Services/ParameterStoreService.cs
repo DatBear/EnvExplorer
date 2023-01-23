@@ -32,22 +32,29 @@ public class ParameterStoreService : IParameterStoreService
 
     public async Task<List<CachedParameter>> RefreshCache()
     {
-        var allParameters = await ListParameters();
-
-        var response = await _ssmClient.GetParametersAsync(new GetParametersRequest
-        {
-            Names = allParameters.Select(x => x.Name).ToList(),
-            WithDecryption = true
-        });
-
-        _cachedParameters = _mapper.Map<List<CachedParameter>>(response.Parameters);
+        var allParameters = await GetAllParameters();
+        _cachedParameters = _mapper.Map<List<CachedParameter>>(allParameters);
         return _cachedParameters;
     }
 
-    public async Task<List<ParameterMetadata>> ListParameters()
+    public async Task<List<Parameter>> GetAllParameters()
     {
-        var response = await _ssmClient.DescribeParametersAsync(new DescribeParametersRequest() { });
-        return response.Parameters;
+        var parameters = new List<Parameter>();
+        string token = null;
+        do
+        {
+            var getParametersResponse = await _ssmClient.GetParametersByPathAsync(new GetParametersByPathRequest()
+            {
+                Path = "/",
+                Recursive = true,
+                WithDecryption = true,
+                NextToken = token
+            });
+            parameters.AddRange(getParametersResponse.Parameters);
+            token = getParametersResponse.NextToken;
+        } while (token != null);
+
+        return parameters.DistinctBy(x => x.Name).ToList();
     }
 
     public async Task<ParameterGroupResponse> ListParameters(string template, Dictionary<string, string> templateValues)
@@ -62,7 +69,7 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<Dictionary<string, string[]>> GetTemplateOptions(string template)
     {
         var templateOptions = new Dictionary<string, string[]>();
-        var allParameters = await ListParameters();
+        var allParameters = _cachedParameters ?? await RefreshCache();
 
         template = template.Replace("/*", "");
         var matches = _templatePartRegex.Matches(template);

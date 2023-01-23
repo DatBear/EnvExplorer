@@ -6,7 +6,7 @@ namespace EnvExplorer.Services;
 
 public interface IParameterStoreService
 {
-    Task<List<ParameterMetadata>> ListParameters();
+    Task<List<Parameter>> GetAllParameters();
     Task<ParameterGroupResponse> ListParameters(string template, Dictionary<string, string> templateValues);
     Task<Dictionary<string, string[]>> GetTemplateOptions(string template);
     Task<ParameterGroupResponse> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null);

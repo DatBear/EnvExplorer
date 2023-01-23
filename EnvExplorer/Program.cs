@@ -17,7 +17,7 @@ services.AddSwaggerGen();
 
 services.Configure<AWSConfig>(config.GetSection("AWSConfig"));
 
-services.AddScoped<IParameterStoreService, ParameterStoreService>();
+services.AddSingleton<IParameterStoreService, ParameterStoreService>();
 
 services.AddAutoMapper(typeof(Program));
 

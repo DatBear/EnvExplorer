@@ -1,0 +1,10 @@
+**/node_modules
+obj/
+bin/
+DesignTimeBuild/
+FileContentIndex/
+*.suo
+v17/
+v16/
+.env
+.vs/

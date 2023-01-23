@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile
+    container_name: envexplorer-api
+    ports:
+      - "5100:80"
+    env_file:
+      - .env
+
+  client:
+    build:
+      context: .
+      dockerfile: ./docker/client/Dockerfile
+    container_name: envexplorer-client
+    ports: 
+      - "5102:80"

@@ -10,7 +10,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 function App() {
   const parameterApiService = useMemo<ParameterApiService>(() => new ParameterApiService(), []);
 
-  const [templateOptions, setTemplateOptions] = useState<any>({});
+  const [templateOptions, setTemplateOptions] = useState<Record<string, string[]>>({});
   const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Map<string, string>>(new Map<string, string>());
   const [selectedGroup, setSelectedGroup] = useState<ParameterGroupResponse>();
 
@@ -43,7 +43,7 @@ function App() {
     <div className="container-fluid">
       {templateOptions && <div className="row align-items-center">
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
-          return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx] as string[]} setSelection={setSelectedOption} />
+          return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
         })}  
       </div>}
       {selectedGroup && <div className="accordion"><ParameterGroup group={selectedGroup} /></div> }

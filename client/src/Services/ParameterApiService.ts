@@ -35,7 +35,7 @@ export default class ParameterApiService {
 
     getTemplateOptions(template: string | null = null) {
         var url = `${this.baseUrl}/parameters/templateOptions?template=${template ?? this.defaultTemplate}`;
-        return this.get<Map<string, string[]>>(url);
+        return this.get<Record<string, string[]>>(url);
     }
 
     getGroupedParameters(template: string | null = null, templateValues: Map<string, string>) {

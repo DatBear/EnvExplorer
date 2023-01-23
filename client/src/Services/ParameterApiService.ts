@@ -47,7 +47,7 @@ export default class ParameterApiService {
     mapReplacer(key: string, value: object) {
         if(value instanceof Map) {
             let ret : Record<string, string> = {};
-            [...value.keys()].map(x => { ret[x] = value.get(x) });
+            [...value.keys()].forEach(x => { ret[x] = value.get(x) });
             return ret;
         }
         return value;

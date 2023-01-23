@@ -1,4 +1,6 @@
-export default class ParameterValueResponse {
-    name!: string;
-    value!: string;
+type ParameterValueResponse = {
+    name: string;
+    value: string;
 }
+
+export default ParameterValueResponse;

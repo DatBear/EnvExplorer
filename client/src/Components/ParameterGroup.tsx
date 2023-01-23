@@ -1,11 +1,13 @@
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import ParameterValue from "./ParameterValue";
 
-interface ParameterGroupProps {
+type ParameterGroupProps = {
   group: ParameterGroupResponse;
 }
 
 function ParameterGroup(props: ParameterGroupProps) {
+  const { group } = props;
+  
   const getId = (name: string) => {
     return name.replace(/^[^a-z]+|[^\w:.-]+/gi, "");
   }
@@ -14,7 +16,7 @@ function ParameterGroup(props: ParameterGroupProps) {
     return name.substring(name.lastIndexOf('/')+1);
   }
 
-  const group = props.group;
+  
   const id = "panels-"+getId(group.name);
   return (<>
     {group.parameters.length > 0 && 
@@ -35,7 +37,7 @@ function ParameterGroup(props: ParameterGroupProps) {
       </div>
     }
     
-    {group.children && group.children.length > 0 && group.parameters.length == 0 && group.children.map((child, idx) => {
+    {group.children && group.children.length > 0 && group.parameters.length === 0 && group.children.map((child, idx) => {
       return <ParameterGroup group={child} key={idx} />
     })}
   </>);

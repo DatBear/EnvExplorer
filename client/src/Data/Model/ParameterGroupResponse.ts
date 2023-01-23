@@ -1,7 +1,9 @@
 import ParameterValueResponse from "./ParameterValueResponse";
 
-export default class ParameterGroupResponse {
-    name!: string;
-    children!: ParameterGroupResponse[];
-    parameters!: ParameterValueResponse[];
+type ParameterGroupResponse = {
+    name: string;
+    children: ParameterGroupResponse[];
+    parameters: ParameterValueResponse[];
 }
+
+export default ParameterGroupResponse;

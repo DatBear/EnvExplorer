@@ -44,7 +44,6 @@ function App() {
 
   const updateSelectedParameter = (parameter: ParameterValueResponse) => {
     setOffCanvasParameter({...parameter});
-    setShowOffCanvas(true);
   }
 
   return (
@@ -56,7 +55,7 @@ function App() {
         })}  
       </div>}
       {selectedGroup && <div className="accordion"><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></div> }
-      {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} show={showOffCanvas} setShow={setShowOffCanvas} />}
+      {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} />}
     </div>
   );
 }

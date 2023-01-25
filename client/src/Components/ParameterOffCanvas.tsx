@@ -1,6 +1,6 @@
 import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClipboard, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -8,11 +8,9 @@ import ParameterApiService from "../Services/ParameterApiService";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
-  show: boolean;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function ParameterOffCanvas({ parameter, show, setShow } : ParameterOffCanvasProps) {
+function ParameterOffCanvas({ parameter } : ParameterOffCanvasProps) {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
 
   const [recentlyCopied, setRecentlyCopied] = useState(false);
@@ -20,8 +18,15 @@ function ParameterOffCanvas({ parameter, show, setShow } : ParameterOffCanvasPro
   const [name, setName] = useState(parameter.name);
   const [value, setValue] = useState(parameter.value);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [show, setShow] = useState(true);
   const handleClose = () => setShow(false);
   
+  useEffect(() => {
+    setValue(parameter.value);
+    setName(parameter.name);
+    setIsEditMode(false);
+    setShow(true);
+  }, [parameter]);
 
   useEffect(() => {
     if(!recentlyCopied) return;
@@ -41,13 +46,13 @@ function ParameterOffCanvas({ parameter, show, setShow } : ParameterOffCanvasPro
   }
 
   const toggleEditMode = () => {
-    setValue(parameter.value);
     setIsEditMode(!isEditMode);
   }
 
   const saveValue = () => {
     parameterApiService.saveParameterValue(name, value).then(res => {
       if(res.name !== undefined && res.value !== undefined) {
+        console.log('res', res);
         setName(res.name);
         setValue(res.value);
       }
@@ -90,14 +95,14 @@ function ParameterOffCanvas({ parameter, show, setShow } : ParameterOffCanvasPro
         </div>
         {!isEditMode && <div className="row pt-1">
           <div className="col-sm">
-            {parameter.value}
+            {value}
           </div>
         </div>}
         {isEditMode && <>
           <div className="row pt-1">
             <div className="col">
-              {parameter.value.length <= 25 && <input type="text" value={value} onChange={e => setValue(e.target.value)} className="form-control" />}
-              {parameter.value.length > 25 && <textarea value={value} onChange={e => setValue(e.target.value)} />}
+              {value.length <= 25 && <input type="text" value={value} onChange={e => setValue(e.target.value)} className="form-control" />}
+              {value.length > 25 && <textarea value={value} onChange={e => setValue(e.target.value)} className="form-control" rows={value.length/40} />}
             </div>
           </div>
           <div className="row pt-2">

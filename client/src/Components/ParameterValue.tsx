@@ -1,21 +1,12 @@
-import { useState } from "react";
-import ParameterApiService from "../Services/ParameterApiService";
+import React from "react";
 
 type ParameterValueProps = {
   name: string;
   value: string;
+  editAction: React.MouseEventHandler;
 }
 
-function ParameterValue(props: ParameterValueProps) {
-  const {name, value} = props;
-  
-  const parameterApiService = new ParameterApiService();
-  const [editMode, setEditMode] = useState<boolean>(false);
-
-  const copy = () => {
-    navigator.clipboard.writeText(`${name}=${value}`);
-  };
-
+function ParameterValue({name, value, editAction}: ParameterValueProps) {
   const envCopy = () => {
     navigator.clipboard.writeText(`${name.replaceAll('/', '__')}=${value}`)
   }
@@ -30,7 +21,7 @@ function ParameterValue(props: ParameterValueProps) {
   }
 
   return (<div>
-    {!editMode && <>{name}={displayValue(value)}</>}
+    <span onClick={editAction}>{name}={displayValue(value)}</span>
   </div>);
 }
 

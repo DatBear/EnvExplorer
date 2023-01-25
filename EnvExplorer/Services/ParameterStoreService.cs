@@ -8,6 +8,7 @@ using Amazon;
 using Amazon.SimpleSystemsManagement.Model;
 using AutoMapper;
 using EnvExplorer.Data.Model;
+using EnvExplorer.Data.Model.Requests;
 using EnvExplorer.Data.Model.Responses;
 using FormatWith;
 
@@ -144,6 +145,33 @@ public class ParameterStoreService : IParameterStoreService
         }
 
         return topLevel;
+    }
+
+    public async Task<UpdateParameterValueResponse> UpdateParameterValue(UpdateParameterValueRequest request)
+    {
+        var parameters = _cachedParameters ?? await RefreshCache();
+        try
+        {
+            var response = await _ssmClient.PutParameterAsync(new PutParameterRequest
+            {
+                Name = request.Name,
+                Value = request.Value,
+                Overwrite = true
+            });
+
+            parameters.First(x => x.Name == request.Name).Value = request.Value;
+        }
+        catch (Exception ex)
+        {
+            return _mapper.Map<UpdateParameterValueResponse>(parameters.FirstOrDefault(x => x.Name == request.Name));
+        }
+
+        return new UpdateParameterValueResponse
+        {
+            Name = request.Name,
+            Value = request.Value,
+            IsSuccess = true
+        };
     }
 
     private int NameMaxLevel(string name)

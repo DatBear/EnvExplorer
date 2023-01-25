@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Model\Requests\" />
     <Folder Include="Infrastructure\Configurations\" />
     <Folder Include="Profiles\" />
     <Folder Include="Services\" />

@@ -1,12 +1,13 @@
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
+import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import ParameterValue from "./ParameterValue";
 
 type ParameterGroupProps = {
   group: ParameterGroupResponse;
+  updateSelectedParameter: (parameter: ParameterValueResponse) => void;
 }
 
-function ParameterGroup(props: ParameterGroupProps) {
-  const { group } = props;
+function ParameterGroup({ group, updateSelectedParameter: setOffCanvasParameter } : ParameterGroupProps) {
 
   const getId = (name: string) => {
     return name.replace(/^[^a-z]+|[^\w:.-]+/gi, "");
@@ -14,6 +15,10 @@ function ParameterGroup(props: ParameterGroupProps) {
 
   const lastName = (name: string) => {
     return name.substring(name.lastIndexOf('/')+1);
+  }
+
+  const editParameter = (parameter: ParameterValueResponse) => {
+    setOffCanvasParameter(parameter);
   }
 
   
@@ -28,9 +33,9 @@ function ParameterGroup(props: ParameterGroupProps) {
         </h2>
         <div id={"panels-"+id} className="accordion-collapse collapse show">
           <div className="accordion-body">
-            {group.parameters.map((param, idx) => <ParameterValue name={param.name} value={param.value} key={idx} />)}
+            {group.parameters.map((param, idx) => <ParameterValue key={idx} name={param.name} value={param.value} editAction={e => editParameter(param)} />)}
             {group.children.map((child, idx) => {
-              return <div className="accordion nested" key={idx}><ParameterGroup group={child} /></div>
+              return <div className="accordion nested" key={idx}><ParameterGroup group={child} updateSelectedParameter={setOffCanvasParameter} /></div>
             })}
           </div>
         </div>
@@ -38,7 +43,7 @@ function ParameterGroup(props: ParameterGroupProps) {
     }
     
     {group.children && group.children.length > 0 && group.parameters.length === 0 && group.children.map((child, idx) => {
-      return <ParameterGroup group={child} key={idx} />
+      return <ParameterGroup key={idx} group={child} updateSelectedParameter={setOffCanvasParameter} />
     })}
   </>);
 }

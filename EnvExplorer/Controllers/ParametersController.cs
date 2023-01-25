@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EnvExplorer.Data.Model.Requests;
 using EnvExplorer.Data.Model.Responses;
 using EnvExplorer.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -44,5 +45,19 @@ public class ParametersController : ControllerBase
     {
         var groupedParameters = await _parameterStoreService.GetGroupedParameters();
         return Ok(groupedParameters);
+    }
+
+    [HttpPost("update")]
+    public async Task<IActionResult> Update(UpdateParameterValueRequest request)
+    {
+        var response = await _parameterStoreService.UpdateParameterValue(request);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpPost("refresh-all")]
+    public async Task<IActionResult> RefreshAll()
+    {
+        var response = await _parameterStoreService.RefreshCache();
+        return Ok(response);
     }
 }

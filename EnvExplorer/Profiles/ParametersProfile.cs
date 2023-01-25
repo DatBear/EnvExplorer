@@ -18,5 +18,8 @@ public class ParametersProfile : Profile
             .ForMember(x => x.Type, x => x.MapFrom(src => src.Type.Value))
             .ForMember(x => x.LastModifiedDate, x => x.MapFrom(src => src.LastModifiedDate))
             .ForMember(x => x.Value, x => x.MapFrom(src => src.Value));
+
+        CreateMap<CachedParameter, UpdateParameterValueResponse>()
+            .ForMember(x => x.IsSuccess, x => x.MapFrom(src => false));
     }
 }

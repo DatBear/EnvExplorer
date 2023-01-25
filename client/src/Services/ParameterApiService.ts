@@ -1,4 +1,5 @@
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
+import UpdateParameterValueResponse from "../Data/Model/UpdateParameterValueResponse";
 
 export default class ParameterApiService {
     private baseUrl: string;
@@ -33,6 +34,15 @@ export default class ParameterApiService {
         });
     }
 
+    private mapReplacer(key: string, value: object) {
+        if(value instanceof Map) {
+            let ret : Record<string, string> = {};
+            [...value.keys()].forEach(x => { ret[x] = value.get(x) });
+            return ret;
+        }
+        return value;
+    }
+
     getTemplateOptions(template: string | null = null) {
         var url = `${this.baseUrl}/parameters/templateOptions?template=${template ?? this.defaultTemplate}`;
         return this.get<Record<string, string[]>>(url);
@@ -44,12 +54,9 @@ export default class ParameterApiService {
         return this.post<ParameterGroupResponse>(url, body);
     }
 
-    mapReplacer(key: string, value: object) {
-        if(value instanceof Map) {
-            let ret : Record<string, string> = {};
-            [...value.keys()].forEach(x => { ret[x] = value.get(x) });
-            return ret;
-        }
-        return value;
+    saveParameterValue(name: string, value: string) {
+        var url = `${this.baseUrl}/parameters/update`;
+        const body = JSON.stringify({ name, value });
+        return this.post<UpdateParameterValueResponse>(url, body);
     }
 }

@@ -14,4 +14,5 @@ public interface IParameterStoreService
     Task<UpdateParameterValueResponse> UpdateParameterValue(UpdateParameterValueRequest request);
     Task<List<CachedParameter>> RefreshCache();
     Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request);
+    Task<MissingParametersResponse> MissingParameters(MissingParametersRequest request);
 }

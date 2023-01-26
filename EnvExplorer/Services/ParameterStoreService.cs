@@ -46,6 +46,67 @@ public class ParameterStoreService : IParameterStoreService
         return _cachedParameters ?? await RefreshCache();
     }
 
+    //todo revisit this later :)
+    public async Task<MissingParametersResponse> MissingParameters(MissingParametersRequest request)
+    {
+        request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;
+
+        var cachedParams = await GetCachedParameters();
+
+        var templateOptions = await GetTemplateOptions(request.Template);
+        var missingByValue = request.TemplateValues[request.MissingByOption];
+        var missingOptions = templateOptions[request.MissingByOption].Except(new List<string>{ missingByValue }).ToList();
+        var otherOptionQueries = new List<string>();
+        var mainOptionQueries = new List<string>();
+
+        var allMissingParams = new List<MissingParameterResponse>();
+
+        foreach (var opt in templateOptions.Where(x => x.Key != request.MissingByOption))
+        {
+            foreach (var val in opt.Value)
+            {
+                var dict = new Dictionary<string, string>();
+                dict[opt.Key] = val;
+                foreach (var missingOpt in missingOptions)
+                {
+                    
+                    dict[request.MissingByOption] = missingOpt;
+                    var otherOption = request.Template.FormatWith(dict);
+                    otherOptionQueries.Add(otherOption);
+
+                    var mainDict = new Dictionary<string, string>(dict);
+                    mainDict[request.MissingByOption] = missingByValue;
+                    var mainOption = request.Template.FormatWith(mainDict);
+
+                    var otherParams = cachedParams.Where(x => x.Name.StartsWith(otherOption+"/"));
+                    var mainParams = cachedParams.Where(x => x.Name.StartsWith(mainOption+"/"));
+
+                    var missingParams = otherParams.Where(op => mainParams.All(mp => op.Name != mp.Name.Replace(mainOption, otherOption)));
+                    foreach (var missingParam in missingParams)
+                    {
+                        var existingMissingParam = allMissingParams.FirstOrDefault(x => x.Name == missingParam.Name.Replace(otherOption, mainOption));
+                        if (existingMissingParam == null)
+                        {
+                            existingMissingParam = new MissingParameterResponse { Name = missingParam.Name.Replace(otherOption, mainOption) };
+                            allMissingParams.Add(existingMissingParam);
+                        }
+                        existingMissingParam.Parameters.Add(new TemplatedParameterValueResponse{ Name = missingParam.Name, TemplateValues = dict, Value = missingParam.Value });
+                    }
+                }
+
+                dict[request.MissingByOption] = missingByValue;
+                mainOptionQueries.Add(request.Template.FormatWith(dict));
+            }
+        }
+
+        var response = new MissingParametersResponse
+        {
+            MissingByOption = request.MissingByOption,
+            Parameters = allMissingParams.OrderBy(x => x.Name).ToList()
+        };
+        return response;
+    }
+
     public async Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request)
     {
         var cachedParams = await GetCachedParameters();

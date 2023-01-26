@@ -47,6 +47,13 @@ public class ParametersController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("missing")]
+    public async Task<IActionResult> Missing(MissingParametersRequest request)
+    {
+        var response = await _parameterStoreService.MissingParameters(request);
+        return Ok(response);
+    }
+
     [HttpGet("grouped")]
     public async Task<IActionResult> GetGroupedParameters()
     {

@@ -21,7 +21,7 @@ public class ParameterStoreService : IParameterStoreService
     private readonly ParameterStoreConfig _psConfig;
 
     private List<CachedParameter>? _cachedParameters;
-    
+
 
     private Regex _templatePartRegex = new("\\{(\\w+)\\}");
 
@@ -55,9 +55,7 @@ public class ParameterStoreService : IParameterStoreService
 
         var templateOptions = await GetTemplateOptions(request.Template);
         var missingByValue = request.TemplateValues[request.MissingByOption];
-        var missingOptions = templateOptions[request.MissingByOption].Except(new List<string>{ missingByValue }).ToList();
-        var otherOptionQueries = new List<string>();
-        var mainOptionQueries = new List<string>();
+        var missingOptions = templateOptions[request.MissingByOption].Except(new List<string> { missingByValue }).ToList();
 
         var allMissingParams = new List<MissingParameterResponse>();
 
@@ -69,17 +67,15 @@ public class ParameterStoreService : IParameterStoreService
                 dict[opt.Key] = val;
                 foreach (var missingOpt in missingOptions)
                 {
-                    
                     dict[request.MissingByOption] = missingOpt;
                     var otherOption = request.Template.FormatWith(dict);
-                    otherOptionQueries.Add(otherOption);
 
                     var mainDict = new Dictionary<string, string>(dict);
                     mainDict[request.MissingByOption] = missingByValue;
                     var mainOption = request.Template.FormatWith(mainDict);
 
-                    var otherParams = cachedParams.Where(x => x.Name.StartsWith(otherOption+"/"));
-                    var mainParams = cachedParams.Where(x => x.Name.StartsWith(mainOption+"/"));
+                    var otherParams = cachedParams.Where(x => x.Name.StartsWith(otherOption + "/"));
+                    var mainParams = cachedParams.Where(x => x.Name.StartsWith(mainOption + "/"));
 
                     var missingParams = otherParams.Where(op => mainParams.All(mp => op.Name != mp.Name.Replace(mainOption, otherOption)));
                     foreach (var missingParam in missingParams)
@@ -90,18 +86,16 @@ public class ParameterStoreService : IParameterStoreService
                             existingMissingParam = new MissingParameterResponse { Name = missingParam.Name.Replace(otherOption, mainOption) };
                             allMissingParams.Add(existingMissingParam);
                         }
-                        existingMissingParam.Parameters.Add(new TemplatedParameterValueResponse{ Name = missingParam.Name, TemplateValues = dict, Value = missingParam.Value });
+                        existingMissingParam.Parameters.Add(new TemplatedParameterValueResponse { Name = missingParam.Name, TemplateValues = new(dict), Value = missingParam.Value });
                     }
                 }
-
-                dict[request.MissingByOption] = missingByValue;
-                mainOptionQueries.Add(request.Template.FormatWith(dict));
             }
         }
 
         var response = new MissingParametersResponse
         {
             MissingByOption = request.MissingByOption,
+            MissingByValue = missingByValue,
             Parameters = allMissingParams.OrderBy(x => x.Name).ToList()
         };
         return response;
@@ -113,7 +107,7 @@ public class ParameterStoreService : IParameterStoreService
 
         var templateOptions = await GetTemplateOptions(request.Template);
         var compareOptions = templateOptions[request.CompareByOption];
-        
+
         var templatedParams = new List<TemplatedParameterValueResponse>();
 
         foreach (var opt in compareOptions)
@@ -121,7 +115,7 @@ public class ParameterStoreService : IParameterStoreService
             var baseValues = request.TemplateValues;
             baseValues[request.CompareByOption] = opt;
             var searchTemplatePart = request.Template.FormatWith(baseValues).Replace("/*", string.Empty);
-            templatedParams.Add(new TemplatedParameterValueResponse { Name = searchTemplatePart, TemplateValues = new (baseValues) });
+            templatedParams.Add(new TemplatedParameterValueResponse { Name = searchTemplatePart, TemplateValues = new(baseValues) });
         }
 
         var namePart = templatedParams.Aggregate(request.ParameterName, (a, b) => a.Replace(b.Name, string.Empty)).TrimStart('/');
@@ -130,7 +124,7 @@ public class ParameterStoreService : IParameterStoreService
             x.Name = $"{x.Name}/{namePart}";
             x.Value = cachedParams.FirstOrDefault(c => c.Name == x.Name)?.Value;
         });
-        
+
         var response = new CompareParametersResponse
         {
             ParameterName = request.ParameterName,

@@ -1,6 +1,8 @@
 import Environment from "../Data/Environment";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
+import MissingParametersRequest from "../Data/Model/MissingParametersRequest";
+import MissingParametersResponse from "../Data/Model/MissingParametersResponse";
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import UpdateParameterValueResponse from "../Data/Model/UpdateParameterValueResponse";
 
@@ -47,6 +49,11 @@ export default class ParameterApiService {
   compareParameters(request: CompareParametersRequest) {
     var url = `${Environment.baseUrl}/parameters/compare`;
     return this.post<CompareParametersResponse>(url, request);
+  }
+
+  missingParameters(request: MissingParametersRequest) {
+    var url = `${Environment.baseUrl}/parameters/missing`;
+    return this.post<MissingParametersResponse>(url, request);
   }
 
   refreshAllParameters() {

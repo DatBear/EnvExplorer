@@ -1,6 +1,9 @@
+import MissingParameterResponse from "./MissingParameterResponse";
+
 type MissingParametersResponse = {
   missingByOption: string;
-  parameters: MissingParametersResponse[];
+  missingByValue: string;
+  parameters: MissingParameterResponse[];
 }
 
 export default MissingParametersResponse;

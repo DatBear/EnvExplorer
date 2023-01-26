@@ -65,7 +65,6 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   const saveValue = () => {
     parameterApiService.saveParameterValue(name, value).then(res => {
       if(res.name !== undefined && res.value !== undefined) {
-        console.log('res', res);
         setName(res.name);
         setValue(res.value);
       }
@@ -79,7 +78,6 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   }
 
   const compareBy = (option: string) => {
-    console.log('compare by', option);
     const request : CompareParametersRequest = {
       template: Environment.defaultTemplate,
       templateValues: selectedTemplateOptions,

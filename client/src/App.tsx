@@ -11,6 +11,11 @@ import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { Dropdown, DropdownButton } from 'react-bootstrap';
+import Environment from './Data/Environment';
+import MissingParametersRequest from './Data/Model/MissingParametersRequest';
+import MissingParametersResponse from './Data/Model/MissingParametersResponse';
+import MissingParametersModal from './Components/MissingParametersModal';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -20,6 +25,7 @@ function App() {
   const [selectedGroup, setSelectedGroup] = useState<ParameterGroupResponse>();
   const [offCanvasParameter, setOffCanvasParameter] = useState<ParameterValueResponse>();
   const [compareParametersResponse, setCompareParametersResponse] = useState<CompareParametersResponse>();
+  const [missingParametersResponse, setMissingParametersResponse] = useState<MissingParametersResponse>();
 
   const dataFetched = useRef(false);
 
@@ -62,6 +68,17 @@ function App() {
     });
   };
 
+  const missingBy = (option: string) => {
+    const request : MissingParametersRequest = {
+      template: Environment.defaultTemplate,
+      templateValues: selectedTemplateOptions,
+      missingByOption: option
+    };
+    parameterApiService.missingParameters(request).then(res => {
+      setMissingParametersResponse(res);
+    });
+  }
+
   return (
     <div className="container-fluid app">
       <header><img src="/img/icon.png" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
@@ -74,10 +91,16 @@ function App() {
             <FontAwesomeIcon icon={faRefresh} />
           </button>
         </div>
+        <div className="col-auto">
+          <DropdownButton title="Find missing in">
+            {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => missingBy(x)}>{x}</Dropdown.Item>)}
+          </DropdownButton>
+        </div>
       </div>}
       {selectedGroup && <div className="accordion"><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></div> }
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
       {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} />}
+      {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} />}
     </div>
   );
 }

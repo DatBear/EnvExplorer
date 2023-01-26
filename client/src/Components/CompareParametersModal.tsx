@@ -25,11 +25,13 @@ function CompareParametersModal({ response, selectedTemplateOptions } : CompareP
           </Row>
           <Row className="pt-3">
             <Col>
-              <table className="table table-bordered table-dark table-striped">
+              <table className="table table-bordered table-dark table-striped table-hover">
                 <thead>
-                  <th>{response.compareByOption}</th>
-                  <th>Name</th>
-                  <th>Value</th>
+                  <tr>
+                    <th>{response.compareByOption}</th>
+                    <th>Name</th>
+                    <th>Value</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {response.parameters.map((x, idx) => {

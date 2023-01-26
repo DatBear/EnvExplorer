@@ -9,6 +9,8 @@ import ParameterValueResponse from './Data/Model/ParameterValueResponse';
 import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -28,7 +30,6 @@ function App() {
     parameterApiService.getTemplateOptions().then(data => {
       setTemplateOptions(data);
     });
-    
   }, [parameterApiService]);
 
   useEffect(() => {
@@ -46,11 +47,20 @@ function App() {
 
   const updateSelectedParameter = (parameter: ParameterValueResponse) => {
     setOffCanvasParameter({...parameter});
-  }
+  };
 
   const updateCompareParametersResponse = (response: CompareParametersResponse) => {
     setCompareParametersResponse({...response});
-  }
+  };
+
+  const refreshAll = () => {
+    parameterApiService.refreshAllParameters().then(() => {
+      parameterApiService.getTemplateOptions().then(data => {
+        setTemplateOptions(data);
+        setSelectedTemplateOptions({...selectedTemplateOptions});
+      });
+    });
+  };
 
   return (
     <div className="container-fluid app">
@@ -59,6 +69,11 @@ function App() {
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
           return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
         })}
+        <div className="col-auto pt-4">
+          <button type="button" className="btn btn-sm btn-success" onClick={_ => refreshAll()}>
+            <FontAwesomeIcon icon={faRefresh} />
+          </button>
+        </div>
       </div>}
       {selectedGroup && <div className="accordion"><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></div> }
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}

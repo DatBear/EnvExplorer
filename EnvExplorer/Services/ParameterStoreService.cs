@@ -37,11 +37,11 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<List<CachedParameter>> RefreshCache()
     {
         var allParameters = await GetAllParameters();
-        _cachedParameters = _mapper.Map<List<CachedParameter>>(allParameters);
+        _cachedParameters = _mapper.Map<List<CachedParameter>>(allParameters.OrderBy(x => x.Name));
         return _cachedParameters;
     }
 
-    public async Task<List<CachedParameter>> GetCachedParameters()
+    private async Task<List<CachedParameter>> GetCachedParameters()
     {
         return _cachedParameters ?? await RefreshCache();
     }

@@ -48,4 +48,9 @@ export default class ParameterApiService {
     var url = `${Environment.baseUrl}/parameters/compare`;
     return this.post<CompareParametersResponse>(url, request);
   }
+
+  refreshAllParameters() {
+    var url = `${Environment.baseUrl}/parameters/refresh-all`;
+    return this.post(url, null);
+  }
 }

@@ -101,17 +101,17 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
         <div className="row">
           <div className="col-auto">
             <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy'}>{recentlyCopied ? 'Copied!' : 'Copy name=value'}</Tooltip>}>
-              <FontAwesomeIcon icon={faClipboard} onClick={e => copy()} />
+              <FontAwesomeIcon icon={faClipboard} onClick={_ => copy()} />
             </OverlayTrigger>
           </div>
           <div className="col-auto">
             <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>{recentlyCopiedEnv ? 'Copied!' : 'Copy local .env value'}</Tooltip>}>
-              <FontAwesomeIcon icon={faClipboard} onClick={e => copyEnv()} />
+              <FontAwesomeIcon icon={faClipboard} onClick={_ => copyEnv()} />
             </OverlayTrigger>
           </div>
           <div className="col-auto">
             <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-edit'}>Edit</Tooltip>}>
-              <FontAwesomeIcon icon={faPenToSquare} onClick={e => toggleEditMode()} />
+              <FontAwesomeIcon icon={faPenToSquare} onClick={_ => toggleEditMode()} />
             </OverlayTrigger>
           </div>
           <div className="col-auto">

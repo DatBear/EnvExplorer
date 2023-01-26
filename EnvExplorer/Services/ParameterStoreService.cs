@@ -21,6 +21,7 @@ public class ParameterStoreService : IParameterStoreService
     private readonly ParameterStoreConfig _psConfig;
 
     private List<CachedParameter>? _cachedParameters;
+    
 
     private Regex _templatePartRegex = new("\\{(\\w+)\\}");
 
@@ -38,6 +39,44 @@ public class ParameterStoreService : IParameterStoreService
         var allParameters = await GetAllParameters();
         _cachedParameters = _mapper.Map<List<CachedParameter>>(allParameters);
         return _cachedParameters;
+    }
+
+    public async Task<List<CachedParameter>> GetCachedParameters()
+    {
+        return _cachedParameters ?? await RefreshCache();
+    }
+
+    public async Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request)
+    {
+        var cachedParams = await GetCachedParameters();
+
+        var templateOptions = await GetTemplateOptions(request.Template);
+        var compareOptions = templateOptions[request.CompareByOption];
+        
+        var templatedParams = new List<TemplatedParameterValueResponse>();
+
+        foreach (var opt in compareOptions)
+        {
+            var baseValues = request.TemplateValues;
+            baseValues[request.CompareByOption] = opt;
+            var searchTemplatePart = request.Template.FormatWith(baseValues).Replace("/*", string.Empty);
+            templatedParams.Add(new TemplatedParameterValueResponse { Name = searchTemplatePart, TemplateValues = new (baseValues) });
+        }
+
+        var namePart = templatedParams.Aggregate(request.ParameterName, (a, b) => a.Replace(b.Name, string.Empty)).TrimStart('/');
+        templatedParams.ForEach(x =>
+        {
+            x.Name = $"{x.Name}/{namePart}";
+            x.Value = cachedParams.FirstOrDefault(c => c.Name == x.Name)?.Value;
+        });
+        
+        var response = new CompareParametersResponse
+        {
+            ParameterName = request.ParameterName,
+            CompareByOption = request.CompareByOption,
+            Parameters = templatedParams
+        };
+        return response;
     }
 
     public async Task<List<Parameter>> GetAllParameters()
@@ -85,7 +124,7 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<ParameterGroupResponse> ListParameters(string template, Dictionary<string, string> templateValues)
     {
         var search = template.FormatWith(templateValues).Replace("/*", "");
-        var allParameters = _cachedParameters ?? await RefreshCache();
+        var allParameters = await GetCachedParameters();
         var foundParams = allParameters.Where(x => x.Name.StartsWith(search));
 
         return await GetGroupedParameters(foundParams);
@@ -94,7 +133,7 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<Dictionary<string, string[]>> GetTemplateOptions(string template)
     {
         var templateOptions = new Dictionary<string, string[]>();
-        var allParameters = _cachedParameters ?? await RefreshCache();
+        var allParameters = await GetCachedParameters();
 
         template = template.Replace("/*", "");
         var matches = _templatePartRegex.Matches(template);
@@ -112,7 +151,7 @@ public class ParameterStoreService : IParameterStoreService
 
     public async Task<ParameterGroupResponse> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null)
     {
-        var parameters = cachedParameters?.ToList() ?? _cachedParameters ?? await RefreshCache();
+        var parameters = cachedParameters?.ToList() ?? await GetCachedParameters();
         var maxLevel = parameters.Max(x => x.Name.Split('/').Length);
         var i = 1;
         var topLevel = parameters.DistinctBy(x => NameLevel(x.Name, i)).Select(x => new ParameterGroupResponse()
@@ -149,7 +188,7 @@ public class ParameterStoreService : IParameterStoreService
 
     public async Task<UpdateParameterValueResponse> UpdateParameterValue(UpdateParameterValueRequest request)
     {
-        var parameters = _cachedParameters ?? await RefreshCache();
+        var parameters = await GetCachedParameters();
         try
         {
             var response = await _ssmClient.PutParameterAsync(new PutParameterRequest

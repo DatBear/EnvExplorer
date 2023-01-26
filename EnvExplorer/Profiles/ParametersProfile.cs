@@ -21,5 +21,7 @@ public class ParametersProfile : Profile
 
         CreateMap<CachedParameter, UpdateParameterValueResponse>()
             .ForMember(x => x.IsSuccess, x => x.MapFrom(src => false));
+
+        CreateMap<CachedParameter, ParameterValueResponse>();
     }
 }

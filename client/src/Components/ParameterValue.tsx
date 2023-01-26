@@ -7,10 +7,6 @@ type ParameterValueProps = {
 }
 
 function ParameterValue({name, value, editAction}: ParameterValueProps) {
-  const envCopy = () => {
-    navigator.clipboard.writeText(`${name.replaceAll('/', '__')}=${value}`)
-  }
-
   const displayValue = (value: string) => {
     if(value === 'true') {
       return (<span className="badge rounded-pill text-bg-success">{value}</span>)

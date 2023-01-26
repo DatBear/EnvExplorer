@@ -13,4 +13,5 @@ public interface IParameterStoreService
     Task<ParameterGroupResponse> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null);
     Task<UpdateParameterValueResponse> UpdateParameterValue(UpdateParameterValueRequest request);
     Task<List<CachedParameter>> RefreshCache();
+    Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request);
 }

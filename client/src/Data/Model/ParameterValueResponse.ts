@@ -1,6 +1,6 @@
 type ParameterValueResponse = {
-    name: string;
-    value: string;
+  name: string;
+  value: string;
 }
 
 export default ParameterValueResponse;

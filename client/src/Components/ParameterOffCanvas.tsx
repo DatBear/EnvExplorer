@@ -3,14 +3,19 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClipboard, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Dropdown, DropdownButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 import ParameterApiService from "../Services/ParameterApiService";
+import Environment from "../Data/Environment";
+import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
+import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
+  selectedTemplateOptions: Record<string, string>;
+  updateCompareParametersResponse: (request: CompareParametersResponse) => void;
 }
 
-function ParameterOffCanvas({ parameter } : ParameterOffCanvasProps) {
+function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse } : ParameterOffCanvasProps) {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
 
   const [recentlyCopied, setRecentlyCopied] = useState(false);
@@ -35,6 +40,13 @@ function ParameterOffCanvas({ parameter } : ParameterOffCanvasProps) {
     }, 2000);
   }, [recentlyCopied]);
 
+  useEffect(() => {
+    if(!recentlyCopiedEnv) return;
+    setTimeout(() => {
+      setRecentlyCopiedEnv(false);
+    }, 2000);
+  }, [recentlyCopiedEnv]);
+
   const copy = () => {
     navigator.clipboard.writeText(`${name}=${value}`);
     setRecentlyCopied(true);
@@ -43,6 +55,7 @@ function ParameterOffCanvas({ parameter } : ParameterOffCanvasProps) {
   const copyEnv = () => {
     let copyName = name.split('/').filter((_, idx) => idx > 2).join('__');
     navigator.clipboard.writeText(`${copyName}=${value}`);
+    setRecentlyCopiedEnv(true);
   }
 
   const toggleEditMode = () => {
@@ -63,6 +76,20 @@ function ParameterOffCanvas({ parameter } : ParameterOffCanvasProps) {
   const cancelValueEdit = () => {
     setValue(parameter.value);
     setIsEditMode(false);
+  }
+
+  const compareBy = (option: string) => {
+    console.log('compare by', option);
+    const request : CompareParametersRequest = {
+      template: Environment.defaultTemplate,
+      templateValues: selectedTemplateOptions,
+      compareByOption: option,
+      parameterName: name
+    };
+
+    parameterApiService.compareParameters(request).then(res => {
+      updateCompareParametersResponse(res);
+    });
   }
 
   return (
@@ -86,6 +113,11 @@ function ParameterOffCanvas({ parameter } : ParameterOffCanvasProps) {
             <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-edit'}>Edit</Tooltip>}>
               <FontAwesomeIcon icon={faPenToSquare} onClick={e => toggleEditMode()} />
             </OverlayTrigger>
+          </div>
+          <div className="col-auto">
+            <DropdownButton title="Compare other">
+              {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => compareBy(x)}>{x}(s)</Dropdown.Item>)}
+            </DropdownButton>
           </div>
         </div>
         <div className="row pt-1">

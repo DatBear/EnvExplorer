@@ -20,7 +20,6 @@ function ParameterGroup({ group, updateSelectedParameter: setOffCanvasParameter 
   const editParameter = (parameter: ParameterValueResponse) => {
     setOffCanvasParameter(parameter);
   }
-
   
   const id = "panels-"+getId(group.name);
   return (<>

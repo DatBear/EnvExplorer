@@ -40,6 +40,13 @@ public class ParametersController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("compare")]
+    public async Task<IActionResult> Compare(CompareParametersRequest request)
+    {
+        var response = await _parameterStoreService.CompareParameters(request);
+        return Ok(response);
+    }
+
     [HttpGet("grouped")]
     public async Task<IActionResult> GetGroupedParameters()
     {

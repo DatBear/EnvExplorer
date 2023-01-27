@@ -53,8 +53,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   };
 
   const copyEnv = () => {
-    let copyName = name.split('/').filter((_, idx) => idx > 2).join('__');
-    navigator.clipboard.writeText(`${copyName}=${value}`);
+    navigator.clipboard.writeText(Environment.getEnvFileParameter(name, value));
     setRecentlyCopiedEnv(true);
   }
 
@@ -63,7 +62,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   }
 
   const saveValue = () => {
-    parameterApiService.saveParameterValue(name, value).then(res => {
+    parameterApiService.saveParameterValue(name, value, parameter.type).then(res => {
       if(res.name !== undefined && res.value !== undefined) {
         setName(res.name);
         setValue(res.value);

@@ -38,8 +38,7 @@ function EnvFileModal({show, setShow, group, templateOptions, selectedTemplateOp
 
   const getFileOutput = (group: ParameterGroupResponse, current: string = '') : string => {
     return current + group.parameters.map(x => {
-      const value = x.value.indexOf(' ') > 0 ? `\"${x.value}\"` : x.value;
-      return `${Environment.removeTemplate(x.name).replaceAll('/', '__')}=${value}\n`;
+      return `${Environment.getEnvFileParameter(x.name, x.value)}\n`;
     }).join('') + group.children.map(x => getFileOutput(x)).join('');
   }
 

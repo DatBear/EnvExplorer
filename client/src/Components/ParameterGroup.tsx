@@ -30,7 +30,7 @@ function ParameterGroup({ group, eventKey, updateSelectedParameter: setOffCanvas
   return (<>
     {group.parameters.length > 0 &&
       <Accordion.Item eventKey={eventKey}>
-        <Accordion.Header>{lastName(group.name)} {eventKey}</Accordion.Header>
+        <Accordion.Header>{lastName(group.name)}</Accordion.Header>
         <Accordion.Body>
           {group.parameters.map((param, idx) => <ParameterValue key={idx} name={param.name} value={param.value} editAction={e => editParameter(param)} />)}
           {group.children.map((child, idx) => {

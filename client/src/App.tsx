@@ -88,7 +88,7 @@ function App() {
   }
 
   const groupAccordions = (group: ParameterGroupResponse) : Number => {
-    return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
+    return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.flatMap(x => x.children).length : groupAccordions(group.children[0]);
   }
 
   return (

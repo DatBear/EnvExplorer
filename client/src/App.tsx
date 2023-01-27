@@ -10,13 +10,15 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { Accordion, Dropdown, DropdownButton } from 'react-bootstrap';
+import { faFile, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { Accordion, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
 import MissingParametersModal from './Components/MissingParametersModal';
 import { idText } from 'typescript';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import EnvFileModal from './Components/EnvFileModal';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -28,6 +30,7 @@ function App() {
   const [compareParametersResponse, setCompareParametersResponse] = useState<CompareParametersResponse>();
   const [compareEditMode, setCompareEditMode] = useState(false);
   const [missingParametersResponse, setMissingParametersResponse] = useState<MissingParametersResponse>();
+  const [showFileModal, setShowFileModal] = useState(false);
 
   const dataFetched = useRef(false);
 
@@ -98,12 +101,16 @@ function App() {
             <FontAwesomeIcon icon={faRefresh} />
           </button>
         </div>
-        <div className="col-auto">
-          <DropdownButton title="Find missing in">
+        <div className="col-auto pt-4">
+          <DropdownButton title="Find missing in" size="sm">
             {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => missingBy(x)}>{x}</Dropdown.Item>)}
           </DropdownButton>
         </div>
+        <div className="col-auto pt-4">
+          <Button size="sm" onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
+        </div>
       </div>}
+      {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
       {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion> }
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}

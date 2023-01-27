@@ -2,7 +2,7 @@ import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClipboard, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faClipboard, faCopy, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, DropdownButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 import ParameterApiService from "../Services/ParameterApiService";
 import Environment from "../Data/Environment";
@@ -99,12 +99,12 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
         <div className="row">
           <div className="col-auto">
             <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy'}>{recentlyCopied ? 'Copied!' : 'Copy name=value'}</Tooltip>}>
-              <FontAwesomeIcon icon={faClipboard} onClick={_ => copy()} />
+              <FontAwesomeIcon icon={faCopy} onClick={_ => copy()} />
             </OverlayTrigger>
           </div>
           <div className="col-auto">
             <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>{recentlyCopiedEnv ? 'Copied!' : 'Copy local .env value'}</Tooltip>}>
-              <FontAwesomeIcon icon={faClipboard} onClick={_ => copyEnv()} />
+              <FontAwesomeIcon icon={faCopy} onClick={_ => copyEnv()} />
             </OverlayTrigger>
           </div>
           <div className="col-auto">

@@ -1,4 +1,4 @@
-import { faKeyboard, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faKeyboard, faPenToSquare, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { Button, Col, Container, Row, Modal, Dropdown, DropdownButton, Badge } from "react-bootstrap";
@@ -16,8 +16,6 @@ type CompareParametersModalProps = {
 
 function CompareParametersModal({ response, selectedTemplateOptions, editMode } : CompareParametersModalProps) {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
-
-  const forceUpdate = useReducer(() => ({}), {})[1];
   
   const [show, setShow] = useState(true);
   const [isEditMode, setIsEditMode] = useState(editMode);
@@ -79,7 +77,7 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
                     const isMissing = !x.value;
                     const parameterTypes = response.parameters.filter(x => x.type !== null).map((x) => ({ opt: x.templateValues[response.compareByOption], type: x.type }));
                     const numParameterTypes = [...new Set(response.parameters.filter(x => x.type !== null).map(x => x.type))].length;
-                    return (<tr key={idx} className={isMissing ? 'text-danger' : ''}>
+                    return (<tr key={idx} className={isMissing ? "text-danger" : ""}>
                       <td>{x.templateValues[response.compareByOption]}</td>
                       <td>
                         {x.name}
@@ -87,12 +85,18 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
                       </td>
                       <td><ParameterEditor value={x.value} isEditMode={isEditMode} onChange={v => onValueChanged(x, v)} /></td>
                       {isEditMode && <td>
-                        <DropdownButton title='' size="sm">
-                          {numParameterTypes == 1 && <DropdownItem onClick={_ => save(x, parameterTypes[0].type)}>Save</DropdownItem>}
-                          {numParameterTypes > 1 && [...new Set(parameterTypes.map(x => x.type))].map((type, idx) => {
-                            return <DropdownItem key={idx} onClick={_ => save(x, type)}>Save as {type} [{parameterTypes.filter(t => t.type === type).length} {response.compareByOption}(s)]</DropdownItem>
-                          })}
-                        </DropdownButton>  
+                        {numParameterTypes == 1 && <Button variant="success" onClick={_ => save(x, parameterTypes[0].type)}><FontAwesomeIcon icon={faSave} size="sm" /></Button>}
+                        {numParameterTypes > 1 && <Dropdown>
+                          <Dropdown.Toggle size="sm" variant="success">
+                            <FontAwesomeIcon icon={faSave} size="sm" />
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                            
+                            {numParameterTypes > 1 && [...new Set(parameterTypes.map(x => x.type))].map((type, idx) => {
+                              return <DropdownItem key={idx} onClick={_ => save(x, type)}>Save as {type} [{parameterTypes.filter(t => t.type === type).length} {response.compareByOption}(s)]</DropdownItem>
+                            })}
+                          </Dropdown.Menu>
+                        </Dropdown>}
                       </td>}
                     </tr>);
                   })}

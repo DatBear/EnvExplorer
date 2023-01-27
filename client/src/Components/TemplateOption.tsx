@@ -6,8 +6,7 @@ type TemplateOptionProps = {
     setSelection: (key: string, value: string) => void;
 }
 
-function TemplateOption(props: TemplateOptionProps) {
-  const {name, values, setSelection} = props;
+function TemplateOption({ name, values, setSelection }: TemplateOptionProps) {
   const isSetup = useRef(false);
   
 
@@ -25,7 +24,7 @@ function TemplateOption(props: TemplateOptionProps) {
   return (<div className="col-auto">
     <b>{name}</b>
     <select name={name} onChange={(e) => onSelectionChanged(e)} className="form-control">
-      {values.map((value, idx) => <option key={idx} value={value}>{value}</option>)}
+      {values.map((value) => <option key={value} value={value}>{value}</option>)}
     </select>
   </div>);
 }

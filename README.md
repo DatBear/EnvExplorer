@@ -8,9 +8,3 @@ To run:
 * Set up a template in client/docker-local.env
 * `docker-compose up` or `dotnet run`, `cd client/ && yarn start`
 * Navigate to `http://localhost:5102/`
-
-## To-do:
-
-* Editing values
-* Copy path/value/.env value
-* Comparing 2(+?) environments

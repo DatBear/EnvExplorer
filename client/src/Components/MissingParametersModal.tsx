@@ -1,6 +1,3 @@
-import { faClipboard } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { editableInputTypes } from "@testing-library/user-event/dist/utils";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { Button, Col, Container, Row, Modal, Accordion, DropdownButton } from "react-bootstrap";
 import DropdownItem from "react-bootstrap/esm/DropdownItem";
@@ -34,7 +31,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
       response.parameters = response.parameters.filter(x => x.name !== name);
       forceUpdate();
       //todo toast success?
-    });    
+    });
   }
 
   const edit = (parameter: MissingParameterResponse) => {
@@ -44,7 +41,6 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
       template: Environment.defaultTemplate,
       templateValues: parameter.parameters[0].templateValues
     };
-    console.log(request);
 
     parameterApiService.compareParameters(request).then(res => {
       updateCompareParametersResponse(res, true);

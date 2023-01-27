@@ -113,6 +113,7 @@ public class ParameterStoreService : IParameterStoreService
         template = template.EndsWith("/*") ? template[..^2] : template;
         return string.Join("/", name.Split('/').Skip(template.Count(x => x == '/')+1).ToList());
     }
+
     public async Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request)
     {
         request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;

@@ -11,6 +11,7 @@ using EnvExplorer.Data.Model;
 using EnvExplorer.Data.Model.Requests;
 using EnvExplorer.Data.Model.Responses;
 using FormatWith;
+using Amazon.Runtime.Internal;
 
 namespace EnvExplorer.Services;
 
@@ -86,7 +87,13 @@ public class ParameterStoreService : IParameterStoreService
                             existingMissingParam = new MissingParameterResponse { Name = missingParam.Name.Replace(otherOption, mainOption) };
                             allMissingParams.Add(existingMissingParam);
                         }
-                        existingMissingParam.Parameters.Add(new TemplatedParameterValueResponse { Name = missingParam.Name, TemplateValues = new(dict), Value = missingParam.Value });
+                        existingMissingParam.Parameters.Add(new TemplatedParameterValueResponse
+                        {
+                            Name = missingParam.Name,
+                            Value = missingParam.Value,
+                            Type = missingParam.Type,
+                            TemplateValues = new(dict),
+                        });
                     }
                 }
             }
@@ -101,28 +108,37 @@ public class ParameterStoreService : IParameterStoreService
         return response;
     }
 
+    private string RemoveTemplate(string name, string template)
+    {
+        template = template.EndsWith("/*") ? template[..^2] : template;
+        return string.Join("/", name.Split('/').Skip(template.Count(x => x == '/')+1).ToList());
+    }
     public async Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request)
     {
+        request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;
+
         var cachedParams = await GetCachedParameters();
 
         var templateOptions = await GetTemplateOptions(request.Template);
         var compareOptions = templateOptions[request.CompareByOption];
 
         var templatedParams = new List<TemplatedParameterValueResponse>();
+        var namePart = RemoveTemplate(request.ParameterName, request.Template);
 
         foreach (var opt in compareOptions)
         {
             var baseValues = request.TemplateValues;
             baseValues[request.CompareByOption] = opt;
-            var searchTemplatePart = request.Template.FormatWith(baseValues).Replace("/*", string.Empty);
+            var searchTemplatePart = request.Template.FormatWith(baseValues);
             templatedParams.Add(new TemplatedParameterValueResponse { Name = searchTemplatePart, TemplateValues = new(baseValues) });
         }
-
-        var namePart = templatedParams.Aggregate(request.ParameterName, (a, b) => a.Replace(b.Name, string.Empty)).TrimStart('/');
+        
         templatedParams.ForEach(x =>
         {
             x.Name = $"{x.Name}/{namePart}";
-            x.Value = cachedParams.FirstOrDefault(c => c.Name == x.Name)?.Value;
+            var cachedParam = cachedParams.FirstOrDefault(c => c.Name == x.Name);
+            x.Type = cachedParam?.Type;
+            x.Value = cachedParam?.Value;
         });
 
         var response = new CompareParametersResponse
@@ -180,9 +196,9 @@ public class ParameterStoreService : IParameterStoreService
     {
         var search = template.FormatWith(templateValues).Replace("/*", "");
         var allParameters = await GetCachedParameters();
-        var foundParams = allParameters.Where(x => x.Name.StartsWith(search));
+        var foundParams = allParameters.Where(x => x.Name.StartsWith(search+"/"));
 
-        return await GetGroupedParameters(foundParams);
+        return foundParams.Any() ? await GetGroupedParameters(foundParams) : new ParameterGroupResponse();
     }
 
     public async Task<Dictionary<string, string[]>> GetTemplateOptions(string template)
@@ -207,6 +223,7 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<ParameterGroupResponse> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null)
     {
         var parameters = cachedParameters?.ToList() ?? await GetCachedParameters();
+
         var maxLevel = parameters.Max(x => x.Name.Split('/').Length);
         var i = 1;
         var topLevel = parameters.DistinctBy(x => NameLevel(x.Name, i)).Select(x => new ParameterGroupResponse()
@@ -221,18 +238,19 @@ public class ParameterStoreService : IParameterStoreService
             if (parentGroup == null) break;
             foreach (var parent in parentGroup)
             {
-                parent.Children = parameters.Where(x => x.Name.StartsWith(parent.Name) && NameMaxLevel(x.Name) > i + 1)
+                parent.Children = parameters.Where(x => x.Name.StartsWith(parent.Name + "/") && NameMaxLevel(x.Name) > i + 1)
                                             .DistinctBy(x => NameLevel(x.Name, i))
                                             .Select(child => new ParameterGroupResponse
                                             {
                                                 Name = NameLevel(child.Name, i)
                                             }).ToList();
-                parent.Parameters = parameters.Where(x => x.Name.StartsWith(parent.Name))
+                parent.Parameters = parameters.Where(x => x.Name.StartsWith(parent.Name + "/"))
                                               .Where(x => NameMaxLevel(x.Name) == i + 1)
                                               .Select(x => new ParameterValueResponse
                                               {
                                                   Name = x.Name,
-                                                  Value = x.Value
+                                                  Value = x.Value,
+                                                  Type = x.Type
                                               }).ToList();
             }
             parentGroup = parentGroup.Where(x => x.Children != null).SelectMany(x => x.Children).ToList();
@@ -250,10 +268,27 @@ public class ParameterStoreService : IParameterStoreService
             {
                 Name = request.Name,
                 Value = request.Value,
+                Type = ParameterType.FindValue(request.Type),
                 Overwrite = true
             });
 
-            parameters.First(x => x.Name == request.Name).Value = request.Value;
+            var paramExists = parameters.FirstOrDefault(x => x.Name == request.Name);
+            if (paramExists != null)
+            {
+                paramExists.Value = request.Value;
+                paramExists.Type = request.Type;
+            }
+            else
+            {
+                var newParam = new CachedParameter
+                {
+                    Name = request.Name,
+                    Value = request.Value,
+                    Type = request.Type,
+                    LastModifiedDate = DateTime.UtcNow
+                };
+                parameters.Add(newParam);
+            }
         }
         catch (Exception ex)
         {

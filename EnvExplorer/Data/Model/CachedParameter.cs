@@ -1,4 +1,6 @@
-﻿namespace EnvExplorer.Data.Model;
+﻿using Amazon.SimpleSystemsManagement;
+
+namespace EnvExplorer.Data.Model;
 
 public class CachedParameter
 {
@@ -6,4 +8,5 @@ public class CachedParameter
     public string Value { get; set; }
     public string Type { get; set; }
     public DateTime LastModifiedDate { get; set; }
+    public ParameterType ParameterType { get; set; }
 }

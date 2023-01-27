@@ -12,7 +12,7 @@ import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
   selectedTemplateOptions: Record<string, string>;
-  updateCompareParametersResponse: (request: CompareParametersResponse) => void;
+  updateCompareParametersResponse: (request: CompareParametersResponse, isEditMode: boolean) => void;
 }
 
 function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse } : ParameterOffCanvasProps) {
@@ -77,7 +77,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
     setIsEditMode(false);
   }
 
-  const compareBy = (option: string) => {
+  const compareBy = (option: string, isEditMode: boolean) => {
     const request : CompareParametersRequest = {
       template: Environment.defaultTemplate,
       templateValues: selectedTemplateOptions,
@@ -86,7 +86,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
     };
 
     parameterApiService.compareParameters(request).then(res => {
-      updateCompareParametersResponse(res);
+      updateCompareParametersResponse(res, isEditMode);
     });
   }
 
@@ -113,8 +113,13 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
             </OverlayTrigger>
           </div>
           <div className="col-auto">
-            <DropdownButton title="Compare other">
-              {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => compareBy(x)}>{x}(s)</Dropdown.Item>)}
+            <DropdownButton title="Compare">
+              {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => compareBy(x, false)}>{x}(s)</Dropdown.Item>)}
+            </DropdownButton>
+          </div>
+          <div className="col-auto">
+            <DropdownButton title="Edit">
+              {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => compareBy(x, true)}>{x}(s)</Dropdown.Item>)}
             </DropdownButton>
           </div>
         </div>

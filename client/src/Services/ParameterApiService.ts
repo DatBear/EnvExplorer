@@ -41,9 +41,9 @@ export default class ParameterApiService {
     return this.post<ParameterGroupResponse>(url, templateValues);
   }
 
-  saveParameterValue(name: string, value: string) {
+  saveParameterValue(name: string, value: string, type: string | null = null) {
     var url = `${Environment.baseUrl}/parameters/update`;
-    return this.post<UpdateParameterValueResponse>(url, { name, value });
+    return this.post<UpdateParameterValueResponse>(url, { name, value, type });
   }
 
   compareParameters(request: CompareParametersRequest) {

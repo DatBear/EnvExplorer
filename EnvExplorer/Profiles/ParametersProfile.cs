@@ -15,9 +15,9 @@ public class ParametersProfile : Profile
 
         CreateMap<Parameter, CachedParameter>()
             .ForMember(x => x.Name, x => x.MapFrom(src => src.Name))
+            .ForMember(x => x.Value, x => x.MapFrom(src => src.Value))
             .ForMember(x => x.Type, x => x.MapFrom(src => src.Type.Value))
-            .ForMember(x => x.LastModifiedDate, x => x.MapFrom(src => src.LastModifiedDate))
-            .ForMember(x => x.Value, x => x.MapFrom(src => src.Value));
+            .ForMember(x => x.LastModifiedDate, x => x.MapFrom(src => src.LastModifiedDate));
 
         CreateMap<CachedParameter, UpdateParameterValueResponse>()
             .ForMember(x => x.IsSuccess, x => x.MapFrom(src => false));

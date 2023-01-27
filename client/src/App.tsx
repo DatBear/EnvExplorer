@@ -11,11 +11,12 @@ import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Accordion, Dropdown, DropdownButton } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
 import MissingParametersModal from './Components/MissingParametersModal';
+import { idText } from 'typescript';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -25,6 +26,7 @@ function App() {
   const [selectedGroup, setSelectedGroup] = useState<ParameterGroupResponse>();
   const [offCanvasParameter, setOffCanvasParameter] = useState<ParameterValueResponse>();
   const [compareParametersResponse, setCompareParametersResponse] = useState<CompareParametersResponse>();
+  const [compareEditMode, setCompareEditMode] = useState(false);
   const [missingParametersResponse, setMissingParametersResponse] = useState<MissingParametersResponse>();
 
   const dataFetched = useRef(false);
@@ -55,8 +57,9 @@ function App() {
     setOffCanvasParameter({...parameter});
   };
 
-  const updateCompareParametersResponse = (response: CompareParametersResponse) => {
+  const updateCompareParametersResponse = (response: CompareParametersResponse, isEditMode: boolean) => {
     setCompareParametersResponse({...response});
+    setCompareEditMode(isEditMode);
   };
 
   const refreshAll = () => {
@@ -79,6 +82,10 @@ function App() {
     });
   }
 
+  const groupAccordions = (group: ParameterGroupResponse) : Number => {
+    return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
+  }
+
   return (
     <div className="container-fluid app">
       <header><img src="/img/icon.png" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
@@ -97,10 +104,11 @@ function App() {
           </DropdownButton>
         </div>
       </div>}
-      {selectedGroup && <div className="accordion"><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></div> }
+      {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion> }
+      {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
-      {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} />}
-      {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} />}
+      {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
+      {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} editMode={compareEditMode} />}
     </div>
   );
 }

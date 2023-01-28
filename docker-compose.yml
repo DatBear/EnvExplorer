@@ -6,8 +6,6 @@ services:
       context: .
       dockerfile: ./docker/api/Dockerfile
     container_name: envexplorer-api
-    ports:
-      - "5100:80"
     env_file:
       - .env
 

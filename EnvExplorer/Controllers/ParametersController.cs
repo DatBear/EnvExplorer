@@ -40,6 +40,13 @@ public class ParametersController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("file-export")]
+    public async Task<IActionResult> FileExport(GetFileExportParametersRequest request)
+    {
+        var templateParams = await _parameterStoreService.FileExportParameters(request);
+        return Ok(templateParams);
+    }
+
     [HttpPost("compare")]
     public async Task<IActionResult> Compare(CompareParametersRequest request)
     {

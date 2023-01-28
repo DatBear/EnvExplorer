@@ -1,7 +1,7 @@
 import { faKeyboard, faPenToSquare, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useMemo, useReducer, useState } from "react";
-import { Button, Col, Container, Row, Modal, Dropdown, DropdownButton, Badge } from "react-bootstrap";
+import { useEffect, useMemo, useState } from "react";
+import { Button, Col, Container, Row, Modal, Dropdown, Badge } from "react-bootstrap";
 import DropdownItem from "react-bootstrap/esm/DropdownItem";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import TemplatedParameterValueResponse from "../Data/Model/TemplatedParameterValueResponse";
@@ -28,7 +28,7 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
   useEffect(() => {
     setShow(true);
     setIsEditMode(editMode);
-  }, [response]);
+  }, [editMode, response]);
 
   const save = (parameter: TemplatedParameterValueResponse, type: string | null = null) => {
     if(parameter.value === null) return;//todo toast error
@@ -85,7 +85,7 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
                       </td>
                       <td><ParameterEditor value={x.value} isEditMode={isEditMode} onChange={v => onValueChanged(x, v)} /></td>
                       {isEditMode && <td>
-                        {numParameterTypes == 1 && <Button variant="success" onClick={_ => save(x, parameterTypes[0].type)}><FontAwesomeIcon icon={faSave} size="sm" /></Button>}
+                        {numParameterTypes === 1 && <Button variant="success" onClick={_ => save(x, parameterTypes[0].type)}><FontAwesomeIcon icon={faSave} size="sm" /></Button>}
                         {numParameterTypes > 1 && <Dropdown>
                           <Dropdown.Toggle size="sm" variant="success">
                             <FontAwesomeIcon icon={faSave} size="sm" />

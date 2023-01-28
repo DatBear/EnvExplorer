@@ -17,12 +17,18 @@ services.AddSwaggerGen();
 
 services.Configure<AWSConfig>(config.GetSection("AWSConfig"));
 services.Configure<ParameterStoreConfig>(config.GetSection("ParameterStoreConfig"));
+services.Configure<ApiConfig>(config.GetSection("ApiConfig"));
+
+var apiConfig = config.GetSection("ApiConfig").Get<ApiConfig>();
 
 services.AddSingleton<IParameterStoreService, ParameterStoreService>();
 
 services.AddAutoMapper(typeof(Program));
 
-services.AddCors(x => x.AddDefaultPolicy(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
+if (apiConfig.SetCorsHeaders)
+{
+    services.AddCors(x => x.AddDefaultPolicy(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
+}
 
 var app = builder.Build();
 
@@ -34,11 +40,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+if (apiConfig.SetCorsHeaders)
+{
+    app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+}
 
 app.Run();

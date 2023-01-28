@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Infrastructure\Configurations\" />
+    <Folder Include="Extensions\" />
     <Folder Include="Profiles\" />
     <Folder Include="Services\" />
   </ItemGroup>

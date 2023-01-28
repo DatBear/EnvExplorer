@@ -10,16 +10,15 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faFile, faPlus, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faFile, faFileExport, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { Accordion, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
 import MissingParametersModal from './Components/MissingParametersModal';
-import { idText } from 'typescript';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import EnvFileModal from './Components/EnvFileModal';
 import CreateParameterModal from './Components/CreateParameterModal';
+import FileExportModal from './Components/ExportFilesModal';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -32,6 +31,7 @@ function App() {
   const [compareEditMode, setCompareEditMode] = useState(false);
   const [missingParametersResponse, setMissingParametersResponse] = useState<MissingParametersResponse>();
   const [showFileModal, setShowFileModal] = useState(false);
+  const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const dataFetched = useRef(false);
@@ -88,7 +88,7 @@ function App() {
   }
 
   const groupAccordions = (group: ParameterGroupResponse) : Number => {
-    return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.flatMap(x => x.children).length : groupAccordions(group.children[0]);
+    return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
   }
 
   return (
@@ -109,14 +109,18 @@ function App() {
           </DropdownButton>
         </div>
         <div className="col-auto pt-4">
+          <Button size="sm" variant="success" onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
+        </div>
+        <div className="col-auto pt-4">
           <Button size="sm" onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
         </div>
         <div className="col-auto pt-4">
-          <Button size="sm" variant="success" onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
+          <Button size="sm" onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
         </div>
       </div>}
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
+      {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}
       {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion> }
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}

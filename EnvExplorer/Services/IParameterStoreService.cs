@@ -10,9 +10,10 @@ public interface IParameterStoreService
     Task<List<Parameter>> GetAllParameters();
     Task<ParameterGroupResponse> ListParameters(string template, Dictionary<string, string> templateValues);
     Task<Dictionary<string, string[]>> GetTemplateOptions(string template);
-    Task<ParameterGroupResponse> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null);
+    Task<ParameterGroupResponse?> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null);
     Task<UpdateParameterValueResponse> UpdateParameterValue(UpdateParameterValueRequest request);
     Task<List<CachedParameter>> RefreshCache();
     Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request);
     Task<MissingParametersResponse> MissingParameters(MissingParametersRequest request);
+    Task<GetFileExportParametersResponse> FileExportParameters(GetFileExportParametersRequest request);
 }

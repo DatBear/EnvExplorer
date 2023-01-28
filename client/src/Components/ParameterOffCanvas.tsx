@@ -2,7 +2,7 @@ import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClipboard, faCopy, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, DropdownButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 import ParameterApiService from "../Services/ParameterApiService";
 import Environment from "../Data/Environment";

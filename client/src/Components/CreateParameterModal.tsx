@@ -28,7 +28,7 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   const updateName = (inputValue: string) => {
     inputValue = inputValue.replaceAll('__', '/');
     const split = inputValue.split('=');
-    if(split.length == 2) {
+    if(split.length === 2) {
       inputValue = split[0]
       setValue(split[1]);
     }

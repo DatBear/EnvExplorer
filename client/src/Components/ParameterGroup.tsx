@@ -1,5 +1,4 @@
 import { Accordion } from "react-bootstrap";
-import AccordionItem from "react-bootstrap/esm/AccordionItem";
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import ParameterValue from "./ParameterValue";
@@ -11,12 +10,6 @@ type ParameterGroupProps = {
 }
 
 function ParameterGroup({ group, eventKey, updateSelectedParameter: setOffCanvasParameter } : ParameterGroupProps) {
-
-  const getId = (name: string) => {
-    if(name === null) return null;
-    return name.replace(/^[^a-z]+|[^\w:.-]+/gi, "");
-  }
-
   const lastName = (name: string) => {
     if(name === null) return null;
     return name.substring(name.lastIndexOf('/')+1);
@@ -26,7 +19,6 @@ function ParameterGroup({ group, eventKey, updateSelectedParameter: setOffCanvas
     setOffCanvasParameter(parameter);
   }
   
-  const id = "panels-"+getId(group.name);
   return (<>
     {group.parameters.length > 0 &&
       <Accordion.Item eventKey={eventKey}>

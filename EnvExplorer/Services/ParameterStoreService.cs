@@ -12,6 +12,8 @@ using EnvExplorer.Data.Model.Requests;
 using EnvExplorer.Data.Model.Responses;
 using FormatWith;
 using Amazon.Runtime.Internal;
+using EnvExplorer.Extensions;
+using Microsoft.VisualBasic;
 
 namespace EnvExplorer.Services;
 
@@ -47,7 +49,7 @@ public class ParameterStoreService : IParameterStoreService
         return _cachedParameters ?? await RefreshCache();
     }
 
-    //todo revisit this later :)
+    //only works for templates with max of 2 parameters?
     public async Task<MissingParametersResponse> MissingParameters(MissingParametersRequest request)
     {
         request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;
@@ -111,7 +113,7 @@ public class ParameterStoreService : IParameterStoreService
     private string RemoveTemplate(string name, string template)
     {
         template = template.EndsWith("/*") ? template[..^2] : template;
-        return string.Join("/", name.Split('/').Skip(template.Count(x => x == '/')+1).ToList());
+        return string.Join("/", name.Split('/').Skip(template.Count(x => x == '/') + 1).ToList());
     }
 
     public async Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request)
@@ -133,7 +135,7 @@ public class ParameterStoreService : IParameterStoreService
             var searchTemplatePart = request.Template.FormatWith(baseValues);
             templatedParams.Add(new TemplatedParameterValueResponse { Name = searchTemplatePart, TemplateValues = new(baseValues) });
         }
-        
+
         templatedParams.ForEach(x =>
         {
             x.Name = $"{x.Name}/{namePart}";
@@ -172,7 +174,7 @@ public class ParameterStoreService : IParameterStoreService
 
             do
             {
-                var getParametersResponse = await _ssmClient.GetParametersByPathAsync(new GetParametersByPathRequest()
+                var getParametersResponse = await _ssmClient.GetParametersByPathAsync(new GetParametersByPathRequest
                 {
                     Path = path,
                     Recursive = true,
@@ -197,10 +199,59 @@ public class ParameterStoreService : IParameterStoreService
     {
         var search = template.FormatWith(templateValues).Replace("/*", "");
         var allParameters = await GetCachedParameters();
-        var foundParams = allParameters.Where(x => x.Name.StartsWith(search+"/"));
+        var foundParams = allParameters.Where(x => x.Name.StartsWith(search + "/"));
 
         return foundParams.Any() ? await GetGroupedParameters(foundParams) : new ParameterGroupResponse();
     }
+
+    public async Task<GetFileExportParametersResponse> FileExportParameters(GetFileExportParametersRequest request)
+    {
+        request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;
+        var cachedParams = await GetCachedParameters();
+        var templateCombos = GetTemplateCombinations(request.Template, request.TemplateValues);
+        var files = new List<ExportFileResponse>();
+        foreach (var prefix in templateCombos)
+        {
+            var group = await GetGroupedParameters(cachedParams.Where(x => x.Name.StartsWith(prefix + "/")));
+            var path = cachedParams.FirstOrDefault(x => x.Name == $"{prefix}/EnvExplorer/DirectoryName")?.Value;
+            if (group != null && path != null)
+            {
+                var file = new ExportFileResponse
+                {
+                    Path = path,
+                    Parameters = group,
+                    Template = prefix
+                };
+                files.Add(file);
+            }
+        }
+
+        return new GetFileExportParametersResponse
+        {
+            Files = files
+        };
+    }
+
+
+    private List<string> GetTemplateCombinations(string template, Dictionary<string, string[]> templateOptions)
+    {
+        //this method is kinda bad but works for now, low volume of total combinations anyways
+        var allCombos = ComboExtensions.GetAllPossibleCombos(templateOptions.Select(x => x.Value.Select(v => $"{x.Key}={v}")));
+        var allTemplates = new List<string>();
+        foreach (var combo in allCombos)
+        {
+            var dict = new Dictionary<string, string>();
+            foreach (var v in combo)
+            {
+                var split = v.Split("=");
+                dict.Add(split[0], split[1]);
+            }
+            allTemplates.Add(template.FormatWith(dict));
+        }
+
+        return allTemplates;
+    }
+
 
     public async Task<Dictionary<string, string[]>> GetTemplateOptions(string template)
     {
@@ -221,10 +272,13 @@ public class ParameterStoreService : IParameterStoreService
         return templateOptions;
     }
 
-    public async Task<ParameterGroupResponse> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null)
+    public async Task<ParameterGroupResponse?> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null)
     {
         var parameters = cachedParameters?.ToList() ?? await GetCachedParameters();
-
+        if (!parameters.Any())
+        {
+            return null;
+        }
         var maxLevel = parameters.Max(x => x.Name.Split('/').Length);
         var i = 1;
         var topLevel = parameters.DistinctBy(x => NameLevel(x.Name, i)).Select(x => new ParameterGroupResponse()

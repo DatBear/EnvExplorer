@@ -1,4 +1,5 @@
 import React from "react";
+import SearchContext from "./Contexts/SearchContext";
 
 type ParameterValueProps = {
   name: string;
@@ -16,9 +17,15 @@ function ParameterValue({name, value, editAction}: ParameterValueProps) {
     return value;
   }
 
-  return (<div>
-    <span onClick={editAction}>{name}={displayValue(value)}</span>
-  </div>);
+  const showFromSearch = (search: string) => {
+    return search === '' || name.toLowerCase().indexOf(search) > -1 || value.toLowerCase().indexOf(search) > -1;
+  }
+
+  return (<SearchContext.Consumer>{search => 
+    showFromSearch(search) && <div>
+      <span onClick={editAction}>{name}={displayValue(value)}</span>
+    </div>}
+  </SearchContext.Consumer>);
 }
 
 export default ParameterValue;

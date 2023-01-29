@@ -25,7 +25,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
   const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Record<string, string[]>>({});
   const [fileExport, setFileExport] = useState<GetFileExportParametersResponse>();
 
-  //revert script options
+  //script options
   const [scriptOptions, setScriptOptions] = useState<ScriptGenerationOptions>({
     includeDateHeader: false,
     includeEnvironmentHeader: true,
@@ -106,9 +106,9 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
             
             <Col xs="auto">
               <div><strong>Script options</strong></div>
-              <Form.Control id="envFileName" value={scriptOptions.envFileName!} onChange={e => setScriptOptions({... scriptOptions, envFileName: e.target.value})} />
+              <Form.Control id="envFileName" placeholder=".env file name(s)" value={scriptOptions.envFileName!} onChange={e => setScriptOptions({...scriptOptions, envFileName: e.target.value})} />
               <Form.Check id="backupCheckbox" label="Back-up files?" checked={backupFiles} onChange={e => setBackupFiles(e.target.checked)} />
-              <Form.Control id="backupLocation" value={scriptOptions.backupLocation} onChange={e => setScriptOptions({...scriptOptions, backupLocation: e.target.value})} disabled={!backupFiles} />
+              <Form.Control id="backupLocation" placeholder="Back-up folder path" value={scriptOptions.backupLocation} onChange={e => setScriptOptions({...scriptOptions, backupLocation: e.target.value})} disabled={!backupFiles} />
               <Form.Check id="overwriteRadio" label="Overwrite" type="radio" checked={scriptOptions.overwrite} onChange={e => setScriptOptions({...scriptOptions, overwrite: e.target.checked})} inline />
               <Form.Check id="appendRadio" label="Append" type="radio" checked={!scriptOptions.overwrite} onChange={e => setScriptOptions({...scriptOptions, overwrite: !e.target.checked})} inline />
               <Form.Check id="environmentHeaderCheckbox" label="Environment header?" checked={scriptOptions.includeEnvironmentHeader} onChange={e => setScriptOptions({...scriptOptions, includeEnvironmentHeader: e.target.checked})} />
@@ -117,7 +117,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
             <Col xs="auto">
               <div><strong>Revert script options</strong></div>
               <Form.Check id="generateRevertCheckbox" label="Generate revert file" checked={generateRevert} onChange={e => setGenerateRevertFile(e.target.checked)} />
-              <Form.Control id="revertScriptPath" value={scriptOptions.revertScriptFilePath!} onChange={e => setScriptOptions({...scriptOptions, revertScriptFilePath: e.target.value})} disabled={!generateRevert || scriptOptions.revertOnly} />
+              <Form.Control id="revertScriptPath" placeholder="Revert script path" value={scriptOptions.revertScriptFilePath!} onChange={e => setScriptOptions({...scriptOptions, revertScriptFilePath: e.target.value})} disabled={!generateRevert || scriptOptions.revertOnly} />
               <Form.Check id="selfDestructRevertCheckbox" label="Delete script after reverting?" checked={scriptOptions.selfDestructAfterReverting} onChange={e => setScriptOptions({...scriptOptions, selfDestructAfterReverting: e.target.checked})} />
               <Form.Check id="revertOnlyCheckbox" label="Generate ONLY revert file" checked={scriptOptions.revertOnly} onChange={e => setScriptOptions({...scriptOptions, revertOnly: e.target.checked})} />
             </Col>

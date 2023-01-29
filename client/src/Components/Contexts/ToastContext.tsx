@@ -24,10 +24,10 @@ const ToastContext = createContext<ToastContextType | null>(null);
 export default ToastContext;
 
 export function ToastContextProvider({ children } : React.PropsWithChildren) {
-  const [toasts, setToasts] = useState<ToastOptions[]>([]);
+  const [toasts, setToasts] = useState<Required<ToastOptions>[]>([]);
 
   const addToast = (opt: ToastOptions) => {
-    opt = {
+    const toast : Required<ToastOptions> = {
       ...opt, 
       id: nanoid(),
       show: opt.show ?? true,
@@ -35,7 +35,7 @@ export function ToastContextProvider({ children } : React.PropsWithChildren) {
       autohide: opt.autohide ?? true,
       textColor: opt.textColor ?? 'light'
     };
-    setToasts([...toasts, opt]);
+    setToasts([...toasts, toast]);
   }
 
   const clearToasts = () => {

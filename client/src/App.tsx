@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ParameterApiService from './Services/ParameterApiService';
 import TemplateOption from './Components/TemplateOption';
 import ParameterGroupResponse from './Data/Model/ParameterGroupResponse';
@@ -21,6 +21,7 @@ import CreateParameterModal from './Components/CreateParameterModal';
 import FileExportModal from './Components/ExportFilesModal';
 import { SearchBar } from './Components/SearchBar';
 import { useToasts } from './Components/Contexts/ToastContext';
+import icon from './Images/icon.png';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -40,6 +41,10 @@ function App() {
   const dataFetched = useRef(false);
   const { addToast } = useToasts();
 
+  const fetchData = useCallback(() => {
+    setSelectedTemplateOptions((s) => ({...s}));
+  }, []);
+
   useEffect(() => {
     if(dataFetched.current) return;
     dataFetched.current = true;
@@ -48,24 +53,22 @@ function App() {
     }).catch(err => {
       addToast({message: err, textColor: 'danger'});
     });
-  }, [parameterApiService]);
+
+  }, [parameterApiService, addToast]);
 
   useEffect(() => {
     if(Object.keys(selectedTemplateOptions).length === 0) return;
-
+    setIsRefreshing(true);
     parameterApiService.getGroupedParameters(null, selectedTemplateOptions).then(data => {
+      setIsRefreshing(false);
       setSelectedGroup(data);
     });
   }, [selectedTemplateOptions, parameterApiService]);
 
   useEffect(() => {
     if(showCreateModal) return;
-    fechData();
-  }, [showCreateModal]);
-
-  const fechData = () => {
-    setSelectedTemplateOptions({...selectedTemplateOptions});
-  }
+    fetchData();
+  }, [showCreateModal, fetchData]);
 
   const setSelectedOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
@@ -85,9 +88,9 @@ function App() {
     setIsRefreshing(true);
     parameterApiService.refreshAllParameters().then(() => {
       parameterApiService.getTemplateOptions().then(data => {
+        setIsRefreshing(false);
         setTemplateOptions(data);
         setSelectedTemplateOptions({...selectedTemplateOptions});
-        setIsRefreshing(false);
       });
     });
   };
@@ -109,8 +112,10 @@ function App() {
 
   return (
     <div className="container-fluid app">
-      <header><img src="/img/icon.png" className="rounded" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
-      {templateOptions && <div className="row align-items-center">
+      <header>
+        <img src={icon} className="rounded" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" />
+      </header>
+      <div className="row align-items-center">
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
           return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
         })}
@@ -138,8 +143,7 @@ function App() {
         <div className="col-auto pt-4">
           <SearchBar />
         </div>
-      </div>}
-
+      </div>
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
       {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}

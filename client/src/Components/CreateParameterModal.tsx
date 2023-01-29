@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Modal, Container, Row, Col, Button, InputGroup, Form } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import ParameterApiService from "../Services/ParameterApiService";
+import { useToasts } from "./Contexts/ToastContext";
 
 type CreateParameterModalProps = {
   show: boolean;
@@ -20,6 +21,8 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   const [value, setValue] = useState('');
 
   const handleClose = () => setShow(false);
+
+  const { addToast } = useToasts();
 
   useEffect(() => {
     
@@ -43,7 +46,11 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
         setType(availableTypes[0]);
         setValue('');
         handleClose();
+      } else {
+        addToast({ message: 'Error saving parameter.', textColor: 'danger' })
       }
+    }).catch(e => {
+      addToast({ message: 'Error saving parameter: ' + e, textColor: 'danger' })
     });
   }
 

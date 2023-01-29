@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import React, { createContext, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
+import icon from '../../Images/icon.png';
 
 type ToastContextType = {
   addToast: (opt: ToastOptions) => void;
@@ -26,15 +27,15 @@ export function ToastContextProvider({ children } : React.PropsWithChildren) {
   const [toasts, setToasts] = useState<ToastOptions[]>([]);
 
   const addToast = (opt: ToastOptions) => {
-    const toast : ToastOptions = {
+    opt = {
       ...opt, 
       id: nanoid(),
       show: opt.show ?? true,
       duration: opt.duration ?? opt.textColor === 'danger' ? 10000 : 2000,
       autohide: opt.autohide ?? true,
-      textColor: opt.textColor ?? 'dark'
+      textColor: opt.textColor ?? 'light'
     };
-    setToasts([...toasts, toast]);
+    setToasts([...toasts, opt]);
   }
 
   const clearToasts = () => {
@@ -42,8 +43,7 @@ export function ToastContextProvider({ children } : React.PropsWithChildren) {
   }
 
   const removeToast = (id: string) => {
-    const remainingToasts = toasts.filter(x => x.id !== id);
-    setToasts(remainingToasts);
+    setToasts([...toasts.filter(x => x.id !== id)]);
   }
 
   return (
@@ -53,7 +53,7 @@ export function ToastContextProvider({ children } : React.PropsWithChildren) {
         {toasts.map(x => {
           return <Toast key={x.id} id={x.id} autohide={x.autohide} delay={x.duration} onClose={() => removeToast(x.id!)}>
             <Toast.Header>
-              <img src="/img/icon.png" className="rounded me-2" style={{width: '20px', height: '20px' }} alt="Sweet EnvExplorer logo lookin fly" />
+              <img src={icon} className="rounded me-2" style={{width: '20px', height: '20px' }} alt="Sweet EnvExplorer logo lookin fly" />
               <span className="me-auto">EnvExplorer</span>
             </Toast.Header>
             <Toast.Body><span className={"text-"+x.textColor}>{x.message}</span></Toast.Body>

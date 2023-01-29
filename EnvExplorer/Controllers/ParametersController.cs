@@ -72,7 +72,7 @@ public class ParametersController : ControllerBase
     public async Task<IActionResult> Update(UpdateParameterValueRequest request)
     {
         var response = await _parameterStoreService.UpdateParameterValue(request);
-        return response.IsSuccess ? Ok(response) : BadRequest(response);
+        return response?.IsSuccess ?? false ? Ok(response) : BadRequest(response ?? new UpdateParameterValueResponse { IsSuccess = false });
     }
 
     [HttpPost("refresh-all")]

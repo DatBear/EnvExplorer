@@ -12,7 +12,7 @@ public interface IParameterStoreService
     Task<Dictionary<string, string[]>> GetTemplateOptions(string template);
     Task<ParameterGroupResponse?> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null);
     Task<UpdateParameterValueResponse> UpdateParameterValue(UpdateParameterValueRequest request);
-    Task<List<CachedParameter>> RefreshCache();
+    Task<List<CachedParameter>> RefreshCache(bool includeHidden = false);
     Task<CompareParametersResponse> CompareParameters(CompareParametersRequest request);
     Task<MissingParametersResponse> MissingParameters(MissingParametersRequest request);
     Task<GetFileExportParametersResponse> FileExportParameters(GetFileExportParametersRequest request);

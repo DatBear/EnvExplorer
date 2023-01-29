@@ -4,7 +4,7 @@ public class ParameterStoreConfig
 {
     public string? AllowedPrefixes { get; set; }
 
-    public List<string> AllowedPrefixesList => (AllowedPrefixes ?? "/").Split(",").ToList();
+    public List<string> AllowedPrefixesList => (AllowedPrefixes ?? "/").Split(",").Select(x => x.Trim()).ToList();
     public string? HiddenParameterPatterns { get; set; }
-    public List<string> HiddenParameterPatternsList => (HiddenParameterPatterns ?? "EnvExplorer").Split(",").ToList();//todo hide these parameters in lists, exports, etc.
+    public List<string> HiddenParameterPatternsList => (HiddenParameterPatterns ?? "/EnvExplorer/").Split(",").Select(x => x.Trim()).ToList();
 }

@@ -1,19 +1,16 @@
-﻿using Amazon.Runtime;
+﻿using Amazon;
+using Amazon.Runtime;
 using Amazon.SimpleSystemsManagement;
-using EnvExplorer.Infrastructure.Configurations;
-using Microsoft.Extensions.Options;
-using System.Net;
-using System.Text.RegularExpressions;
-using Amazon;
 using Amazon.SimpleSystemsManagement.Model;
 using AutoMapper;
 using EnvExplorer.Data.Model;
 using EnvExplorer.Data.Model.Requests;
 using EnvExplorer.Data.Model.Responses;
-using FormatWith;
-using Amazon.Runtime.Internal;
 using EnvExplorer.Extensions;
-using Microsoft.VisualBasic;
+using EnvExplorer.Infrastructure.Configurations;
+using FormatWith;
+using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 
 namespace EnvExplorer.Services;
 
@@ -24,7 +21,6 @@ public class ParameterStoreService : IParameterStoreService
     private readonly ParameterStoreConfig _psConfig;
 
     private List<CachedParameter>? _cachedParameters;
-
 
     private Regex _templatePartRegex = new("\\{(\\w+)\\}");
 
@@ -37,16 +33,17 @@ public class ParameterStoreService : IParameterStoreService
         _ssmClient = new AmazonSimpleSystemsManagementClient(credentials, RegionEndpoint.GetBySystemName(awsConfig.Region));
     }
 
-    public async Task<List<CachedParameter>> RefreshCache()
+    public async Task<List<CachedParameter>> RefreshCache(bool includeHidden = false)
     {
         var allParameters = await GetAllParameters();
         _cachedParameters = _mapper.Map<List<CachedParameter>>(allParameters.OrderBy(x => x.Name));
-        return _cachedParameters;
+        _cachedParameters.ForEach(x => x.IsHidden = _psConfig.HiddenParameterPatternsList.Any(p => x.Name.Contains(p)));
+        return _cachedParameters.Where(x => includeHidden || !x.IsHidden).ToList();
     }
 
-    private async Task<List<CachedParameter>> GetCachedParameters()
+    private async Task<List<CachedParameter>> GetCachedParameters(bool includeHidden = false)
     {
-        return _cachedParameters ?? await RefreshCache();
+        return _cachedParameters?.Where(x => includeHidden || !x.IsHidden).ToList() ?? await RefreshCache();
     }
 
     //only works for templates with max of 2 parameters?
@@ -207,12 +204,12 @@ public class ParameterStoreService : IParameterStoreService
     public async Task<GetFileExportParametersResponse> FileExportParameters(GetFileExportParametersRequest request)
     {
         request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;
-        var cachedParams = await GetCachedParameters();
+        var cachedParams = await GetCachedParameters(true);
         var templateCombos = GetTemplateCombinations(request.Template, request.TemplateValues);
         var files = new List<ExportFileResponse>();
         foreach (var prefix in templateCombos)
         {
-            var group = await GetGroupedParameters(cachedParams.Where(x => x.Name.StartsWith(prefix + "/")));
+            var group = await GetGroupedParameters(cachedParams.Where(x => !x.IsHidden && x.Name.StartsWith(prefix + "/")));
             var path = cachedParams.FirstOrDefault(x => x.Name == $"{prefix}/EnvExplorer/DirectoryName")?.Value;
             if (group != null && path != null)
             {

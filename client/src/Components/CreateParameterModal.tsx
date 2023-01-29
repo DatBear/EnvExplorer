@@ -22,15 +22,15 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   const handleClose = () => setShow(false);
 
   useEffect(() => {
-
+    
   }, [selectedTemplateOptions]);
 
   const updateName = (inputValue: string) => {
     inputValue = inputValue.replaceAll('__', '/');
     const split = inputValue.split('=');
-    if(split.length === 2) {
+    if(split.length >= 2) {
       inputValue = split[0]
-      setValue(split[1]);
+      setValue(split.filter((x, idx) => idx > 0).join('='));
     }
     setName(inputValue);
   }
@@ -61,11 +61,17 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
           <Form>
             <Row className="mb-3">
               <Col>
-                <Form.Label htmlFor="paramName">Value</Form.Label>
+                <Form.Label htmlFor="paramName">Name</Form.Label>
                 <InputGroup>
                   <InputGroup.Text id="paramName">{Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}/</InputGroup.Text>
                   <Form.Control placeholder="Parameter name" aria-label="Parameter name" aria-describedby="paramName" value={name} onChange={e => updateName(e.target.value)} />
                 </InputGroup>
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Col>
+                <Form.Label htmlFor="paramValue">Value</Form.Label>
+                <Form.Control id="paramValue" placeholder="Parameter value" value={value} onChange={e => setValue(e.target.value)} />
               </Col>
             </Row>
             <Row className="mb-3">
@@ -78,8 +84,7 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
             </Row>
             <Row className="mb-3">
               <Col>
-                <Form.Label htmlFor="paramValue">Value</Form.Label>
-                <Form.Control id="paramValue" placeholder="Parameter value" value={value} onChange={e => setValue(e.target.value)} />
+                <span className="text-muted">Note: pasting a value from a local env file will fill out the name and value.</span>
               </Col>
             </Row>
           </Form>

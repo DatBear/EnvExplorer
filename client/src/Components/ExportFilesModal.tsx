@@ -5,6 +5,7 @@ import { Modal, Container, Row, Col, Button, OverlayTrigger, Tooltip, Form } fro
 import Environment from "../Data/Environment";
 import GetFileExportParametersRequest from "../Data/Model/GetFileExportParametersRequest";
 import GetFileExportParametersResponse from "../Data/Model/GetFileExportParametersResponse";
+import ScriptGenerationOptions from "../Data/Model/ScriptGenerationOptions";
 import FileService from "../Services/FileService";
 import ParameterApiService from "../Services/ParameterApiService";
 import TemplateOption from "./TemplateOption";
@@ -25,18 +26,20 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
   const [fileExport, setFileExport] = useState<GetFileExportParametersResponse>();
 
   //revert script options
-  const [revertScriptFilePath, setRevertScriptFilePath] = useState('./revertEnvVars.sh');
+  const [scriptOptions, setScriptOptions] = useState<ScriptGenerationOptions>({
+    includeDateHeader: false,
+    includeEnvironmentHeader: true,
+    overwrite: true,
+    revertOnly: false,
+    selfDestructAfter: true,
+    selfDestructAfterReverting: true,
+    backupLocation: './backup',
+    envFileName: '.env',
+    revertScriptFilePath: './revertEnvVars.sh'
+  });
+
   const [generateRevert, setGenerateRevertFile] = useState(true);
-  const [revertOnly, setRevertOnly] = useState(false);
-  const [selfDestructAfterReverting, setSelfDestructAfterReverting] = useState(true);
-  //script options
   const [backupFiles, setBackupFiles] = useState(true);
-  const [backupLocation, setBackupLocation] = useState('./backup');
-  const [selfDestructAfter, setSelfDestructAfter] = useState(true);
-  const [overwrite, setOverwrite] = useState(true);
-  const [includeDateHeader, setIncludeDateHeader] = useState(false);
-  const [includeEnvironmentHeader, setIncludeEnvironmentHeader] = useState(true);
-  const [envFileName, setEnvFileName] = useState('.env');
   
   const handleClose = () => setShow(false);
 
@@ -54,18 +57,12 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
     }
 
     var script = fileService.generateScript(fileExport.files, {
-      revertOnly: revertOnly,
-      revertScriptFilePath: generateRevert ? revertScriptFilePath : '',
-      selfDestructAfterReverting: selfDestructAfterReverting,
-      includeDateHeader: includeDateHeader,
-      includeEnvironmentHeader: includeEnvironmentHeader,
-      overwrite: overwrite,
-      selfDestructAfter: selfDestructAfter,
-      backupLocation: backupFiles ? backupLocation : '',
-      envFileName: envFileName
+      ...scriptOptions,
+      revertScriptFilePath : generateRevert ? scriptOptions.revertScriptFilePath : '',
+      backupLocation : backupFiles ? scriptOptions.backupLocation : ''
     });
     setFileOutput(script.toString());
-  }, [fileService, fileExport, revertScriptFilePath, generateRevert, revertOnly, selfDestructAfterReverting, backupFiles, backupLocation, selfDestructAfter, overwrite, includeDateHeader, includeEnvironmentHeader, envFileName]);
+  }, [fileService, fileExport, scriptOptions]);
 
   const setSelectedOptions = (name: string, values: string[]) => {
     selectedTemplateOptions[name] = values;
@@ -89,7 +86,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
     });
   }
 
-  const scriptWillBackup = backupFiles && backupLocation;
+  const scriptWillBackup = backupFiles && scriptOptions.backupLocation;
 
   return (
     <Modal show={show} onHide={handleClose} size='xl' centered>
@@ -109,20 +106,20 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
             
             <Col xs="auto">
               <div><strong>Script options</strong></div>
-              <Form.Control id="envFileName" value={envFileName} onChange={e => setEnvFileName(e.target.value)} />
+              <Form.Control id="envFileName" value={scriptOptions.envFileName!} onChange={e => setScriptOptions({... scriptOptions, envFileName: e.target.value})} />
               <Form.Check id="backupCheckbox" label="Back-up files?" checked={backupFiles} onChange={e => setBackupFiles(e.target.checked)} />
-              <Form.Control id="backupLocation" value={backupLocation} onChange={e => setBackupLocation(e.target.value)} disabled={!backupFiles} />
-              <Form.Check id="overwriteRadio" label="Overwrite" type="radio" checked={overwrite} onChange={e => setOverwrite(e.target.checked)} inline />
-              <Form.Check id="appendRadio" label="Append" type="radio" checked={!overwrite} onChange={e => setOverwrite(!e.target.checked)} inline />
-              <Form.Check id="environmentHeaderCheckbox" label="Environment header?" checked={includeEnvironmentHeader} onChange={e => setIncludeEnvironmentHeader(e.target.checked)} />
-              <Form.Check id="selfDestructCheckbox" label="Delete script after?" checked={selfDestructAfter} onChange={e => setSelfDestructAfter(e.target.checked)} />
+              <Form.Control id="backupLocation" value={scriptOptions.backupLocation} onChange={e => setScriptOptions({...scriptOptions, backupLocation: e.target.value})} disabled={!backupFiles} />
+              <Form.Check id="overwriteRadio" label="Overwrite" type="radio" checked={scriptOptions.overwrite} onChange={e => setScriptOptions({...scriptOptions, overwrite: e.target.checked})} inline />
+              <Form.Check id="appendRadio" label="Append" type="radio" checked={!scriptOptions.overwrite} onChange={e => setScriptOptions({...scriptOptions, overwrite: !e.target.checked})} inline />
+              <Form.Check id="environmentHeaderCheckbox" label="Environment header?" checked={scriptOptions.includeEnvironmentHeader} onChange={e => setScriptOptions({...scriptOptions, includeEnvironmentHeader: e.target.checked})} />
+              <Form.Check id="selfDestructCheckbox" label="Delete script after?" checked={scriptOptions.selfDestructAfter} onChange={e => setScriptOptions({...scriptOptions, selfDestructAfter: e.target.checked})} />
             </Col>
             <Col xs="auto">
               <div><strong>Revert script options</strong></div>
               <Form.Check id="generateRevertCheckbox" label="Generate revert file" checked={generateRevert} onChange={e => setGenerateRevertFile(e.target.checked)} />
-              <Form.Control id="revertScriptPath" value={revertScriptFilePath} onChange={e => setRevertScriptFilePath(e.target.value)} disabled={!generateRevert || revertOnly} />
-              <Form.Check id="selfDestructRevertCheckbox" label="Delete script after reverting?" checked={selfDestructAfterReverting} onChange={e => setSelfDestructAfterReverting(e.target.checked)} />
-              <Form.Check id="revertOnlyCheckbox" label="Generate ONLY revert file" checked={revertOnly} onChange={e => setRevertOnly(e.target.checked)} />
+              <Form.Control id="revertScriptPath" value={scriptOptions.revertScriptFilePath!} onChange={e => setScriptOptions({...scriptOptions, revertScriptFilePath: e.target.value})} disabled={!generateRevert || scriptOptions.revertOnly} />
+              <Form.Check id="selfDestructRevertCheckbox" label="Delete script after reverting?" checked={scriptOptions.selfDestructAfterReverting} onChange={e => setScriptOptions({...scriptOptions, selfDestructAfterReverting: e.target.checked})} />
+              <Form.Check id="revertOnlyCheckbox" label="Generate ONLY revert file" checked={scriptOptions.revertOnly} onChange={e => setScriptOptions({...scriptOptions, revertOnly: e.target.checked})} />
             </Col>
           </Row>}
           <Row className="pt-3">
@@ -134,19 +131,19 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
             {fileOutput && <Col>
               <div><strong>Directions</strong></div>
               <div>Save the script on the right to your environment directoy.</div>
-              {!revertOnly && <div>
+              {!scriptOptions.revertOnly && <div>
                 It will create the following files containing environment variables:
                 <ul>
                   {fileExport && fileExport.files.map((x, idx) => {
-                    return <li key={idx}><code>{`./${x.path}/${envFileName}`}</code></li>
+                    return <li key={idx}><code>{`./${x.path}/${scriptOptions.envFileName}`}</code></li>
                   })}
                 </ul>
               </div>}
               <div>
-                The script <span className={scriptWillBackup ? "text-success" : "text-danger"}>will{!scriptWillBackup ? ' not': ''}</span> generate a backup{backupLocation ? <> at <code>{backupLocation}</code></> : ''}.
+                The script <span className={scriptWillBackup ? "text-success" : "text-danger"}>will{!scriptWillBackup ? ' not': ''}</span> generate a backup{scriptOptions.backupLocation ? <> at <code>{scriptOptions.backupLocation}</code></> : ''}.
               </div>
-              {!revertOnly && generateRevert && <div>
-                Running the script will also generate a revert file at <code>{revertScriptFilePath}</code> that you can run to revert the changes.
+              {!scriptOptions.revertOnly && generateRevert && <div>
+                Running the script will also generate a revert file at <code>{scriptOptions.revertScriptFilePath}</code> that you can run to revert the changes.
               </div>}
             </Col>}
             {fileOutput && <Col>

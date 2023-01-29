@@ -7,9 +7,10 @@ export default class FileService {
 
   public generateScript = (files: ExportFileResponse[], opt: ScriptGenerationOptions) => {
     const envFileName = opt.envFileName ?? '.env';
-    let output = '#!/bin/bash\n';
+    let output = '';
 
     if(!opt.revertOnly){
+      output += '#!/bin/bash\n';
       output += files.map(x => {
         let file = '';
         file += `mkdir -p ${x.path}\n`;
@@ -26,7 +27,7 @@ export default class FileService {
     }
     
     output += this.generateRevertScript(files, opt);
-    output += opt.selfDestructAfter ? 'rm $0\n' : '';
+    output += opt.selfDestructAfter && !opt.revertOnly ? 'rm $0\n' : '';
     return output;
   }
 

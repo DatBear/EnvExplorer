@@ -45,23 +45,23 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
       template: Environment.defaultTemplate,
       templateValues: parameter.parameters[0].templateValues
     };
-    
+
     parameterApiService.compareParameters(request).then(res => {
       updateCompareParametersResponse(res, true);
     });
   }
 
   const showFromSearch = (param: MissingParameterResponse, search: string) => {
-    return search == '' || param.name.indexOf(search) >= 0 || param.parameters.find(x => x.name.indexOf(search) >= 0 || x.value!.indexOf(search) >= 0);
+    return search === '' || param.name.indexOf(search) >= 0 || param.parameters.find(x => x.name.indexOf(search) >= 0 || x.value!.indexOf(search) >= 0);
   }
 
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
+    <Modal show={show} onHide={handleClose} size="xl">
       <Modal.Header closeButton>
         <Container>
           <Row>
-            <Col><strong>{response.missingByValue} Missing Parameters</strong></Col>
-            <Col xs="auto"><SearchBar /></Col>
+            <Col className="pt-2"><strong>{response.missingByValue} Missing Parameters</strong></Col>
+            <Col><SearchBar /></Col>
           </Row>
         </Container>
       </Modal.Header>

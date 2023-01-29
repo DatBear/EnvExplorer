@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Modal, Container, Row, Col, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import FileService from "../Services/FileService";
+import { useToasts } from "./Contexts/ToastContext";
 
 type EnvFileModalProps = {
   show: boolean;
@@ -17,9 +18,10 @@ function EnvFileModal({show, setShow, group, templateOptions, selectedTemplateOp
   const fileService = useMemo(() => new FileService(), []);
 
   const [fileOutput, setFileOutput] = useState('');
-  const [recentlyCopied, setRecentlyCopied] = useState(false);
 
   const handleClose = () => setShow(false);
+
+  const { addToast } = useToasts();
 
   useEffect(() => {
     let header = fileService.getTemplateHeader(selectedTemplateOptions);
@@ -27,16 +29,9 @@ function EnvFileModal({show, setShow, group, templateOptions, selectedTemplateOp
     setFileOutput(fileOutput);
   }, [fileService, group, selectedTemplateOptions]);
 
-  useEffect(() => {
-    if(!recentlyCopied) return;
-    setTimeout(() => {
-      setRecentlyCopied(false);
-    }, 2000);
-  }, [recentlyCopied]);
-
   const copyFile = () => {
     navigator.clipboard.writeText(fileOutput);
-    setRecentlyCopied(true);
+    addToast({ message: 'File copied to clipboard!', textColor: 'success' });
   }
 
   return (
@@ -55,7 +50,7 @@ function EnvFileModal({show, setShow, group, templateOptions, selectedTemplateOp
               <div className="file">
                 <div style={{position: 'relative'}}>
                   <div className="copy-file-button">
-                    <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>{recentlyCopied ? 'Copied!' : 'Copy file to clipboard'}</Tooltip>}>
+                    <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>Copy file to clipboard</Tooltip>}>
                       <FontAwesomeIcon icon={faCopy} onClick={_ => copyFile()} />
                     </OverlayTrigger>
                   </div>

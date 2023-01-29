@@ -1,5 +1,5 @@
 import React from "react";
-import SearchContext, { useSearch } from "./Contexts/SearchContext";
+import { useSearch } from "./Contexts/SearchContext";
 
 type ParameterValueProps = {
   name: string;

@@ -1,7 +1,7 @@
 import { Accordion } from "react-bootstrap";
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
-import SearchContext, { useSearch } from "./Contexts/SearchContext";
+import { useSearch } from "./Contexts/SearchContext";
 import ParameterValue from "./ParameterValue";
 
 type ParameterGroupProps = {

@@ -10,8 +10,8 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faFile, faFileExport, faRefresh, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { Accordion, Button, Dropdown, DropdownButton, Form, InputGroup, Spinner } from 'react-bootstrap';
+import { faAdd, faFile, faFileExport, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { Accordion, Button, Dropdown, DropdownButton, Spinner } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
@@ -19,8 +19,8 @@ import MissingParametersModal from './Components/MissingParametersModal';
 import EnvFileModal from './Components/EnvFileModal';
 import CreateParameterModal from './Components/CreateParameterModal';
 import FileExportModal from './Components/ExportFilesModal';
-import SearchContext, { SearchContextProvider, useSearch } from './Components/Contexts/SearchContext';
 import { SearchBar } from './Components/SearchBar';
+import { useToasts } from './Components/Contexts/ToastContext';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -37,16 +37,16 @@ function App() {
   const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const {search, setSearch} = useSearch();
-  const searchRef = useRef();
-
   const dataFetched = useRef(false);
+  const { addToast } = useToasts();
 
   useEffect(() => {
     if(dataFetched.current) return;
     dataFetched.current = true;
     parameterApiService.getTemplateOptions().then(data => {
       setTemplateOptions(data);
+    }).catch(err => {
+      addToast({message: err, textColor: 'danger'});
     });
   }, [parameterApiService]);
 
@@ -60,8 +60,12 @@ function App() {
 
   useEffect(() => {
     if(showCreateModal) return;
-    refreshAll();
+    fechData();
   }, [showCreateModal]);
+
+  const fechData = () => {
+    setSelectedTemplateOptions({...selectedTemplateOptions});
+  }
 
   const setSelectedOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
@@ -105,7 +109,7 @@ function App() {
 
   return (
     <div className="container-fluid app">
-      <header><img src="/img/icon.png" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
+      <header><img src="/img/icon.png" className="rounded" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
       {templateOptions && <div className="row align-items-center">
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
           return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />

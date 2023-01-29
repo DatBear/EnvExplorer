@@ -8,6 +8,7 @@ import ParameterApiService from "../Services/ParameterApiService";
 import Environment from "../Data/Environment";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
+import { useToasts } from "./Contexts/ToastContext";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
@@ -18,13 +19,13 @@ type ParameterOffCanvasProps = {
 function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse } : ParameterOffCanvasProps) {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
 
-  const [recentlyCopied, setRecentlyCopied] = useState(false);
-  const [recentlyCopiedEnv, setRecentlyCopiedEnv] = useState(false);
   const [name, setName] = useState(parameter.name);
   const [value, setValue] = useState(parameter.value);
   const [isEditMode, setIsEditMode] = useState(false);
   const [show, setShow] = useState(true);
   const handleClose = () => setShow(false);
+
+  const { addToast } = useToasts();
   
   useEffect(() => {
     setValue(parameter.value);
@@ -33,28 +34,14 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
     setShow(true);
   }, [parameter]);
 
-  useEffect(() => {
-    if(!recentlyCopied) return;
-    setTimeout(() => {
-      setRecentlyCopied(false);
-    }, 2000);
-  }, [recentlyCopied]);
-
-  useEffect(() => {
-    if(!recentlyCopiedEnv) return;
-    setTimeout(() => {
-      setRecentlyCopiedEnv(false);
-    }, 2000);
-  }, [recentlyCopiedEnv]);
-
   const copy = () => {
     navigator.clipboard.writeText(`${name}=${value}`);
-    setRecentlyCopied(true);
+    addToast({ message: 'Parameter copied to clipboard!', textColor: 'success' });
   };
 
   const copyEnv = () => {
     navigator.clipboard.writeText(Environment.getEnvFileParameter(name, value));
-    setRecentlyCopiedEnv(true);
+    addToast({ message: 'Parameter copied to clipboard!', textColor: 'success' });
   }
 
   const toggleEditMode = () => {
@@ -97,12 +84,12 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
       <Offcanvas.Body>
         <div className="row">
           <div className="col-auto">
-            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy'}>{recentlyCopied ? 'Copied!' : 'Copy name=value'}</Tooltip>}>
+            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy'}>Copy name=value</Tooltip>}>
               <FontAwesomeIcon icon={faCopy} onClick={_ => copy()} />
             </OverlayTrigger>
           </div>
           <div className="col-auto">
-            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>{recentlyCopiedEnv ? 'Copied!' : 'Copy local .env value'}</Tooltip>}>
+            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>Copy local .env value</Tooltip>}>
               <FontAwesomeIcon icon={faCopy} onClick={_ => copyEnv()} />
             </OverlayTrigger>
           </div>

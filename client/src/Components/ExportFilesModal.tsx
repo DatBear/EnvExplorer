@@ -8,6 +8,7 @@ import GetFileExportParametersResponse from "../Data/Model/GetFileExportParamete
 import ScriptGenerationOptions from "../Data/Model/ScriptGenerationOptions";
 import FileService from "../Services/FileService";
 import ParameterApiService from "../Services/ParameterApiService";
+import { useToasts } from "./Contexts/ToastContext";
 import TemplateOption from "./TemplateOption";
 
 type ExportFilesModalProps = {
@@ -21,7 +22,6 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
   const fileService = useMemo(() => new FileService(), []);
   
   const [fileOutput, setFileOutput] = useState('');
-  const [recentlyCopied, setRecentlyCopied] = useState(false);
   const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Record<string, string[]>>({});
   const [fileExport, setFileExport] = useState<GetFileExportParametersResponse>();
 
@@ -37,18 +37,12 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
     envFileName: '.env',
     revertScriptFilePath: './revertEnvVars.sh'
   });
-
-  const [generateRevert, setGenerateRevertFile] = useState(true);
+  const [generateRevertScript, setGenerateRevertScript] = useState(true);
   const [backupFiles, setBackupFiles] = useState(true);
   
   const handleClose = () => setShow(false);
 
-  useEffect(() => {
-    if(!recentlyCopied) return;
-    setTimeout(() => {
-      setRecentlyCopied(false);
-    }, 2000);
-  }, [recentlyCopied]);
+  const { addToast } = useToasts();
 
   useEffect(() => {
     if(!fileExport) {
@@ -58,11 +52,11 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
 
     var script = fileService.generateScript(fileExport.files, {
       ...scriptOptions,
-      revertScriptFilePath : generateRevert ? scriptOptions.revertScriptFilePath : '',
+      revertScriptFilePath : generateRevertScript ? scriptOptions.revertScriptFilePath : '',
       backupLocation : backupFiles ? scriptOptions.backupLocation : ''
     });
     setFileOutput(script.toString());
-  }, [fileService, fileExport, scriptOptions]);
+  }, [fileService, fileExport, scriptOptions, backupFiles, generateRevertScript]);
 
   const setSelectedOptions = (name: string, values: string[]) => {
     selectedTemplateOptions[name] = values;
@@ -73,7 +67,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
 
   const copyFile = () => {
     navigator.clipboard.writeText(fileOutput);
-    setRecentlyCopied(true);
+    addToast({ message: 'Script copied to clipboard!', textColor: 'success' });
   }
 
   const generateFile = () => {
@@ -116,10 +110,10 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
             </Col>
             <Col xs="auto">
               <div><strong>Revert script options</strong></div>
-              <Form.Check id="generateRevertCheckbox" label="Generate revert file" checked={generateRevert} onChange={e => setGenerateRevertFile(e.target.checked)} />
-              <Form.Control id="revertScriptPath" placeholder="Revert script path" value={scriptOptions.revertScriptFilePath!} onChange={e => setScriptOptions({...scriptOptions, revertScriptFilePath: e.target.value})} disabled={!generateRevert || scriptOptions.revertOnly} />
+              <Form.Check id="generateRevertCheckbox" label="Generate revert script" checked={generateRevertScript} onChange={e => setGenerateRevertScript(e.target.checked)} />
+              <Form.Control id="revertScriptPath" placeholder="Revert script path" value={scriptOptions.revertScriptFilePath!} onChange={e => setScriptOptions({...scriptOptions, revertScriptFilePath: e.target.value})} disabled={!generateRevertScript || scriptOptions.revertOnly} />
               <Form.Check id="selfDestructRevertCheckbox" label="Delete script after reverting?" checked={scriptOptions.selfDestructAfterReverting} onChange={e => setScriptOptions({...scriptOptions, selfDestructAfterReverting: e.target.checked})} />
-              <Form.Check id="revertOnlyCheckbox" label="Generate ONLY revert file" checked={scriptOptions.revertOnly} onChange={e => setScriptOptions({...scriptOptions, revertOnly: e.target.checked})} />
+              <Form.Check id="revertOnlyCheckbox" label="Generate ONLY revert script" checked={scriptOptions.revertOnly} onChange={e => setScriptOptions({...scriptOptions, revertOnly: e.target.checked})} />
             </Col>
           </Row>}
           <Row className="pt-3">
@@ -142,7 +136,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
               <div>
                 The script <span className={scriptWillBackup ? "text-success" : "text-danger"}>will{!scriptWillBackup ? ' not': ''}</span> generate a backup{scriptOptions.backupLocation ? <> at <code>{scriptOptions.backupLocation}</code></> : ''}.
               </div>
-              {!scriptOptions.revertOnly && generateRevert && <div>
+              {!scriptOptions.revertOnly && generateRevertScript && <div>
                 Running the script will also generate a revert file at <code>{scriptOptions.revertScriptFilePath}</code> that you can run to revert the changes.
               </div>}
             </Col>}
@@ -151,7 +145,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
               {(fileExport?.files.length ?? 0) > 0 && <div className="file">
                 <div style={{position: 'relative'}}>
                   <div className="copy-file-button">
-                    <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>{recentlyCopied ? 'Copied!' : 'Copy file to clipboard'}</Tooltip>}>
+                    <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>Copy script to clipboard</Tooltip>}>
                       <FontAwesomeIcon icon={faCopy} onClick={_ => copyFile()} />
                     </OverlayTrigger>
                   </div>

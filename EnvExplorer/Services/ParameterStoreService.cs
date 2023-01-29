@@ -339,7 +339,7 @@ public class ParameterStoreService : IParameterStoreService
                     Type = request.Type,
                     LastModifiedDate = DateTime.UtcNow
                 };
-                parameters.Add(newParam);
+                _cachedParameters.Add(newParam);
             }
         }
         catch (Exception ex)

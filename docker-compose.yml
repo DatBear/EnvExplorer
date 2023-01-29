@@ -16,4 +16,4 @@ services:
       dockerfile: ./docker/client/Dockerfile
     container_name: envexplorer-client
     ports: 
-      - "5102:80"
+      - "5103:80"

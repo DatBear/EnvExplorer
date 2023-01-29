@@ -19,7 +19,8 @@ import MissingParametersModal from './Components/MissingParametersModal';
 import EnvFileModal from './Components/EnvFileModal';
 import CreateParameterModal from './Components/CreateParameterModal';
 import FileExportModal from './Components/ExportFilesModal';
-import SearchContext from './Components/Contexts/SearchContext';
+import SearchContext, { SearchContextProvider, useSearch } from './Components/Contexts/SearchContext';
+import { SearchBar } from './Components/SearchBar';
 
 function App() {
   const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -36,7 +37,7 @@ function App() {
   const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const [search, setSearch] = useState('');
+  const {search, setSearch} = useSearch();
   const searchRef = useRef();
 
   const dataFetched = useRef(false);
@@ -103,59 +104,47 @@ function App() {
   }
 
   return (
-    <SearchContext.Provider value={search.toLowerCase()}>
-      <div className="container-fluid app">
-        <header><img src="/img/icon.png" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
-        {templateOptions && <div className="row align-items-center">
-          {templateOptions && Object.keys(templateOptions).map((key, idx) => {
-            return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
-          })}
-          <div className="col-auto pt-4">
-            <Button variant="success" size="sm" onClick={_ => refreshAll()}>
-              {isRefreshing ? <Spinner animation="border" role="status" size="sm">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
-            </Button>
-          </div>
-          <div className="col-auto pt-4">
-            <DropdownButton title="Find missing in" size="sm">
-              {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => missingBy(x)}>{x}</Dropdown.Item>)}
-            </DropdownButton>
-          </div>
-          <div className="col-auto pt-4">
-            <Button size="sm" variant="success" onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
-          </div>
-          <div className="col-auto pt-4">
-            <Button size="sm" onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
-          </div>
-          <div className="col-auto pt-4">
-            <Button size="sm" onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
-          </div>
-          <div className="col-auto pt-4">
-            <InputGroup>
-                <InputGroup.Text id="search"><FontAwesomeIcon icon={faSearch} /></InputGroup.Text>
-                <Form.Control
-                  placeholder="Filter parameters"
-                  aria-label="Filter parameters"
-                  aria-describedby="search"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  ref={searchRef.current}
-                />
-            </InputGroup>
-          </div>
-        </div>}
+    <div className="container-fluid app">
+      <header><img src="/img/icon.png" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" /></header>
+      {templateOptions && <div className="row align-items-center">
+        {templateOptions && Object.keys(templateOptions).map((key, idx) => {
+          return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
+        })}
+        <div className="col-auto pt-4">
+          <Button variant="success" size="sm" onClick={_ => refreshAll()}>
+            {isRefreshing ? <Spinner animation="border" role="status" size="sm">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
+          </Button>
+        </div>
+        <div className="col-auto pt-4">
+          <DropdownButton title="Find missing in" size="sm">
+            {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => missingBy(x)}>{x}</Dropdown.Item>)}
+          </DropdownButton>
+        </div>
+        <div className="col-auto pt-4">
+          <Button size="sm" variant="success" onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
+        </div>
+        <div className="col-auto pt-4">
+          <Button size="sm" onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
+        </div>
+        <div className="col-auto pt-4">
+          <Button size="sm" onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
+        </div>
+        <div className="col-auto pt-4">
+          <SearchBar />
+        </div>
+      </div>}
 
-        <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
-        {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
-        {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}
-        {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion> }
-        {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
-        {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
-        {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
-        {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} editMode={compareEditMode} />}
-      </div>
-    </SearchContext.Provider>
+      <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
+      {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
+      {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}
+      {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion> }
+      {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
+      {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
+      {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
+      {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} editMode={compareEditMode} />}
+    </div>
   );
 }
 

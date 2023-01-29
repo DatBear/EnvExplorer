@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { SearchContextProvider } from './Components/Contexts/SearchContext';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import './Styles/bootstrap.scss';
@@ -8,7 +9,9 @@ import './Styles/bootstrap.scss';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <SearchContextProvider>
+      <App />
+    </SearchContextProvider>
   </React.StrictMode>
 );
 

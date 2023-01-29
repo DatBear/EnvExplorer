@@ -7,6 +7,8 @@ import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import MissingParameterResponse from "../Data/Model/MissingParameterResponse";
 import MissingParametersResponse from "../Data/Model/MissingParametersResponse";
 import ParameterApiService from "../Services/ParameterApiService";
+import { useSearch } from "./Contexts/SearchContext";
+import { SearchBar } from "./SearchBar";
 
 type MissingParametersModalProps = {
   response: MissingParametersResponse;
@@ -21,6 +23,8 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
 
   const [show, setShow] = useState(true);
   const handleClose = () => setShow(false);
+
+  const { search } = useSearch();
   
   useEffect(() => {
     setShow(true);
@@ -41,15 +45,26 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
       template: Environment.defaultTemplate,
       templateValues: parameter.parameters[0].templateValues
     };
-
+    
     parameterApiService.compareParameters(request).then(res => {
       updateCompareParametersResponse(res, true);
     });
   }
 
+  const showFromSearch = (param: MissingParameterResponse, search: string) => {
+    return search == '' || param.name.indexOf(search) >= 0 || param.parameters.find(x => x.name.indexOf(search) >= 0 || x.value!.indexOf(search) >= 0);
+  }
+
   return (
     <Modal show={show} onHide={handleClose} size="xl" centered>
-      <Modal.Header closeButton><strong>{response.missingByValue} Missing Parameters</strong></Modal.Header>
+      <Modal.Header closeButton>
+        <Container>
+          <Row>
+            <Col><strong>{response.missingByValue} Missing Parameters</strong></Col>
+            <Col xs="auto"><SearchBar /></Col>
+          </Row>
+        </Container>
+      </Modal.Header>
       <Modal.Body>
         <Container>
           {!response.parameters.length && <span>No missing parameters found for {response.missingByValue}.</span>}
@@ -58,7 +73,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
               <Col>Showing missing parameters for {response.missingByOption}: {response.missingByValue}.</Col>
             </Row>
             <Accordion alwaysOpen defaultActiveKey={Array.from(Array(response.parameters.length).keys()).map(x => x.toString())}>
-              {response.parameters.map((x, idx) => {
+              {response.parameters.filter(x => showFromSearch(x, search)).map((x, idx) => {
                 return (
                   <Accordion.Item key={idx} eventKey={idx.toString()}>
                     <Accordion.Header>{x.name}</Accordion.Header>

@@ -1,6 +1,11 @@
 class Environment {
   public static readonly baseUrl = process.env.REACT_APP_apiBaseUrl!;
   public static readonly defaultTemplate = process.env.REACT_APP_defaultTemplate!;
+  public static readonly awsAccessKeyId = process.env.REACT_APP_AWSConfig__AccessKeyId!;
+  public static readonly awsAccessKeySecret = process.env.REACT_APP_AWSConfig__AccessKeySecret!;
+  public static readonly awsRegion = process.env.REACT_APP_AWSConfig__Region!;
+  private static readonly rawParameterStoreAllowedPrefixes = process.env.REACT_APP_ParameterStoreConfig__AllowedPrefixes;
+  public static readonly parameterStoreAllowedPrefixes = this.rawParameterStoreAllowedPrefixes?.split(',') ?? ['/'];
 
   public static templateOptions = () => {
     return this.defaultTemplate.split('/')

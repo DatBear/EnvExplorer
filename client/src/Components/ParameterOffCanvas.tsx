@@ -9,6 +9,7 @@ import Environment from "../Data/Environment";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import { useToasts } from "./Contexts/ToastContext";
+import ParameterStoreService from "../Services/v2/ParameterStoreService";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
@@ -17,7 +18,8 @@ type ParameterOffCanvasProps = {
 }
 
 function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse } : ParameterOffCanvasProps) {
-  const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
 
   const [name, setName] = useState(parameter.name);
   const [value, setValue] = useState(parameter.value);

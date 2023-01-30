@@ -52,7 +52,7 @@ public class ParameterStoreService : IParameterStoreService
         request.Template = request.Template.EndsWith("/*") ? request.Template[..^2] : request.Template;
 
         var cachedParams = await GetCachedParameters();
-
+        
         var templateOptions = await GetTemplateOptions(request.Template);
         var missingByValue = request.TemplateValues[request.MissingByOption];
         var missingOptions = templateOptions[request.MissingByOption].Except(new List<string> { missingByValue }).ToList();
@@ -233,7 +233,8 @@ public class ParameterStoreService : IParameterStoreService
     private List<string> GetTemplateCombinations(string template, Dictionary<string, string[]> templateOptions)
     {
         //this method is kinda bad but works for now, low volume of total combinations anyways
-        var allCombos = ComboExtensions.GetAllPossibleCombos(templateOptions.Select(x => x.Value.Select(v => $"{x.Key}={v}")));
+        var comboInput = templateOptions.Select(x => x.Value.Select(v => $"{x.Key}={v}"));
+        var allCombos = ComboExtensions.GetAllPossibleCombos(comboInput);
         var allTemplates = new List<string>();
         foreach (var combo in allCombos)
         {
@@ -269,7 +270,7 @@ public class ParameterStoreService : IParameterStoreService
         return templateOptions;
     }
 
-    public async Task<ParameterGroupResponse?> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null)
+    private async Task<ParameterGroupResponse?> GetGroupedParameters(IEnumerable<CachedParameter>? cachedParameters = null)
     {
         var parameters = cachedParameters?.ToList() ?? await GetCachedParameters();
         if (!parameters.Any())
@@ -337,7 +338,8 @@ public class ParameterStoreService : IParameterStoreService
                     Name = request.Name,
                     Value = request.Value,
                     Type = request.Type,
-                    LastModifiedDate = DateTime.UtcNow
+                    LastModifiedDate = DateTime.UtcNow,
+                    //todo add isHidden
                 };
                 _cachedParameters.Add(newParam);
             }

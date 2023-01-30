@@ -7,6 +7,7 @@ import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import MissingParameterResponse from "../Data/Model/MissingParameterResponse";
 import MissingParametersResponse from "../Data/Model/MissingParametersResponse";
 import ParameterApiService from "../Services/ParameterApiService";
+import ParameterStoreService from "../Services/v2/ParameterStoreService";
 import { useSearch } from "./Contexts/SearchContext";
 import { SearchBar } from "./SearchBar";
 
@@ -17,7 +18,8 @@ type MissingParametersModalProps = {
 }
 
 function MissingParametersModal({ response, selectedTemplateOptions, updateCompareParametersResponse } : MissingParametersModalProps) {
-  const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
 
   const forceUpdate = useReducer(() => ({}), {})[1];
 

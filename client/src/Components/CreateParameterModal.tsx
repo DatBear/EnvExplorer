@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Modal, Container, Row, Col, Button, InputGroup, Form } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import ParameterApiService from "../Services/ParameterApiService";
+import ParameterStoreService from "../Services/v2/ParameterStoreService";
 import { useToasts } from "./Contexts/ToastContext";
 
 type CreateParameterModalProps = {
@@ -12,7 +13,8 @@ type CreateParameterModalProps = {
 }
 
 function CreateParameterModal({show, setShow, templateOptions, selectedTemplateOptions}: CreateParameterModalProps) {
-  const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
 
   const availableTypes = ['String', 'SecureString'];
 

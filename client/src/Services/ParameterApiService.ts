@@ -33,13 +33,13 @@ export default class ParameterApiService {
     });
   }
 
-  getTemplateOptions(template: string | null = null) {
-    var url = `${Environment.baseUrl}/parameters/templateOptions?template=${template ?? Environment.defaultTemplate}`;
+  getTemplateOptions() {
+    var url = `${Environment.baseUrl}/parameters/templateOptions?template=${Environment.defaultTemplate}`;
     return this.get<Record<string, string[]>>(url);
   }
 
-  getGroupedParameters(template: string | null = null, templateValues: Record<string, string>) {
-    var url = `${Environment.baseUrl}/parameters/list?template=${template ?? Environment.defaultTemplate}`;
+  listParameters(templateValues: Record<string, string>) {
+    var url = `${Environment.baseUrl}/parameters/list?template=${Environment.defaultTemplate}`;
     return this.post<ParameterGroupResponse>(url, templateValues);
   }
 

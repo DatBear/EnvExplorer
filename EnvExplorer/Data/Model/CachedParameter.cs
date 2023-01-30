@@ -8,6 +8,5 @@ public class CachedParameter
     public string Value { get; set; }
     public string Type { get; set; }
     public DateTime LastModifiedDate { get; set; }
-    public ParameterType ParameterType { get; set; }
     public bool IsHidden { get; set; }
 }

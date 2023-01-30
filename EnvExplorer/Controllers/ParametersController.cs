@@ -61,13 +61,6 @@ public class ParametersController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("grouped")]
-    public async Task<IActionResult> GetGroupedParameters()
-    {
-        var groupedParameters = await _parameterStoreService.GetGroupedParameters();
-        return Ok(groupedParameters);
-    }
-
     [HttpPost("update")]
     public async Task<IActionResult> Update(UpdateParameterValueRequest request)
     {

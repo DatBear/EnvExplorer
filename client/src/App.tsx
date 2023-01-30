@@ -22,9 +22,11 @@ import FileExportModal from './Components/ExportFilesModal';
 import { SearchBar } from './Components/SearchBar';
 import { useToasts } from './Components/Contexts/ToastContext';
 import icon from './Images/icon.png';
+import ParameterStoreService from './Services/v2/ParameterStoreService';
 
 function App() {
-  const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [templateOptions, setTemplateOptions] = useState<Record<string, string[]>>({});
@@ -59,7 +61,7 @@ function App() {
   useEffect(() => {
     if(Object.keys(selectedTemplateOptions).length === 0) return;
     setIsRefreshing(true);
-    parameterApiService.getGroupedParameters(null, selectedTemplateOptions).then(data => {
+    parameterApiService.listParameters(selectedTemplateOptions).then(data => {
       setIsRefreshing(false);
       setSelectedGroup(data);
     });
@@ -86,7 +88,7 @@ function App() {
 
   const refreshAll = () => {
     setIsRefreshing(true);
-    parameterApiService.refreshAllParameters().then(() => {
+    parameterApiService.refreshCache().then(() => {
       parameterApiService.getTemplateOptions().then(data => {
         setIsRefreshing(false);
         setTemplateOptions(data);

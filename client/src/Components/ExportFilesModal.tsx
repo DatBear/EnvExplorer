@@ -8,6 +8,7 @@ import GetFileExportParametersResponse from "../Data/Model/GetFileExportParamete
 import ScriptGenerationOptions from "../Data/Model/ScriptGenerationOptions";
 import FileService from "../Services/FileService";
 import ParameterApiService from "../Services/ParameterApiService";
+import ParameterStoreService from "../Services/v2/ParameterStoreService";
 import { useToasts } from "./Contexts/ToastContext";
 import TemplateOption from "./TemplateOption";
 
@@ -18,7 +19,9 @@ type ExportFilesModalProps = {
 }
 
 function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProps) {
-  const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
+  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+
   const fileService = useMemo(() => new FileService(), []);
   
   const [fileOutput, setFileOutput] = useState('');

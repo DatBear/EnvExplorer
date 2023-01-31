@@ -45,11 +45,11 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
     container.profileNames = [...new Set([...container.profileNames, currentProfile])];
     setAppSettingsContainer(container);
     Environment.__initialize();
-  }, [currentAppSettings, currentProfile, appSettingsContainer.allAppSettings, appSettingsContainer.currentProfile, appSettingsContainer.profileNames])
+  }, [currentAppSettings, currentProfile])
 
   useEffect(() => {
     setCurrentAppSettings(appSettingsContainer.allAppSettings[currentProfile] ?? {} as Required<AppSettings>);
-  }, [currentProfile, appSettingsContainer.allAppSettings]);
+  }, [currentProfile]);
 
   const setSelectedProfile = (name: string) => {
     setCurrentProfile(name);

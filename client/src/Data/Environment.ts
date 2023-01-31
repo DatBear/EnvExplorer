@@ -15,12 +15,12 @@ class Environment {
 
   public static __initialize() {
     const appSettings = getCurrentAppSettings();
-    this.defaultTemplate = appSettings.template ?? this.defaultTemplate;
-    this.awsAccessKeyId = appSettings.awsAccessKeyId;
-    this.awsAccessKeySecret = appSettings.awsAccessKeySecret;
-    this.awsRegion = appSettings.awsRegion;
-    this.rawParameterStoreAllowedPrefixes = appSettings.rawParameterStoreAllowedPrefixes;
-    this.rawParameterStoreHiddenPatterns = appSettings.rawParameterStoreHiddenPatterns;
+    this.defaultTemplate = appSettings?.template ?? this.defaultTemplate;
+    this.awsAccessKeyId = appSettings?.awsAccessKeyId;
+    this.awsAccessKeySecret = appSettings?.awsAccessKeySecret;
+    this.awsRegion = appSettings?.awsRegion;
+    this.rawParameterStoreAllowedPrefixes = appSettings?.rawParameterStoreAllowedPrefixes;
+    this.rawParameterStoreHiddenPatterns = appSettings?.rawParameterStoreHiddenPatterns;
   }
 
   public static templateOptions = () => {

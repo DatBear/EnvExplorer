@@ -13,7 +13,8 @@ export function getAppSettingsContainer() {
     currentProfile: 'default',
     allAppSettings: {
       "default": {
-        template: ''
+        template: '',
+        awsRegion: 'us-east-2'
       } as AppSettings
     },
     

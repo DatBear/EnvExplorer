@@ -13,6 +13,12 @@ type SettingsOffCanvasProps = {
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const awsRegions = ['us-east-2', 'us-east-1', 'us-west-1', 'us-west-2', 
+  'af-south-1', 'ap-east-1', 'ap-south-2', 'ap-southeast-3', 'ap-southeast-4', 'ap-south-1', 'ap-northeast-3', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 
+  'ca-central-1', 'eu-central-1', 'eu-west-1', 'eu-west-2', 'eu-south-1', 'eu-west-3', 'eu-south-2', 'eu-north-1', 'eu-central-2', 'me-south-1', 'me-central-1', 'sa-east-1', 
+  'us-gov-east-1', 'us-gov-west-1'
+];
+
 type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
 
 function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
@@ -88,7 +94,9 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
           <Row className="mb-2">
             <Col>
               <div><strong>AWS Region</strong></div>
-              <Form.Control id="awsRegion" placeholder="Region" value={currentAppSettings.awsRegion ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, awsRegion: e.target.value})} />
+              <select id="awsRegion" className="form-control" value={currentAppSettings.awsRegion ?? awsRegions[0]} onChange={e => setCurrentAppSettings({...currentAppSettings, awsRegion: e.target.value})}>
+                {awsRegions.map(x => <option key={x} value={x}>{x}</option>)}
+              </select>
             </Col>
           </Row>
           <Row className="mb-2">

@@ -1,9 +1,7 @@
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Modal, Offcanvas, Row } from "react-bootstrap";
-import { atom, RecoilValue, useRecoilState } from "recoil";
-import { recoilPersist } from "recoil-persist";
 import { useToasts } from "./Contexts/ToastContext";
 import PasswordInput from "./PasswordInput";
 
@@ -26,30 +24,29 @@ type AppSettingsContainer = {
   allAppSettings: Record<string, AppSettings>;
 }
 
-const { persistAtom } = recoilPersist();
-
-const appSettingsState = atom<AppSettingsContainer>({
-  key: 'allAppSettings',
-  default: { 
-    profileNames: ['default'], 
-    allAppSettings: { 
-      "default": {} as Required<AppSettings>
-    }
-  } as AppSettingsContainer,
-  effects_UNSTABLE: [persistAtom],
-});
-
 type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
 
+const defaultAppSettingsContainer = {
+  allAppSettings: {},
+  profileNames: ['default']
+} as AppSettingsContainer;
+
+let getAppSettingsContainer = () => {
+  return JSON.parse(localStorage.getItem("appSettingsContainer") || JSON.stringify(defaultAppSettingsContainer)) as AppSettingsContainer;
+};
+
 function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
-  console.log('localstorage', window.localStorage);
-  const [appSettingsContainer, setAppSettingsContainer] = useRecoilState(appSettingsState); 
+  const [appSettingsContainer, setAppSettingsContainer] = useState<AppSettingsContainer>(getAppSettingsContainer() as AppSettingsContainer); 
   const [currentProfile, setCurrentProfile] = useState('default');
   const [currentAppSettings, setCurrentAppSettings] = useState(appSettingsContainer.allAppSettings[currentProfile]); 
 
-  const [showAddProfileModal, setShowAddProfileModal] = useState(false); 
+  const [showAddProfileModal, setShowAddProfileModal] = useState(false);  
   
   const handleClose = () => setShow(false);
+
+  useEffect(() => {
+    localStorage.setItem("appSettingsContainer", JSON.stringify(appSettingsContainer));
+  }, [appSettingsContainer]);
 
   useEffect(() => {
     const container = {
@@ -57,6 +54,7 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
       profileNames: [...appSettingsContainer.profileNames]
     } as AppSettingsContainer;
     container.allAppSettings[currentProfile] = {...currentAppSettings};
+    container.profileNames = [...new Set([...container.profileNames, currentProfile])];
     setAppSettingsContainer(container);
   }, [currentAppSettings])
 
@@ -85,45 +83,47 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
             <Button onClick={_ => setShowAddProfileModal(true)} variant="success" className="mt-3"><FontAwesomeIcon icon={faAdd} /></Button>
           </Col>
         </Row>
-        <Row className="mb-2">
-          <Col> 
-            <div><strong>AWS Access Key Id</strong></div>
-            <PasswordInput id="awsKey" placeholder="Access Key Id" value={currentAppSettings.awsAccessKeyId ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({...currentAppSettings, awsAccessKeyId: e.target.value})} />
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <div><strong>AWS Access Key Secret</strong></div>
-            <PasswordInput id="awsSecret" placeholder="Access Key Secret" value={currentAppSettings.awsAccessKeySecret ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({...currentAppSettings, awsAccessKeySecret: e.target.value})} />
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <div><strong>AWS Region</strong></div>
-            <Form.Control id="awsRegion" placeholder="Region" value={currentAppSettings.awsRegion ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, awsRegion: e.target.value})} />
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <div><strong>Template</strong></div>
-            <Form.Control id="template" placeholder="Template" value={currentAppSettings.template ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, template: e.target.value})} />
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <div><strong>Allowed Prefixes</strong></div>
-            <Form.Control id="allowedPrefixes" placeholder="Allowed Prefixes" value={currentAppSettings.rawParameterStoreAllowedPrefixes ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreAllowedPrefixes: e.target.value})} />
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <div><strong>Hidden Patterns</strong></div>
-            <Form.Control id="hiddenPatterns" placeholder="Hidden Patterns" value={currentAppSettings.rawParameterStoreHiddenPatterns ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreHiddenPatterns: e.target.value})} />
-          </Col>
-        </Row>
+        {currentAppSettings && <>
+          <Row className="mb-2">
+            <Col> 
+              <div><strong>AWS Access Key Id</strong></div>
+              <PasswordInput id="awsKey" placeholder="Access Key Id" value={currentAppSettings.awsAccessKeyId ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({...currentAppSettings, awsAccessKeyId: e.target.value})} />
+            </Col>
+          </Row>
+          <Row className="mb-2">
+            <Col>
+              <div><strong>AWS Access Key Secret</strong></div>
+              <PasswordInput id="awsSecret" placeholder="Access Key Secret" value={currentAppSettings.awsAccessKeySecret ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({...currentAppSettings, awsAccessKeySecret: e.target.value})} />
+            </Col>
+          </Row>
+          <Row className="mb-2">
+            <Col>
+              <div><strong>AWS Region</strong></div>
+              <Form.Control id="awsRegion" placeholder="Region" value={currentAppSettings.awsRegion ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, awsRegion: e.target.value})} />
+            </Col>
+          </Row>
+          <Row className="mb-2">
+            <Col>
+              <div><strong>Template</strong></div>
+              <Form.Control id="template" placeholder="Template" value={currentAppSettings.template ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, template: e.target.value})} />
+            </Col>
+          </Row>
+          <Row className="mb-2">
+            <Col>
+              <div><strong>Allowed Prefixes</strong></div>
+              <Form.Control id="allowedPrefixes" placeholder="Allowed Prefixes" value={currentAppSettings.rawParameterStoreAllowedPrefixes ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreAllowedPrefixes: e.target.value})} />
+            </Col>
+          </Row>
+          <Row className="mb-2">
+            <Col>
+              <div><strong>Hidden Patterns</strong></div>
+              <Form.Control id="hiddenPatterns" placeholder="Hidden Patterns" value={currentAppSettings.rawParameterStoreHiddenPatterns ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreHiddenPatterns: e.target.value})} />
+            </Col>
+          </Row>
+        </>}
       </Offcanvas.Body>
     </Offcanvas>
-    <AddSettingsProfileModal show={showAddProfileModal} setShow={setShowAddProfileModal} setSelectedProfile={setSelectedProfile} />
+    <AddSettingsProfileModal show={showAddProfileModal} setShow={setShowAddProfileModal} setSelectedProfile={setSelectedProfile} initialAppSettingsContainer={appSettingsContainer} />
   </>);
 }
 
@@ -131,13 +131,14 @@ type AddSettingsProfileModalProps = {
   show: boolean;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedProfile: (name: string) => void;
+  initialAppSettingsContainer: AppSettingsContainer;
 };
 
-function AddSettingsProfileModal({ show, setShow, setSelectedProfile } : AddSettingsProfileModalProps) {
+function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialAppSettingsContainer } : AddSettingsProfileModalProps) {
   const handleClose = () => setShow(false);
 
   const { addToast } = useToasts();
-  const [appSettingsContainer, setAppSettingsContainer] = useRecoilState(appSettingsState);
+  const [appSettingsContainer, setAppSettingsContainer] = useState(initialAppSettingsContainer);
   const [name, setName] = useState('');
 
   const addNewProfile = () => {
@@ -147,9 +148,9 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile } : AddSett
     } else {
       const container = {
         allAppSettings: { ...appSettingsContainer.allAppSettings },
-        profileNames: [...appSettingsContainer.profileNames]
+        profileNames: [...appSettingsContainer.profileNames, name]
       } as AppSettingsContainer; 
-      container.profileNames = [...container.profileNames, name];
+      //container.profileNames = [...container.profileNames, name];
       setAppSettingsContainer(container);
       setSelectedProfile(name);
       setName('');

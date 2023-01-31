@@ -22,8 +22,6 @@
     "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "recoil": "^0.7.6",
-    "recoil-persist": "^4.2.0",
     "sass": "^1.57.1",
     "typescript": "^4.9.4",
     "web-vitals": "^2.1.0"

@@ -17,8 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: go to app
-        - run: cd ./client
-        - run: ls
+        run: cd ./client
+      - name: show contents
+        run: ls
       - name: install app dependencies and build it
         run: yarn && yarn build
 #      - name: setup node

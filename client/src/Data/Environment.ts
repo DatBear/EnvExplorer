@@ -1,11 +1,27 @@
+import ParameterStoreService from "../Services/ParameterStoreService";
+import { getCurrentAppSettings } from "./Model/AppSettings";
+import { getAppSettingsContainer } from "./Model/AppSettingsContainer";
+
 class Environment {
-  public static readonly baseUrl = process.env.REACT_APP_apiBaseUrl!;
-  public static readonly defaultTemplate = process.env.REACT_APP_defaultTemplate!;
-  public static readonly awsAccessKeyId = process.env.REACT_APP_AWSConfig__AccessKeyId!;
-  public static readonly awsAccessKeySecret = process.env.REACT_APP_AWSConfig__AccessKeySecret!;
-  public static readonly awsRegion = process.env.REACT_APP_AWSConfig__Region!;
-  private static readonly rawParameterStoreAllowedPrefixes = process.env.REACT_APP_ParameterStoreConfig__AllowedPrefixes;
-  public static readonly parameterStoreAllowedPrefixes = this.rawParameterStoreAllowedPrefixes?.split(',') ?? ['/'];
+  public static baseUrl = process.env.REACT_APP_apiBaseUrl!;
+  public static defaultTemplate = '';
+  public static awsAccessKeyId = '';
+  public static awsAccessKeySecret = '';
+  public static awsRegion = '';
+  private static rawParameterStoreAllowedPrefixes: string = '/';
+  public static parameterStoreAllowedPrefixes = [...new Set([...this.rawParameterStoreAllowedPrefixes?.split(','), '/'])] ?? ['/'];
+  private static rawParameterStoreHiddenPatterns: string = '/EnvExplorer/';
+  public static parameterStoreHiddenPatterns = [...new Set([...this.rawParameterStoreHiddenPatterns?.split(','), '/EnvExplorer/'])] ?? ['/EnvExplorer/'];
+
+  public static __initialize() {
+    const appSettings = getCurrentAppSettings();
+    this.defaultTemplate = appSettings.template ?? this.defaultTemplate;
+    this.awsAccessKeyId = appSettings.awsAccessKeyId;
+    this.awsAccessKeySecret = appSettings.awsAccessKeySecret;
+    this.awsRegion = appSettings.awsRegion;
+    this.rawParameterStoreAllowedPrefixes = appSettings.rawParameterStoreAllowedPrefixes;
+    this.rawParameterStoreHiddenPatterns = appSettings.rawParameterStoreHiddenPatterns;
+  }
 
   public static templateOptions = () => {
     return this.defaultTemplate.split('/')
@@ -39,5 +55,6 @@ class Environment {
     return `${this.removeTemplate(name).replaceAll('/', '__')}=${value}`;
   }
 }
+Environment.__initialize();
 
 export default Environment;

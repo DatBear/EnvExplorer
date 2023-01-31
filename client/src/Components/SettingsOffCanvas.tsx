@@ -2,6 +2,9 @@ import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Modal, Offcanvas, Row } from "react-bootstrap";
+import Environment from "../Data/Environment";
+import { AppSettings } from "../Data/Model/AppSettings";
+import { AppSettingsContainer, getAppSettingsContainer } from "../Data/Model/AppSettingsContainer";
 import { useToasts } from "./Contexts/ToastContext";
 import PasswordInput from "./PasswordInput";
 
@@ -10,34 +13,11 @@ type SettingsOffCanvasProps = {
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-type AppSettings = {
-  awsAccessKeyId: string;
-  awsAccessKeySecret: string;
-  awsRegion: string;
-  template: string;
-  rawParameterStoreAllowedPrefixes: string;
-  rawParameterStoreHiddenPatterns: string;
-};
-
-type AppSettingsContainer = {
-  profileNames: string[];
-  allAppSettings: Record<string, AppSettings>;
-}
-
 type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
-
-const defaultAppSettingsContainer = {
-  allAppSettings: {},
-  profileNames: ['default']
-} as AppSettingsContainer;
-
-let getAppSettingsContainer = () => {
-  return JSON.parse(localStorage.getItem("appSettingsContainer") || JSON.stringify(defaultAppSettingsContainer)) as AppSettingsContainer;
-};
 
 function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
   const [appSettingsContainer, setAppSettingsContainer] = useState<AppSettingsContainer>(getAppSettingsContainer() as AppSettingsContainer); 
-  const [currentProfile, setCurrentProfile] = useState('default');
+  const [currentProfile, setCurrentProfile] = useState(appSettingsContainer.currentProfile);
   const [currentAppSettings, setCurrentAppSettings] = useState(appSettingsContainer.allAppSettings[currentProfile]); 
 
   const [showAddProfileModal, setShowAddProfileModal] = useState(false);  
@@ -51,15 +31,24 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
   useEffect(() => {
     const container = {
       allAppSettings: { ...appSettingsContainer.allAppSettings },
+      currentProfile: appSettingsContainer.currentProfile,
       profileNames: [...appSettingsContainer.profileNames]
     } as AppSettingsContainer;
     container.allAppSettings[currentProfile] = {...currentAppSettings};
+    container.currentProfile = currentProfile;
     container.profileNames = [...new Set([...container.profileNames, currentProfile])];
     setAppSettingsContainer(container);
+    Environment.__initialize();
   }, [currentAppSettings])
 
   useEffect(() => {
+    const container = {
+      allAppSettings: { ...appSettingsContainer.allAppSettings },
+      currentProfile: currentProfile,
+      profileNames: [...appSettingsContainer.profileNames]
+    } as AppSettingsContainer;
     setCurrentAppSettings(appSettingsContainer.allAppSettings[currentProfile] ?? {} as Required<AppSettings>);
+    setAppSettingsContainer(container);
   }, [currentProfile]);
 
   const setSelectedProfile = (name: string) => {

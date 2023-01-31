@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RecoilRoot } from 'recoil';
 import App from './App';
 import { SearchContextProvider } from './Components/Contexts/SearchContext';
 import { ToastContextProvider } from './Components/Contexts/ToastContext';
@@ -11,13 +10,11 @@ import './Styles/bootstrap.scss';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    <RecoilRoot>
-      <SearchContextProvider>
-        <ToastContextProvider>
-          <App />
-        </ToastContextProvider>
-      </SearchContextProvider>
-    </RecoilRoot>
+    <SearchContextProvider>
+      <ToastContextProvider>
+        <App />
+      </ToastContextProvider>
+    </SearchContextProvider>
   </React.StrictMode>
 );
 

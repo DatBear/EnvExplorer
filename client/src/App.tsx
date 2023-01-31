@@ -11,7 +11,7 @@ import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAdd, faFile, faFileExport, faGear, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { Accordion, Button, Dropdown, DropdownButton, Row, Spinner } from 'react-bootstrap';
+import { Accordion, Button, Col, Dropdown, DropdownButton, Row, Spinner } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
@@ -54,9 +54,7 @@ function App() {
     dataFetched.current = true;
     parameterApiService.getTemplateOptions().then(data => {
       setTemplateOptions(data);
-    }).catch(err => {
-      addToast({message: err, textColor: 'danger'});
-    });
+    }).catch(showError);
 
   }, [parameterApiService, addToast]);
 
@@ -66,7 +64,7 @@ function App() {
     parameterApiService.listParameters(selectedTemplateOptions).then(data => {
       setIsRefreshing(false);
       setSelectedGroup(data);
-    });
+    }).catch(showError);
   }, [selectedTemplateOptions, parameterApiService]);
 
   useEffect(() => {
@@ -95,9 +93,13 @@ function App() {
         setIsRefreshing(false);
         setTemplateOptions(data);
         setSelectedTemplateOptions({...selectedTemplateOptions});
-      });
-    });
+      }).catch(showError);
+    }).catch(showError);
   };
+
+  const reloadPage = () => {
+    window.location.reload();
+  }
 
   const missingBy = (option: string) => {
     const request : MissingParametersRequest = {
@@ -110,10 +112,38 @@ function App() {
     });
   }
 
+  const showError = (err: any) => {
+    addToast({ message: 'Error: ' + err, textColor: 'danger' });
+    setIsRefreshing(false);
+  }
+
   const groupAccordions = (group: ParameterGroupResponse) : Number => {
     return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
   }
   
+  if(Object.keys(templateOptions).length === 0) {
+    return (<div className="container-fluid app">
+      <Row className="m-3">
+        <Col xs="auto">
+          <Button  size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
+        </Col>
+        <Col xs="auto">
+          <Button variant="success" size="sm" onClick={_ => reloadPage()}>
+            {isRefreshing ? <Spinner animation="border" role="status" size="sm">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
+          </Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col xs="12">
+          <div>Error loading parameters, check your settings and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
+        </Col>
+      </Row>
+      <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
+    </div>)
+  }
+
   return (
     <div className="container-fluid app">
       <header>

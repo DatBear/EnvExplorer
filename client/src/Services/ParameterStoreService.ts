@@ -18,13 +18,15 @@ import UpdateParameterValueResponse from "../Data/Model/UpdateParameterValueResp
 export default class ParameterStoreService {
   public static instance : ParameterStoreService = new ParameterStoreService();
 
-  private readonly ssmClient: SSMClient;
-  private readonly parameterPrefixes: string[];
+  private ssmClient!: SSMClient;
+  private parameterPrefixes!: string[];
+  private hiddenPatterns!: string[];
   private cachedParameters?: CachedParameter[];
-  private readonly template: string;
+  private template!: string;
+  
   private readonly templatePartRegex = /\{(\w+)\}/g;//REMEMBER: GLOBAL REGEX STORES STATE
 
-  private constructor() {
+  public __updateEnvironment(){
     this.ssmClient = new SSMClient({ 
       region: Environment.awsRegion, 
       credentials: { 
@@ -33,7 +35,13 @@ export default class ParameterStoreService {
       } 
     });
     this.parameterPrefixes = Environment.parameterStoreAllowedPrefixes;
+    this.hiddenPatterns = Environment.parameterStoreHiddenPatterns;
     this.template = Environment.defaultTemplate.endsWith('/*') ? Environment.defaultTemplate.substring(0, Environment.defaultTemplate.length-2) : Environment.defaultTemplate;
+    this.cachedParameters = undefined;
+  }
+
+  private constructor() {
+    this.__updateEnvironment();
   }
 
   private async getAllParameters() {
@@ -80,7 +88,7 @@ export default class ParameterStoreService {
       name: x.Name,
       type: x.Type,
       value: x.Value,
-      isHidden: false//todo implement later
+      isHidden: this.hiddenPatterns.find(p => x.Name!.indexOf(p) > -1) != null
     } as CachedParameter));
     return this.cachedParameters.filter(x => includeHidden || !x.isHidden);
   }
@@ -153,7 +161,7 @@ export default class ParameterStoreService {
         value: request.value,
         type: request.type,
         lastModifiedDate: new Date(),
-        isHidden: false//todo fix
+        isHidden: this.hiddenPatterns.find(p => request.name.indexOf(p) > -1) != null
       };
       this.cachedParameters?.push(newParam);
     }

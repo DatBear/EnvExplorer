@@ -7,7 +7,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "envExplorer",
+    "productName": "EnvExplorer",
     "version": "0.1.0"
   },
   "tauri": {

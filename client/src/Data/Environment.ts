@@ -7,9 +7,9 @@ class Environment {
   public static awsAccessKeySecret = '';
   public static awsRegion = '';
   private static rawParameterStoreAllowedPrefixes: string = '/';
-  public static parameterStoreAllowedPrefixes = [...new Set([...this.rawParameterStoreAllowedPrefixes?.split(','), '/'])] ?? ['/'];
+  public static parameterStoreAllowedPrefixes = () => [...new Set([...this.rawParameterStoreAllowedPrefixes?.split(',') ?? ''])] ?? ['/'];
   private static rawParameterStoreHiddenPatterns: string = '/EnvExplorer/';
-  public static parameterStoreHiddenPatterns = [...new Set([...this.rawParameterStoreHiddenPatterns?.split(','), '/EnvExplorer/'])] ?? ['/EnvExplorer/'];
+  public static parameterStoreHiddenPatterns = () => [...new Set([...this.rawParameterStoreHiddenPatterns?.split(',') ?? '', '/EnvExplorer/'])] ?? ['/EnvExplorer/'];
 
   public static __initialize() {
     const appSettings = getCurrentAppSettings();

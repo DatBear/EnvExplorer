@@ -32,10 +32,10 @@ export default class ParameterStoreService {
       credentials: { 
         accessKeyId: Environment.awsAccessKeyId, 
         secretAccessKey: Environment.awsAccessKeySecret 
-      } 
+      }
     });
-    this.parameterPrefixes = Environment.parameterStoreAllowedPrefixes;
-    this.hiddenPatterns = Environment.parameterStoreHiddenPatterns;
+    this.parameterPrefixes = Environment.parameterStoreAllowedPrefixes();
+    this.hiddenPatterns = Environment.parameterStoreHiddenPatterns();
     this.template = Environment.defaultTemplate.endsWith('/*') ? Environment.defaultTemplate.substring(0, Environment.defaultTemplate.length-2) : Environment.defaultTemplate;
     this.cachedParameters = undefined;
   }

@@ -17,4 +17,4 @@ jobs:
       - name: publish
         uses: JonasKruckenberg/tauri-build@v1.0.3
         with:
-          projectPath: ../client
+          projectPath: ../../client

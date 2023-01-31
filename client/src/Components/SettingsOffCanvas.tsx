@@ -145,7 +145,7 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialApp
       setAppSettingsContainer(container);
       setSelectedProfile(name);
       setName('');
-      handleClose();      
+      handleClose();
     }
   }
 

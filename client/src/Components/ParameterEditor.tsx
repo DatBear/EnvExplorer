@@ -15,7 +15,7 @@ function ParameterEditor({ value, isEditMode, onChange: onChangeProp } : Paramet
 
   useEffect(() => {
     onChangeProp(stateValue);
-  }, [stateValue])
+  }, [stateValue, onChangeProp])
 
   return (<>
     {isEditMode && <>

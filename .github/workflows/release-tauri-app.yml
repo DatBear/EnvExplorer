@@ -1,40 +1,21 @@
-name: 'publish'
-on:
-  push:
-    branches:
-      - release-tauri-app
-
-jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
-
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: install app dependencies and build it
-        run: yarn && yarn build
-      - uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+name: tauri-build
+  on:
+    push:
+      branches:
+        - release-tauri-app
+  # You may pin to the exact commit or the version.
+  # uses: JonasKruckenberg/tauri-build@406f9292d464c04add8c74e8ed1ed4105b91a20e
+  uses: JonasKruckenberg/tauri-build@v1.0.3
+  with:
+    # Binary to use to build the application
+    # runner: # optional
+    # Additional arguments for the build command
+    # args: # optional
+    # Path to the root of the project
+    projectPath: ./client
+    # Path to the tauri.conf.json file if you want a configuration different from the default one
+    # configPath: # optional
+    # The target triple to build against
+    # target: # optional
+    # Builds with the debug flag
+    # debug: # optional

@@ -7,7 +7,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "env-explorer",
+    "productName": "envExplorer",
     "version": "0.1.0"
   },
   "tauri": {
@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.datbear.envexplorer",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

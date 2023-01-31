@@ -1,6 +1,4 @@
-import ParameterStoreService from "../Services/ParameterStoreService";
 import { getCurrentAppSettings } from "./Model/AppSettings";
-import { getAppSettingsContainer } from "./Model/AppSettingsContainer";
 
 class Environment {
   public static baseUrl = process.env.REACT_APP_apiBaseUrl!;

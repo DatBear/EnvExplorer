@@ -5,7 +5,6 @@ import { Button, Col, Container, Row, Modal, Dropdown, Badge } from "react-boots
 import DropdownItem from "react-bootstrap/esm/DropdownItem";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import TemplatedParameterValueResponse from "../Data/Model/TemplatedParameterValueResponse";
-import ParameterApiService from "../Services/ParameterApiService";
 import ParameterStoreService from "../Services/ParameterStoreService";
 import ParameterEditor from "./ParameterEditor";
 

@@ -129,12 +129,13 @@ export default class ParameterStoreService {
     
     let parentGroup = [topLevel];
     for(i = 2; i <= maxLevel-1; i++) {
+      const a = i;
       if(parentGroup.length === 0) break;
       for(const parent of parentGroup) {
-        parent.children = [...new Set(parameters.filter(x => x.name.startsWith(parent.name + '/') && this.nameMaxLevel(x.name) > i+1).map(x => this.nameLevel(x.name, i)))]
-          .map(x => ({ name: this.nameLevel(x, i)} as ParameterGroupResponse));
+        parent.children = [...new Set(parameters.filter(x => x.name.startsWith(parent.name + '/') && this.nameMaxLevel(x.name) > a+1).map(x => this.nameLevel(x.name, a)))]
+          .map(x => ({ name: this.nameLevel(x, a)} as ParameterGroupResponse));
         parent.parameters = parameters.filter(x => x.name.startsWith(parent.name+'/'))
-          .filter(x => this.nameMaxLevel(x.name) === i + 1)
+          .filter(x => this.nameMaxLevel(x.name) === a + 1)
           .map(x => ({ name: x.name, value: x.value, type: x.type } as ParameterValueResponse));
       }
       parentGroup = parentGroup.flatMap(x => x.children).filter(x => x != null);

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, DropdownButton, OverlayTrigger, Tooltip } from "react-bootstrap";
-import ParameterApiService from "../Services/ParameterApiService";
 import Environment from "../Data/Environment";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";

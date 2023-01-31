@@ -6,7 +6,6 @@ import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import MissingParameterResponse from "../Data/Model/MissingParameterResponse";
 import MissingParametersResponse from "../Data/Model/MissingParametersResponse";
-import ParameterApiService from "../Services/ParameterApiService";
 import ParameterStoreService from "../Services/ParameterStoreService";
 import { useSearch } from "./Contexts/SearchContext";
 import { SearchBar } from "./SearchBar";

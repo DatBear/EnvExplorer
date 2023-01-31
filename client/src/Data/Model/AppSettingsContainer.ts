@@ -1,4 +1,3 @@
-import Environment from "../Environment";
 import { AppSettings } from "./AppSettings";
 
 export type AppSettingsContainer = {

@@ -45,17 +45,11 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
     container.profileNames = [...new Set([...container.profileNames, currentProfile])];
     setAppSettingsContainer(container);
     Environment.__initialize();
-  }, [currentAppSettings])
+  }, [currentAppSettings, currentProfile, appSettingsContainer.allAppSettings, appSettingsContainer.currentProfile, appSettingsContainer.profileNames])
 
   useEffect(() => {
-    const container = {
-      allAppSettings: { ...appSettingsContainer.allAppSettings },
-      currentProfile: currentProfile,
-      profileNames: [...appSettingsContainer.profileNames]
-    } as AppSettingsContainer;
     setCurrentAppSettings(appSettingsContainer.allAppSettings[currentProfile] ?? {} as Required<AppSettings>);
-    setAppSettingsContainer(container);
-  }, [currentProfile]);
+  }, [currentProfile, appSettingsContainer.allAppSettings]);
 
   const setSelectedProfile = (name: string) => {
     setCurrentProfile(name);
@@ -139,7 +133,7 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialApp
   const [name, setName] = useState('');
 
   const addNewProfile = () => {
-    var existingProfile = appSettingsContainer.profileNames.find(x => x == name);
+    var existingProfile = appSettingsContainer.profileNames.find(x => x === name);
     if(existingProfile){
       addToast({ message: 'Error: profile already exists!', textColor: 'danger' });
     } else {

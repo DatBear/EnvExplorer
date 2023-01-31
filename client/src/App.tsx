@@ -1,7 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ParameterApiService from './Services/ParameterApiService';
 import TemplateOption from './Components/TemplateOption';
 import ParameterGroupResponse from './Data/Model/ParameterGroupResponse';
 import ParameterGroup from './Components/ParameterGroup';
@@ -49,6 +48,11 @@ function App() {
     setSelectedTemplateOptions((s) => ({...s}));
   }, []);
 
+  const showError = useCallback((err: any) => {
+    addToast({ message: 'Error: ' + err, textColor: 'danger' });
+    setIsRefreshing(false);
+  }, [addToast]);
+
   useEffect(() => {
     if(dataFetched.current) return;
     dataFetched.current = true;
@@ -56,7 +60,7 @@ function App() {
       setTemplateOptions(data);
     }).catch(showError);
 
-  }, [parameterApiService, addToast]);
+  }, [parameterApiService, addToast, showError]);
 
   useEffect(() => {
     if(Object.keys(selectedTemplateOptions).length === 0) return;
@@ -65,7 +69,7 @@ function App() {
       setIsRefreshing(false);
       setSelectedGroup(data);
     }).catch(showError);
-  }, [selectedTemplateOptions, parameterApiService]);
+  }, [selectedTemplateOptions, parameterApiService, showError]);
 
   useEffect(() => {
     if(showCreateModal) return;
@@ -110,11 +114,6 @@ function App() {
     parameterApiService.missingParameters(request).then(res => {
       setMissingParametersResponse(res);
     });
-  }
-
-  const showError = (err: any) => {
-    addToast({ message: 'Error: ' + err, textColor: 'danger' });
-    setIsRefreshing(false);
   }
 
   const groupAccordions = (group: ParameterGroupResponse) : Number => {

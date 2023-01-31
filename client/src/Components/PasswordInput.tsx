@@ -1,14 +1,9 @@
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useId, useState } from "react";
-import { Form, InputGroup } from "react-bootstrap";
-
-type PasswordInputProps = {
-}
+import { useState } from "react";
 
 function PasswordInput({ ...props }) {
   const [isVisible, setIsVisible] = useState(false);
-  const id = useId();
 
   return (
     <div className="input-group">

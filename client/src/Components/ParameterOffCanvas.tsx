@@ -9,7 +9,7 @@ import Environment from "../Data/Environment";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import { useToasts } from "./Contexts/ToastContext";
-import ParameterStoreService from "../Services/v2/ParameterStoreService";
+import ParameterStoreService from "../Services/ParameterStoreService";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;

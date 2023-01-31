@@ -1,19 +1,19 @@
 import { SSMClient, GetParametersByPathCommand, Parameter, PutParameterCommand } from "@aws-sdk/client-ssm";
-import Environment from "../../Data/Environment";
-import { CachedParameter } from "../../Data/Model/CachedParameter";
-import CompareParametersRequest from "../../Data/Model/CompareParametersRequest";
-import CompareParametersResponse from "../../Data/Model/CompareParametersResponse";
-import ExportFileResponse from "../../Data/Model/ExportFileResponse";
-import GetFileExportParametersRequest from "../../Data/Model/GetFileExportParametersRequest";
-import GetFileExportParametersResponse from "../../Data/Model/GetFileExportParametersResponse";
-import MissingParameterResponse from "../../Data/Model/MissingParameterResponse";
-import MissingParametersRequest from "../../Data/Model/MissingParametersRequest";
-import MissingParametersResponse from "../../Data/Model/MissingParametersResponse";
-import ParameterGroupResponse from "../../Data/Model/ParameterGroupResponse";
-import ParameterValueResponse from "../../Data/Model/ParameterValueResponse";
-import TemplatedParameterValueResponse from "../../Data/Model/TemplatedParameterValueResponse";
-import UpdateParameterValueRequest from "../../Data/Model/UpdateParameterValueRequest";
-import UpdateParameterValueResponse from "../../Data/Model/UpdateParameterValueResponse";
+import Environment from "../Data/Environment";
+import { CachedParameter } from "../Data/Model/CachedParameter";
+import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
+import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
+import ExportFileResponse from "../Data/Model/ExportFileResponse";
+import GetFileExportParametersRequest from "../Data/Model/GetFileExportParametersRequest";
+import GetFileExportParametersResponse from "../Data/Model/GetFileExportParametersResponse";
+import MissingParameterResponse from "../Data/Model/MissingParameterResponse";
+import MissingParametersRequest from "../Data/Model/MissingParametersRequest";
+import MissingParametersResponse from "../Data/Model/MissingParametersResponse";
+import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
+import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
+import TemplatedParameterValueResponse from "../Data/Model/TemplatedParameterValueResponse";
+import UpdateParameterValueRequest from "../Data/Model/UpdateParameterValueRequest";
+import UpdateParameterValueResponse from "../Data/Model/UpdateParameterValueResponse";
 
 export default class ParameterStoreService {
   public static instance : ParameterStoreService = new ParameterStoreService();

@@ -10,8 +10,8 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faFile, faFileExport, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { Accordion, Button, Dropdown, DropdownButton, Spinner } from 'react-bootstrap';
+import { faAdd, faFile, faFileExport, faGear, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { Accordion, Button, Dropdown, DropdownButton, Row, Spinner } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
@@ -22,7 +22,8 @@ import FileExportModal from './Components/ExportFilesModal';
 import { SearchBar } from './Components/SearchBar';
 import { useToasts } from './Components/Contexts/ToastContext';
 import icon from './Images/icon.png';
-import ParameterStoreService from './Services/v2/ParameterStoreService';
+import ParameterStoreService from './Services/ParameterStoreService';
+import SettingsOffCanvas from './Components/SettingsOffCanvas';
 
 function App() {
   //const parameterApiService = useMemo(() => new ParameterApiService(), []);
@@ -39,6 +40,7 @@ function App() {
   const [showFileModal, setShowFileModal] = useState(false);
   const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showSettingsOffCanvas, setShowSettingsOffCanvas] = useState(false);
 
   const dataFetched = useRef(false);
   const { addToast } = useToasts();
@@ -111,41 +113,46 @@ function App() {
   const groupAccordions = (group: ParameterGroupResponse) : Number => {
     return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
   }
-
+  
   return (
     <div className="container-fluid app">
       <header>
         <img src={icon} className="rounded" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" />
       </header>
-      <div className="row align-items-center">
+      <Row className="ps-2">
+        <div className="col-auto pt-4">
+          <Button size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
+        </div>
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
           return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
         })}
-        <div className="col-auto pt-4">
+      </Row>
+      <Row className="pt-3 ps-2">
+        <div className="col-auto">
           <Button variant="success" size="sm" onClick={_ => refreshAll()}>
             {isRefreshing ? <Spinner animation="border" role="status" size="sm">
               <span className="visually-hidden">Loading...</span>
             </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
           </Button>
         </div>
-        <div className="col-auto pt-4">
+        <div className="col-auto">
           <DropdownButton title="Find missing in" size="sm">
             {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => missingBy(x)}>{x}</Dropdown.Item>)}
           </DropdownButton>
         </div>
-        <div className="col-auto pt-4">
+        <div className="col-auto">
           <Button size="sm" variant="success" onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
         </div>
-        <div className="col-auto pt-4">
+        <div className="col-auto">
           <Button size="sm" onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
         </div>
-        <div className="col-auto pt-4">
+        <div className="col-auto">
           <Button size="sm" onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
         </div>
-        <div className="col-auto pt-4">
+        <div className="col-auto">
           <SearchBar />
         </div>
-      </div>
+      </Row>
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
       {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}
@@ -154,6 +161,7 @@ function App() {
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
       {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
       {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} editMode={compareEditMode} />}
+      <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
     </div>
   );
 }

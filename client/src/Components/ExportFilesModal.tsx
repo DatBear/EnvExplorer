@@ -8,7 +8,7 @@ import GetFileExportParametersResponse from "../Data/Model/GetFileExportParamete
 import ScriptGenerationOptions from "../Data/Model/ScriptGenerationOptions";
 import FileService from "../Services/FileService";
 import ParameterApiService from "../Services/ParameterApiService";
-import ParameterStoreService from "../Services/v2/ParameterStoreService";
+import ParameterStoreService from "../Services/ParameterStoreService";
 import { useToasts } from "./Contexts/ToastContext";
 import TemplateOption from "./TemplateOption";
 

@@ -6,7 +6,7 @@ import DropdownItem from "react-bootstrap/esm/DropdownItem";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import TemplatedParameterValueResponse from "../Data/Model/TemplatedParameterValueResponse";
 import ParameterApiService from "../Services/ParameterApiService";
-import ParameterStoreService from "../Services/v2/ParameterStoreService";
+import ParameterStoreService from "../Services/ParameterStoreService";
 import ParameterEditor from "./ParameterEditor";
 
 type CompareParametersModalProps = {

@@ -1,7 +1,3 @@
-.app{
-    margin-top: 35px;
-}
-
 table tbody tr.missing td {
     color: red !important;
 }

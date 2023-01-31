@@ -2,12 +2,12 @@ import { useMemo, useState, useEffect } from "react";
 import { Modal, Container, Row, Col, Button, InputGroup, Form } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import ParameterApiService from "../Services/ParameterApiService";
-import ParameterStoreService from "../Services/v2/ParameterStoreService";
+import ParameterStoreService from "../Services/ParameterStoreService";
 import { useToasts } from "./Contexts/ToastContext";
 
 type CreateParameterModalProps = {
   show: boolean;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
   templateOptions: Record<string, string[]>;
   selectedTemplateOptions: Record<string, string>;
 }

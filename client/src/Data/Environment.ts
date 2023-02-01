@@ -7,9 +7,15 @@ class Environment {
   public static awsAccessKeySecret = '';
   public static awsRegion = '';
   private static rawParameterStoreAllowedPrefixes: string = '/';
-  public static parameterStoreAllowedPrefixes = () => [...new Set([...this.rawParameterStoreAllowedPrefixes?.split(',') ?? ''])] ?? ['/'];
+  public static parameterStoreAllowedPrefixes = () => this.getUniqueList(this.rawParameterStoreAllowedPrefixes, ['/']);
   private static rawParameterStoreHiddenPatterns: string = '/EnvExplorer/';
-  public static parameterStoreHiddenPatterns = () => [...new Set([...this.rawParameterStoreHiddenPatterns?.split(',') ?? '', '/EnvExplorer/'])] ?? ['/EnvExplorer/'];
+  public static parameterStoreHiddenPatterns = () => this.getUniqueList(this.rawParameterStoreHiddenPatterns, ['/EnvExplorer/']);
+
+  static getUniqueList(str: string | undefined, defaultValue: string[]) {
+    var split = str?.split('/') ?? [];
+    split = [...new Set([...split])];
+    return split.length === 0 ? defaultValue : split;
+  }
 
   public static __initialize() {
     const appSettings = getCurrentAppSettings();

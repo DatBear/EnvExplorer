@@ -17,8 +17,7 @@ type ParameterOffCanvasProps = {
 }
 
 function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse } : ParameterOffCanvasProps) {
-  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
-  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+  const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const [name, setName] = useState(parameter.name);
   const [value, setValue] = useState(parameter.value);
@@ -50,7 +49,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   }
 
   const saveValue = () => {
-    parameterApiService.saveParameterValue(name, value, parameter.type).then(res => {
+    parameterStoreService.saveParameterValue(name, value, parameter.type).then(res => {
       if(res.name !== undefined && res.value !== undefined) {
         setName(res.name);
         setValue(res.value);
@@ -72,7 +71,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
       parameterName: name
     };
 
-    parameterApiService.compareParameters(request).then(res => {
+    parameterStoreService.compareParameters(request).then(res => {
       updateCompareParametersResponse(res, isEditMode);
     });
   }

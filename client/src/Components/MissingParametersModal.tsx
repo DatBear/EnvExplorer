@@ -7,7 +7,8 @@ import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import MissingParameterResponse from "../Data/Model/MissingParameterResponse";
 import MissingParametersResponse from "../Data/Model/MissingParametersResponse";
 import ParameterStoreService from "../Services/ParameterStoreService";
-import { useSearch } from "./Contexts/SearchContext";
+import { searchFilterMissingParameter, useSearch } from "./Contexts/SearchContext";
+import { useToasts } from "./Contexts/ToastContext";
 import { SearchBar } from "./SearchBar";
 
 type MissingParametersModalProps = {
@@ -17,8 +18,8 @@ type MissingParametersModalProps = {
 }
 
 function MissingParametersModal({ response, selectedTemplateOptions, updateCompareParametersResponse } : MissingParametersModalProps) {
-  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
-  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+  const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
+  const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 
   const forceUpdate = useReducer(() => ({}), {})[1];
 
@@ -26,17 +27,26 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
   const handleClose = () => setShow(false);
 
   const { search } = useSearch();
+  const { addToast, addErrorToast } = useToasts();
   
   useEffect(() => {
     setShow(true);
   }, [response]);
 
+  useEffect(() => {
+    const total = response?.parameters.length ?? 0;
+    setParameterCounts({
+      parameters: total,
+      filteredParameters: response?.parameters?.filter(x => searchFilterMissingParameter(search, x)).length ?? total
+    });
+  }, [response, search]);
+
   const addParameter = (name: string, value: string, type: string) => {
-    parameterApiService.saveParameterValue(name, value, type).then(res => {
+    parameterStoreService.saveParameterValue(name, value, type).then(res => {
       response.parameters = response.parameters.filter(x => x.name !== name);
       forceUpdate();
-      //todo toast success?
-    });
+      addToast({ message: 'Parameter added: ' + name, textColor: 'success' });
+    }).catch(addErrorToast);
   }
 
   const edit = (parameter: MissingParameterResponse) => {
@@ -47,14 +57,14 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
       templateValues: parameter.parameters[0].templateValues
     };
 
-    parameterApiService.compareParameters(request).then(res => {
+    parameterStoreService.compareParameters(request).then(res => {
       updateCompareParametersResponse(res, true);
     });
   }
 
-  const showFromSearch = (param: MissingParameterResponse, search: string) => {
-    return search === '' || param.name.indexOf(search) >= 0 || param.parameters.find(x => x.name.indexOf(search) >= 0 || x.value!.indexOf(search) >= 0);
-  }
+  const parameterCount = () => {
+    return parameterCounts.filteredParameters + (parameterCounts.filteredParameters !== parameterCounts.parameters ? `/${parameterCounts.parameters}` : '');
+  };
 
   return (
     <Modal show={show} onHide={handleClose} size="xl">
@@ -71,10 +81,12 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
           {!response.parameters.length && <span>No missing parameters found for {response.missingByValue}.</span>}
           {!!response.parameters.length && <>
             <Row>
-              <Col>Showing missing parameters for {response.missingByOption}: {response.missingByValue}.</Col>
+              <Col>
+                Showing <strong>{parameterCount()}</strong> missing parameters for {response.missingByOption}: {response.missingByValue}.
+              </Col>
             </Row>
             <Accordion alwaysOpen defaultActiveKey={Array.from(Array(response.parameters.length).keys()).map(x => x.toString())}>
-              {response.parameters.filter(x => showFromSearch(x, search)).map((x, idx) => {
+              {response.parameters.filter(x => searchFilterMissingParameter(search, x)).map((x, idx) => {
                 return (
                   <Accordion.Item key={idx} eventKey={idx.toString()}>
                     <Accordion.Header>{x.name}</Accordion.Header>

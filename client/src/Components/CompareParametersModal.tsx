@@ -6,6 +6,7 @@ import DropdownItem from "react-bootstrap/esm/DropdownItem";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import TemplatedParameterValueResponse from "../Data/Model/TemplatedParameterValueResponse";
 import ParameterStoreService from "../Services/ParameterStoreService";
+import { useToasts } from "./Contexts/ToastContext";
 import ParameterEditor from "./ParameterEditor";
 
 type CompareParametersModalProps = {
@@ -15,8 +16,7 @@ type CompareParametersModalProps = {
 }
 
 function CompareParametersModal({ response, selectedTemplateOptions, editMode } : CompareParametersModalProps) {
-  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
-  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+  const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
   
   const [show, setShow] = useState(true);
   const [isEditMode, setIsEditMode] = useState(editMode);
@@ -25,6 +25,8 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
   const handleClose = () => setShow(false);
   const toggleIsEditMode = () => setIsEditMode(!isEditMode);
   const toggleShowTypes = () => setShowTypes(!showTypes);
+
+  const { addToast, addErrorToast } = useToasts();
   
   useEffect(() => {
     setShow(true);
@@ -32,10 +34,15 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
   }, [editMode, response]);
 
   const save = (parameter: TemplatedParameterValueResponse, type: string | null = null) => {
-    if(parameter.value === null) return;//todo toast error
-    parameterApiService.saveParameterValue(parameter.name, parameter.value, type ?? parameter.type).then(res => {
-      //todo toast
-    });    
+    if(parameter.value === null || parameter.value === '') {
+      addErrorToast('Error: invalid parameter value');
+      return;
+    }
+    parameterStoreService.saveParameterValue(parameter.name, parameter.value, type ?? parameter.type).then(res => {
+      if(res.isSuccess){
+        addToast({ message: 'Successfully updated ' + parameter.name, textColor: 'success'});
+      }
+    }).catch(addErrorToast);
   }
 
   const onValueChanged = (template: TemplatedParameterValueResponse, value: string) => {

@@ -18,8 +18,7 @@ type ExportFilesModalProps = {
 }
 
 function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProps) {
-  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
-  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+  const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const fileService = useMemo(() => new FileService(), []);
   
@@ -77,7 +76,7 @@ function ExportFilesModal({show, setShow, templateOptions}: ExportFilesModalProp
       template: Environment.defaultTemplate,
       templateValues: selectedTemplateOptions
     };
-    parameterApiService.getFileExport(request).then(res => {
+    parameterStoreService.getFileExport(request).then(res => {
       setFileExport(res);
     });
   }

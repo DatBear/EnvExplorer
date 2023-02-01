@@ -12,8 +12,7 @@ type CreateParameterModalProps = {
 }
 
 function CreateParameterModal({show, setShow, templateOptions, selectedTemplateOptions}: CreateParameterModalProps) {
-  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
-  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+  const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const availableTypes = ['String', 'SecureString'];
 
@@ -21,7 +20,10 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   const [type, setType] = useState(availableTypes[0]);
   const [value, setValue] = useState('');
 
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    reset();
+    setShow(false);
+  }
 
   const { addToast } = useToasts();
 
@@ -41,18 +43,22 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
 
   const save = () => {
     const fullName = `${Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}/${name}`;
-    parameterApiService.saveParameterValue(fullName, value, type).then(res => {
+    parameterStoreService.saveParameterValue(fullName, value, type).then(res => {
       if(res.isSuccess) {
-        setName('');
-        setType(availableTypes[0]);
-        setValue('');
+        addToast({ message: 'Save successful!', textColor: 'success' });        
         handleClose();
       } else {
-        addToast({ message: 'Error saving parameter.', textColor: 'danger' })
+        addToastError('Error saving parameter.');
       }
     }).catch(e => {
-      addToast({ message: 'Error saving parameter: ' + e, textColor: 'danger' })
+      addToastError(e);
     });
+  }
+
+  const reset = () => {
+    setValue('');
+    setName('');
+    setType(availableTypes[0]);
   }
 
   return (
@@ -107,3 +113,7 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
 }
 
 export default CreateParameterModal;
+
+function addToastError(arg0: string) {
+  throw new Error("Function not implemented.");
+}

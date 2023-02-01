@@ -23,12 +23,13 @@ import { useToasts } from './Components/Contexts/ToastContext';
 import icon from './Images/icon.png';
 import ParameterStoreService from './Services/ParameterStoreService';
 import SettingsOffCanvas from './Components/SettingsOffCanvas';
+import { searchFilterParameter, useSearch } from './Components/Contexts/SearchContext';
 
 function App() {
-  //const parameterApiService = useMemo(() => new ParameterApiService(), []);
-  const parameterApiService = useMemo(() => ParameterStoreService.instance, []);
+  const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [templateOptions, setTemplateOptions] = useState<Record<string, string[]>>({});
   const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Record<string, string>>({});
   const [selectedGroup, setSelectedGroup] = useState<ParameterGroupResponse>();
@@ -40,41 +41,64 @@ function App() {
   const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettingsOffCanvas, setShowSettingsOffCanvas] = useState(false);
+  const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 
+  const { search } = useSearch();
   const dataFetched = useRef(false);
-  const { addToast } = useToasts();
+  const { addErrorToast } = useToasts();
 
   const fetchData = useCallback(() => {
     setSelectedTemplateOptions((s) => ({...s}));
   }, []);
 
   const showError = useCallback((err: any) => {
-    addToast({ message: 'Error: ' + err, textColor: 'danger' });
+    setHasError(true);
     setIsRefreshing(false);
-  }, [addToast]);
+    addErrorToast(err);
+  }, [addErrorToast]);
+
+  const getTemplateOptions = useCallback(() => {
+    ParameterStoreService.instance.__updateEnvironment();
+    setHasError(false);
+    setIsRefreshing(true);
+    parameterStoreService.getTemplateOptions().then(data => {
+      setIsRefreshing(false);
+      setTemplateOptions(data);
+    }).catch(showError);
+  }, [parameterStoreService, showError]);
 
   useEffect(() => {
     if(dataFetched.current) return;
     dataFetched.current = true;
-    parameterApiService.getTemplateOptions().then(data => {
-      setTemplateOptions(data);
-    }).catch(showError);
-
-  }, [parameterApiService, addToast, showError]);
+    if(Environment.awsAccessKeyId && Environment.awsAccessKeySecret) {
+      getTemplateOptions();
+    } else {
+      setHasError(true);
+    }
+  }, [parameterStoreService, showError, getTemplateOptions]);
 
   useEffect(() => {
     if(Object.keys(selectedTemplateOptions).length === 0) return;
     setIsRefreshing(true);
-    parameterApiService.listParameters(selectedTemplateOptions).then(data => {
+    setHasError(false);
+    parameterStoreService.listParameters(selectedTemplateOptions).then(data => {
       setIsRefreshing(false);
       setSelectedGroup(data);
     }).catch(showError);
-  }, [selectedTemplateOptions, parameterApiService, showError]);
+  }, [selectedTemplateOptions, parameterStoreService, showError]);
 
   useEffect(() => {
     if(showCreateModal) return;
     fetchData();
   }, [showCreateModal, fetchData]);
+
+  useEffect(() => {
+    const total = selectedGroup?.total ?? 0;
+    setParameterCounts({
+      parameters: total,
+      filteredParameters: selectedGroup?.allParameters?.filter(x => searchFilterParameter(search, x)).length ?? total
+    });
+  }, [selectedGroup, search]);
 
   const setSelectedOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
@@ -92,8 +116,9 @@ function App() {
 
   const refreshAll = () => {
     setIsRefreshing(true);
-    parameterApiService.refreshCache().then(() => {
-      parameterApiService.getTemplateOptions().then(data => {
+    setHasError(false);
+    parameterStoreService.refreshCache().then(() => {
+      parameterStoreService.getTemplateOptions().then(data => {
         setIsRefreshing(false);
         setTemplateOptions(data);
         setSelectedTemplateOptions({...selectedTemplateOptions});
@@ -101,24 +126,20 @@ function App() {
     }).catch(showError);
   };
 
-  const reloadPage = () => {
-    window.location.reload();
-  }
-
   const missingBy = (option: string) => {
     const request : MissingParametersRequest = {
       template: Environment.defaultTemplate,
       templateValues: selectedTemplateOptions,
       missingByOption: option
     };
-    parameterApiService.missingParameters(request).then(res => {
+    parameterStoreService.missingParameters(request).then(res => {
       setMissingParametersResponse(res);
     });
-  }
+  };
 
   const groupAccordions = (group: ParameterGroupResponse) : Number => {
     return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
-  }
+  };
   
   if(Object.keys(templateOptions).length === 0) {
     return (<div className="container-fluid app">
@@ -127,18 +148,18 @@ function App() {
           <Button  size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
         </Col>
         <Col xs="auto">
-          <Button variant="success" size="sm" onClick={_ => reloadPage()}>
+          <Button variant="success" size="sm" onClick={_ => getTemplateOptions()}>
             {isRefreshing ? <Spinner animation="border" role="status" size="sm">
               <span className="visually-hidden">Loading...</span>
             </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
           </Button>
         </Col>
       </Row>
-      <Row>
+      {hasError && <Row>
         <Col xs="12">
           <div>Error loading parameters, check your settings and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
         </Col>
-      </Row>
+      </Row>}
       <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
     </div>)
   }
@@ -180,6 +201,9 @@ function App() {
         </div>
         <div className="col-auto">
           <SearchBar />
+        </div>
+        <div className="col-auto">
+          <div className="pt-2">Showing <strong>{parameterCounts.filteredParameters}{parameterCounts.filteredParameters !== parameterCounts.parameters ? `/${parameterCounts.parameters}`: ''}</strong> parameters.</div>
         </div>
       </Row>
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />

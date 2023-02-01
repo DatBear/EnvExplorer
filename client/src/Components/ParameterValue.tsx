@@ -1,13 +1,14 @@
 import React from "react";
-import { useSearch } from "./Contexts/SearchContext";
+import { searchFilterParameter, useSearch } from "./Contexts/SearchContext";
 
 type ParameterValueProps = {
   name: string;
   value: string;
+  type: string;
   editAction: React.MouseEventHandler;
 }
 
-function ParameterValue({name, value, editAction}: ParameterValueProps) {
+function ParameterValue({name, value, type, editAction}: ParameterValueProps) {
   const { search } = useSearch();
   
   const displayValue = (value: string) => {
@@ -19,12 +20,8 @@ function ParameterValue({name, value, editAction}: ParameterValueProps) {
     return value;
   }
 
-  const showFromSearch = (search: string | null) => {
-    return search == null || name.toLowerCase().indexOf(search) > -1 || value.toLowerCase().indexOf(search) > -1;
-  }
-
   return (<>
-    {showFromSearch(search) && <div>
+    {searchFilterParameter(search, { name, value, type }) && <div>
       <span onClick={editAction}>{name}={displayValue(value)}</span>
     </div>}
   </>);

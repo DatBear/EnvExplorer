@@ -5,7 +5,7 @@ import icon from '../../Images/icon.png';
 
 type ToastContextType = {
   addToast: (opt: ToastOptions) => void;
-  clearToasts: () => void;
+  addErrorToast: (err: any) => void;
 }
 
 type ToastOptions = {
@@ -38,8 +38,11 @@ export function ToastContextProvider({ children } : React.PropsWithChildren) {
     setToasts([...toasts, toast]);
   }
 
-  const clearToasts = () => {
-    setToasts([]);
+  const addErrorToast = (err: any) => {
+    addToast({
+      message: 'Error: ' + err.toString().replaceAll(/^Error: /g, ''),
+      textColor: 'danger'
+    });
   }
 
   const removeToast = (id: string) => {
@@ -47,7 +50,7 @@ export function ToastContextProvider({ children } : React.PropsWithChildren) {
   }
 
   return (
-    <ToastContext.Provider value={{addToast, clearToasts}}>
+    <ToastContext.Provider value={{addToast, addErrorToast}}>
       {children}
       <ToastContainer position="top-end" className="p-3">
         {toasts.map(x => {

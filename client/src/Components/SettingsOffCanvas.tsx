@@ -1,7 +1,7 @@
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Modal, Offcanvas, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Modal, Offcanvas, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import { AppSettings } from "../Data/Model/AppSettings";
 import { AppSettingsContainer, getAppSettingsContainer } from "../Data/Model/AppSettingsContainer";
@@ -32,6 +32,7 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
 
   useEffect(() => {
     localStorage.setItem("appSettingsContainer", JSON.stringify(appSettingsContainer));
+    Environment.__initialize();
   }, [appSettingsContainer]);
 
   useEffect(() => {
@@ -44,7 +45,6 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
     container.currentProfile = currentProfile;
     container.profileNames = [...new Set([...container.profileNames, currentProfile])];
     setAppSettingsContainer(container);
-    Environment.__initialize();
   }, [currentAppSettings, currentProfile])
 
   useEffect(() => {
@@ -102,13 +102,17 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
           <Row className="mb-2">
             <Col>
               <div><strong>Allowed Prefixes</strong></div>
-              <Form.Control id="allowedPrefixes" placeholder="Allowed Prefixes" value={currentAppSettings.rawParameterStoreAllowedPrefixes ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreAllowedPrefixes: e.target.value})} />
+              <OverlayTrigger placement='right' overlay={<Tooltip id={'tooltip-edit'}>Comma-separated list - Only parameters with these prefixes will be retrieved from parameter store. Useful for environments where access is limited to a subset of all available parameters.</Tooltip>}>
+                <Form.Control id="allowedPrefixes" placeholder="Allowed Prefixes" value={currentAppSettings.rawParameterStoreAllowedPrefixes ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreAllowedPrefixes: e.target.value})} />
+              </OverlayTrigger>
             </Col>
           </Row>
           <Row className="mb-2">
             <Col>
               <div><strong>Hidden Patterns</strong></div>
+              <OverlayTrigger placement='right' overlay={<Tooltip id={'tooltip-edit'}>Comma-separated list - Parameter names containing these strings will be hidden by default in lists, not exported to .env files, etc.</Tooltip>}>
               <Form.Control id="hiddenPatterns" placeholder="Hidden Patterns" value={currentAppSettings.rawParameterStoreHiddenPatterns ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreHiddenPatterns: e.target.value})} />
+              </OverlayTrigger>
             </Col>
           </Row>
         </>}
@@ -141,7 +145,6 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialApp
         allAppSettings: { ...appSettingsContainer.allAppSettings },
         profileNames: [...appSettingsContainer.profileNames, name]
       } as AppSettingsContainer; 
-      //container.profileNames = [...container.profileNames, name];
       setAppSettingsContainer(container);
       setSelectedProfile(name);
       setName('');

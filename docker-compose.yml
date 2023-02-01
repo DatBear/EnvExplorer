@@ -1,15 +1,6 @@
 version: "3"
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: ./docker/api/Dockerfile
-    container_name: envexplorer-api
-    env_file:
-      - .env
-      - docker-local.env
-
   client:
     build:
       context: .

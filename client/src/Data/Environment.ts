@@ -12,7 +12,7 @@ class Environment {
   public static parameterStoreHiddenPatterns = () => this.getUniqueList(this.rawParameterStoreHiddenPatterns, ['/EnvExplorer/']);
 
   static getUniqueList(str: string | undefined, defaultValue: string[]) {
-    var split = str?.split('/') ?? [];
+    var split = str?.split(',') ?? [];
     split = [...new Set([...split])];
     return split.length === 0 ? defaultValue : split;
   }

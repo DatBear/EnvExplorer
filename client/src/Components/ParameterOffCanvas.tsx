@@ -9,6 +9,7 @@ import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import { useToasts } from "./Contexts/ToastContext";
 import ParameterStoreService from "../Services/ParameterStoreService";
+import ParameterEditor from "./ParameterEditor";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
@@ -116,7 +117,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
         </div>
         {!isEditMode && <div className="row pt-1">
           <div className="col-sm">
-            {value}
+            <ParameterEditor value={value} isEditMode={isEditMode} onChange={v => setValue(v)} />
           </div>
         </div>}
         {isEditMode && <>

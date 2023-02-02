@@ -112,6 +112,13 @@ export default class ParameterStoreService {
     let search = this.formatWith(this.template, templateValues);
     let allParameters = await this.getCachedParameters();
     let foundParams = allParameters.filter(x => x.name.startsWith(search + '/'));
+    return foundParams.length ? foundParams.map(x => ({ ...x })) : [] as ParameterValueResponse[];
+  }
+
+  public async getParameterGroup(templateValues: Record<string, string>) {
+    let search = this.formatWith(this.template, templateValues);
+    let allParameters = await this.getCachedParameters();
+    let foundParams = allParameters.filter(x => x.name.startsWith(search + '/'));
     return foundParams.length ? await this.getGroupedParameters(foundParams) : {} as ParameterGroupResponse;
   }
 
@@ -124,7 +131,7 @@ export default class ParameterStoreService {
     let maxLevel = Math.max(...parameters.map(x => this.nameMaxLevel(x.name)));
     let i = 1;
     let topLevel = [...new Set(parameters.map(x => this.nameLevel(x.name, i)))]
-      .map(x => ({ name: x, total: parameters.length, allParameters: parameters.map(x => toParameterValue(x)) } as ParameterGroupResponse))[0];
+      .map(x => ({ name: x, total: parameters.length, allParameters: parameters.map(x => ({...x}) as ParameterValueResponse) } as ParameterGroupResponse))[0];
     
     let parentGroup = [topLevel];
     for(i = 2; i <= maxLevel-1; i++) {
@@ -135,7 +142,7 @@ export default class ParameterStoreService {
           .map(x => ({ name: this.nameLevel(x, a)} as ParameterGroupResponse));
         parent.parameters = parameters.filter(x => x.name.startsWith(parent.name+'/'))
           .filter(x => this.nameMaxLevel(x.name) === a + 1)
-          .map(x => toParameterValue(x));
+          .map(x => ({...x}));
       }
       parentGroup = parentGroup.flatMap(x => x.children).filter(x => x != null);
     }
@@ -331,12 +338,3 @@ const cartesian = <T extends any[][]>(...arr: T): MapCartesian<T>[] =>
     (a, b) => a.flatMap(c => b.map(d => [...c, d] )),
     [[]] 
 ) as MapCartesian<T>[];
-
-
-function toParameterValue(cachedParameter: CachedParameter) {
-  return {
-    name: cachedParameter.name,
-    type: cachedParameter.type,
-    value: cachedParameter.value
-  } as ParameterValueResponse;
-}

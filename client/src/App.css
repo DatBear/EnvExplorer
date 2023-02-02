@@ -1,5 +1,12 @@
 table tbody tr.missing td {
     color: red !important;
+    filter: brightness(50%);
+    opacity: .9;
+}
+
+table tbody tr td.missing {
+    filter: brightness(50%);
+    opacity: .5;
 }
 
 .file {
@@ -16,4 +23,9 @@ div.copy-file-button {
     top: 10px;
     right: 10px;
     padding: 10px;
+}
+
+td.wrap, .parameter-value, .offcanvas-header {
+    word-break: break-word; /* Chrome, Safari */
+    word-wrap: break-word; /* IE11, Firefox */
 }

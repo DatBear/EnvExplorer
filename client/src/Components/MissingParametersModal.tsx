@@ -94,7 +94,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
                       <Container>
                         <Row>
                           <Col>
-                            <table className="table table-bordered table-dark table-striped table-hover">
+                            <table className="table table-bordered table-dark table-striped table-hover missing-env-table">
                               <thead>
                                 <tr>
                                   <th>{response.missingByOption}</th>
@@ -107,7 +107,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
                                   return (<tr key={idx}>
                                     <td>{x.templateValues[response.missingByOption]}</td>
                                     <td>{x.name}</td>
-                                    <td>{x.value}</td>
+                                    <td className="wrap">{x.value}</td>
                                   </tr>);
                                 })}
                               </tbody>

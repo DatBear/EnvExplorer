@@ -91,7 +91,7 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
                         {x.name}
                         {showTypes && x.type && <><br/><Badge bg='secondary'>{x.type}</Badge></>}
                       </td>
-                      <td><ParameterEditor value={x.value} isEditMode={isEditMode} onChange={v => onValueChanged(x, v)} /></td>
+                      <td className="wrap"><ParameterEditor value={x.value} isEditMode={isEditMode} onChange={v => onValueChanged(x, v)} /></td>
                       {isEditMode && <td>
                         {numParameterTypes === 1 && <Button variant="success" onClick={_ => save(x, parameterTypes[0].type)}><FontAwesomeIcon icon={faSave} size="sm" /></Button>}
                         {numParameterTypes > 1 && <Dropdown>
@@ -99,7 +99,6 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
                             <FontAwesomeIcon icon={faSave} size="sm" />
                           </Dropdown.Toggle>
                           <Dropdown.Menu>
-                            
                             {numParameterTypes > 1 && [...new Set(parameterTypes.map(x => x.type))].map((type, idx) => {
                               return <DropdownItem key={idx} onClick={_ => save(x, type)}>Save as {type} [{parameterTypes.filter(t => t.type === type).length} {response.compareByOption}(s)]</DropdownItem>
                             })}

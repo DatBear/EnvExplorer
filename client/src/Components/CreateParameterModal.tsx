@@ -14,11 +14,11 @@ type CreateParameterModalProps = {
 function CreateParameterModal({show, setShow, templateOptions, selectedTemplateOptions}: CreateParameterModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
-  const availableTypes = ['String', 'SecureString'];
+  const availableTypes = ["String", "SecureString"];
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [type, setType] = useState(availableTypes[0]);
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
 
   const handleClose = () => {
     reset();
@@ -32,11 +32,11 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   }, [selectedTemplateOptions]);
 
   const updateName = (inputValue: string) => {
-    inputValue = inputValue.replaceAll('__', '/');
-    const split = inputValue.split('=');
+    inputValue = inputValue.replaceAll("__", "/");
+    const split = inputValue.split("=");
     if(split.length >= 2) {
       inputValue = split[0]
-      setValue(split.filter((x, idx) => idx > 0).join('='));
+      setValue(split.filter((x, idx) => idx > 0).join("="));
     }
     setName(inputValue);
   }
@@ -45,10 +45,10 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
     const fullName = `${Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}/${name}`;
     parameterStoreService.saveParameterValue(fullName, value, type).then(res => {
       if(res.isSuccess) {
-        addToast({ message: 'Save successful!', textColor: 'success' });        
+        addToast({ message: "Save successful!", textColor: "success" });        
         handleClose();
       } else {
-        addToastError('Error saving parameter.');
+        addToastError("Error saving parameter.");
       }
     }).catch(e => {
       addToastError(e);
@@ -56,16 +56,16 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   }
 
   const reset = () => {
-    setValue('');
-    setName('');
+    setValue("");
+    setName("");
     setType(availableTypes[0]);
   }
 
   return (
-    <Modal show={show} onHide={handleClose} size='lg' centered>
+    <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
         <Container>
-          <Row className='justify-content-md-center'>
+          <Row className="justify-content-md-center">
             <Col><strong>Create parameter in {Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}</strong></Col>
           </Row>
         </Container>

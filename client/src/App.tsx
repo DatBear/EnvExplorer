@@ -1,5 +1,3 @@
-import './App.css';
-import 'bootstrap/dist/js/bootstrap.min.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import TemplateOption from './Components/TemplateOption';
 import ParameterGroupResponse from './Data/Model/ParameterGroupResponse';
@@ -25,6 +23,8 @@ import ParameterStoreService from './Services/ParameterStoreService';
 import SettingsOffCanvas from './Components/SettingsOffCanvas';
 import { searchFilterParameter, useSearch } from './Components/Contexts/SearchContext';
 import CompareTemplatesModal from './Components/CompareTemplatesModal';
+import './App.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
@@ -50,7 +50,7 @@ function App() {
   const { addErrorToast } = useToasts();
 
   const fetchData = useCallback(() => {
-    setSelectedTemplateOptions((s) => ({...s}));
+    setSelectedTemplateOptions((s) => ({ ...s }));
   }, []);
 
   const showError = useCallback((err: any) => {
@@ -70,9 +70,9 @@ function App() {
   }, [parameterStoreService, showError]);
 
   useEffect(() => {
-    if(dataFetched.current) return;
+    if (dataFetched.current) return;
     dataFetched.current = true;
-    if(Environment.awsAccessKeyId && Environment.awsAccessKeySecret) {
+    if (Environment.awsAccessKeyId && Environment.awsAccessKeySecret) {
       getTemplateOptions();
     } else {
       setHasError(true);
@@ -80,17 +80,17 @@ function App() {
   }, [parameterStoreService, showError, getTemplateOptions]);
 
   useEffect(() => {
-    if(Object.keys(selectedTemplateOptions).length === 0) return;
+    if (Object.keys(selectedTemplateOptions).length === 0) return;
     setIsRefreshing(true);
     setHasError(false);
     parameterStoreService.getParameterGroup(selectedTemplateOptions).then(data => {
       setIsRefreshing(false);
       setSelectedGroup(data);
     }).catch(showError);
-  }, [selectedTemplateOptions, parameterStoreService, showError]);
+  }, [selectedTemplateOptions, parameterStoreService]);
 
   useEffect(() => {
-    if(showCreateModal) return;
+    if (showCreateModal) return;
     fetchData();
   }, [showCreateModal, fetchData]);
 
@@ -104,15 +104,15 @@ function App() {
 
   const setSelectedOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
-    setSelectedTemplateOptions({...selectedTemplateOptions});
+    setSelectedTemplateOptions({ ...selectedTemplateOptions });
   };
 
   const updateSelectedParameter = (parameter: ParameterValueResponse) => {
-    setOffCanvasParameter({...parameter});
+    setOffCanvasParameter({ ...parameter });
   };
 
   const updateCompareParametersResponse = (response: CompareParametersResponse, isEditMode: boolean) => {
-    setCompareParametersResponse({...response});
+    setCompareParametersResponse({ ...response });
     setCompareEditMode(isEditMode);
   };
 
@@ -123,13 +123,13 @@ function App() {
       parameterStoreService.getTemplateOptions().then(data => {
         setIsRefreshing(false);
         setTemplateOptions(data);
-        setSelectedTemplateOptions({...selectedTemplateOptions});
+        setSelectedTemplateOptions({ ...selectedTemplateOptions });
       }).catch(showError);
     }).catch(showError);
   };
 
   const missingBy = (option: string) => {
-    const request : MissingParametersRequest = {
+    const request: MissingParametersRequest = {
       template: Environment.defaultTemplate,
       templateValues: selectedTemplateOptions,
       missingByOption: option
@@ -139,15 +139,15 @@ function App() {
     });
   };
 
-  const groupAccordions = (group: ParameterGroupResponse) : Number => {
+  const groupAccordions = (group: ParameterGroupResponse): Number => {
     return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
   };
-  
-  if(Object.keys(templateOptions).length === 0) {
+
+  if (Object.keys(templateOptions).length === 0) {
     return (<div className="container-fluid app">
       <Row className="m-3">
         <Col xs="auto">
-          <Button  size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
+          <Button size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
         </Col>
         <Col xs="auto">
           <Button variant="success" size="sm" onClick={_ => getTemplateOptions()}>
@@ -169,7 +169,7 @@ function App() {
   return (
     <div className="container-fluid app">
       <header>
-        <img src={icon} className="rounded" style={{position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" />
+        <img src={icon} className="rounded" style={{ position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" />
       </header>
       <Row className="ps-2">
         <div className="col-auto pt-4">
@@ -201,7 +201,7 @@ function App() {
         <div className="col-auto">
           <Button size="sm" onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
         </div>
-        
+
         <div className="col-auto">
           <Button size="sm" onClick={_ => setShowCompareModal(true)}><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /></Button>
         </div>
@@ -209,14 +209,14 @@ function App() {
           <SearchBar />
         </div>
         <div className="col-auto">
-          <div className="pt-2">Showing <strong>{parameterCounts.filteredParameters}{parameterCounts.filteredParameters !== parameterCounts.parameters ? `/${parameterCounts.parameters}`: ''}</strong> parameters.</div>
+          <div className="pt-2">Showing <strong>{parameterCounts.filteredParameters}{parameterCounts.filteredParameters !== parameterCounts.parameters ? `/${parameterCounts.parameters}` : ''}</strong> parameters.</div>
         </div>
       </Row>
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       <CompareTemplatesModal show={showCompareModal} setShow={setShowCompareModal} templateOptions={templateOptions} />
       {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
       {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}
-      {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion> }
+      {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion>}
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
       {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}

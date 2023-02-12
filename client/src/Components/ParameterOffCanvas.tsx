@@ -17,7 +17,7 @@ type ParameterOffCanvasProps = {
   updateCompareParametersResponse: (request: CompareParametersResponse, isEditMode: boolean) => void;
 }
 
-function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse } : ParameterOffCanvasProps) {
+function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse }: ParameterOffCanvasProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const [name, setName] = useState(parameter.name);
@@ -27,7 +27,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   const handleClose = () => setShow(false);
 
   const { addToast } = useToasts();
-  
+
   useEffect(() => {
     setValue(parameter.value);
     setName(parameter.name);
@@ -51,7 +51,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
 
   const saveValue = () => {
     parameterStoreService.saveParameterValue(name, value, parameter.type).then(res => {
-      if(res.name !== undefined && res.value !== undefined) {
+      if (res.name !== undefined && res.value !== undefined) {
         setName(res.name);
         setValue(res.value);
       }
@@ -65,7 +65,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
   }
 
   const compareBy = (option: string, isEditMode: boolean) => {
-    const request : CompareParametersRequest = {
+    const request: CompareParametersRequest = {
       template: Environment.defaultTemplate,
       templateValues: selectedTemplateOptions,
       compareByOption: option,
@@ -124,7 +124,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
           <div className="row pt-1">
             <div className="col">
               {value.length <= 25 && <input type="text" value={value} onChange={e => setValue(e.target.value)} className="form-control" />}
-              {value.length > 25 && <textarea value={value} onChange={e => setValue(e.target.value)} className="form-control" rows={value.length/40} />}
+              {value.length > 25 && <textarea value={value} onChange={e => setValue(e.target.value)} className="form-control" rows={value.length / 40} />}
             </div>
           </div>
           <div className="row pt-2">

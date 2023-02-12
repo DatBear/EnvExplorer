@@ -10,12 +10,12 @@ type ParameterGroupProps = {
   updateSelectedParameter: (parameter: ParameterValueResponse) => void;
 }
 
-function ParameterGroup({ group, eventKey, updateSelectedParameter: setOffCanvasParameter } : ParameterGroupProps) {
-  const {search} = useSearch();
+function ParameterGroup({ group, eventKey, updateSelectedParameter: setOffCanvasParameter }: ParameterGroupProps) {
+  const { search } = useSearch();
 
   const lastName = (name: string) => {
-    if(name === null) return null;
-    return name.substring(name.lastIndexOf('/')+1);
+    if (name === null) return null;
+    return name.substring(name.lastIndexOf('/') + 1);
   };
 
   const editParameter = (parameter: ParameterValueResponse) => {
@@ -34,7 +34,7 @@ function ParameterGroup({ group, eventKey, updateSelectedParameter: setOffCanvas
         </Accordion.Body>
       </Accordion.Item>
     }
-    
+
     {group.children && group.children.length > 0 && group.parameters.length === 0 && group.children.map((child, idx) => {
       return <ParameterGroup key={idx} group={child} updateSelectedParameter={setOffCanvasParameter} eventKey={idx.toString()} />
     })}

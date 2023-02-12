@@ -10,9 +10,9 @@ type CompareTemplatesModalProps = {
   templateOptions: Record<string, string[]>;
 }
 
-function CompareTemplatesModal({ show, setShow, templateOptions } : CompareTemplatesModalProps) {
+function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTemplatesModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
-  const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Record<string,string>[]>([{} as Record<string,string>, {} as Record<string,string>]);
+  const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Record<string, string>[]>([{} as Record<string, string>, {} as Record<string, string>]);
   const [parameterLists, setParameterLists] = useState<[ParameterValueResponse[]]>([[]]);
   const [parameterNames, setParameterNames] = useState<string[]>([]);
 
@@ -25,29 +25,29 @@ function CompareTemplatesModal({ show, setShow, templateOptions } : CompareTempl
   }, [templateOptions, selectedTemplateOptions]);
 
   useEffect(() => {
-    const defaultSelection = {} as Record<string,string>;
+    const defaultSelection = {} as Record<string, string>;
     Object.keys(templateOptions).forEach(x => {
       defaultSelection[x] = templateOptions[x][0];
     });
-    setSelectedTemplateOptions([{...defaultSelection}, {...defaultSelection}]);
+    setSelectedTemplateOptions([{ ...defaultSelection }, { ...defaultSelection }]);
   }, [templateOptions]);
 
   useEffect(() => {
-    if(!hasTemplatesSelected()) return;
+    if (!hasTemplatesSelected()) return;
 
-    for(let x = 0; x < selectedTemplateOptions.length; x++) {
+    for (let x = 0; x < selectedTemplateOptions.length; x++) {
       parameterStoreService.listParameters(selectedTemplateOptions[x]).then(data => {
         parameterLists[x] = data;
         setParameterLists([...parameterLists]);
       })
-    }    
+    }
   }, [selectedTemplateOptions, hasTemplatesSelected]);
 
   useEffect(() => {
     setParameterNames([...new Set(parameterLists.flatMap(x => x).map(x => Environment.removeTemplate(x.name)))].sort((a, b) => (a.toLowerCase() > b.toLowerCase()) ? 1 : ((b.toLowerCase() > a.toLowerCase()) ? -1 : 0)));
   }, [parameterLists]);
 
-  
+
 
   const onTemplateValueSelected = (idx: number, key: string, val: string) => {
     selectedTemplateOptions[idx][key] = val;
@@ -65,12 +65,12 @@ function CompareTemplatesModal({ show, setShow, templateOptions } : CompareTempl
       </Modal.Header>
       <Modal.Body>
         <Container>
-          {!!Object.keys(selectedTemplateOptions[0]).length && <Row className="mb-3">
+          {Object.keys(selectedTemplateOptions[0]).length > 0 && <Row className="mb-3">
             {selectedTemplateOptions.map((i, idx) => {
               return <Col key={idx}>
                 <Row>
-                  {Object.keys(templateOptions).map(k => {
-                    return <Col xs="auto">
+                  {Object.keys(templateOptions).map((k, idx) => {
+                    return <Col key={idx} xs="auto">
                       <strong>{k}</strong>
                       <select value={i[k]} onChange={e => onTemplateValueSelected(idx, k, e.target.value)} className="form-control">
                         {templateOptions[k].map(x => {
@@ -101,12 +101,12 @@ function CompareTemplatesModal({ show, setShow, templateOptions } : CompareTempl
                     <td>{name}</td>
                     {selectedTemplateOptions.map((x, idx) => {
                       const value = parameterLists[idx].find(p => p.name.endsWith(name))?.value;
-                      return <td key={idx} style={{width: (100/(selectedTemplateOptions.length+1))+'%'}} className={(value === '' || value === undefined ? 'bg-danger missing' : '') + ' wrap'}>{value}</td>
+                      return <td key={idx} style={{ width: (100 / (selectedTemplateOptions.length + 1)) + '%' }} className={(value === '' || value === undefined ? 'bg-danger missing' : '') + ' wrap'}>{value}</td>
                     })}
                   </tr>)}
                 </tbody>
               </table>}
-            </Col>  
+            </Col>
           </Row>}
         </Container>
       </Modal.Body>

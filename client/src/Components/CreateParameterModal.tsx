@@ -11,7 +11,7 @@ type CreateParameterModalProps = {
   selectedTemplateOptions: Record<string, string>;
 }
 
-function CreateParameterModal({show, setShow, templateOptions, selectedTemplateOptions}: CreateParameterModalProps) {
+function CreateParameterModal({ show, setShow, templateOptions, selectedTemplateOptions }: CreateParameterModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const availableTypes = ["String", "SecureString"];
@@ -28,13 +28,13 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   const { addToast } = useToasts();
 
   useEffect(() => {
-    
+
   }, [selectedTemplateOptions]);
 
   const updateName = (inputValue: string) => {
     inputValue = inputValue.replaceAll("__", "/");
     const split = inputValue.split("=");
-    if(split.length >= 2) {
+    if (split.length >= 2) {
       inputValue = split[0]
       setValue(split.filter((x, idx) => idx > 0).join("="));
     }
@@ -44,8 +44,8 @@ function CreateParameterModal({show, setShow, templateOptions, selectedTemplateO
   const save = () => {
     const fullName = `${Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}/${name}`;
     parameterStoreService.saveParameterValue(fullName, value, type).then(res => {
-      if(res.isSuccess) {
-        addToast({ message: "Save successful!", textColor: "success" });        
+      if (res.isSuccess) {
+        addToast({ message: "Save successful!", textColor: "success" });
         handleClose();
       } else {
         addToastError("Error saving parameter.");

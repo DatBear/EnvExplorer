@@ -16,7 +16,7 @@ export function getAppSettingsContainer() {
         awsRegion: 'us-east-2'
       } as AppSettings
     },
-    
+
   } as AppSettingsContainer;
   return JSON.parse(localStorage.getItem("appSettingsContainer") || JSON.stringify(defaultAppSettingsContainer)) as AppSettingsContainer;
 };

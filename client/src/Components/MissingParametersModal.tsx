@@ -17,7 +17,7 @@ type MissingParametersModalProps = {
   updateCompareParametersResponse: (request: CompareParametersResponse, isEditMode: boolean) => void;
 }
 
-function MissingParametersModal({ response, selectedTemplateOptions, updateCompareParametersResponse } : MissingParametersModalProps) {
+function MissingParametersModal({ response, selectedTemplateOptions, updateCompareParametersResponse }: MissingParametersModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
   const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 
@@ -28,7 +28,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
 
   const { search } = useSearch();
   const { addToast, addErrorToast } = useToasts();
-  
+
   useEffect(() => {
     setShow(true);
   }, [response]);
@@ -50,7 +50,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
   }
 
   const edit = (parameter: MissingParameterResponse) => {
-    const request : CompareParametersRequest = {
+    const request: CompareParametersRequest = {
       compareByOption: response.missingByOption,
       parameterName: parameter.name,
       template: Environment.defaultTemplate,
@@ -88,47 +88,51 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
             <Accordion alwaysOpen defaultActiveKey={Array.from(Array(response.parameters.length).keys()).map(x => x.toString())}>
               {response.parameters.filter(x => searchFilterMissingParameter(search, x)).map((x, idx) => {
                 return (
-                  <Accordion.Item key={idx} eventKey={idx.toString()}>
-                    <Accordion.Header>{x.name}</Accordion.Header>
-                    <Accordion.Body>
-                      <Container>
-                        <Row>
-                          <Col>
-                            <table className="table table-bordered table-dark table-striped table-hover missing-env-table">
-                              <thead>
-                                <tr>
-                                  <th>{response.missingByOption}</th>
-                                  <th>Name</th>
-                                  <th>Value</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {x.parameters.map((x, idx) => {
-                                  return (<tr key={idx}>
-                                    <td>{x.templateValues[response.missingByOption]}</td>
-                                    <td>{x.name}</td>
-                                    <td className="wrap">{x.value}</td>
-                                  </tr>);
-                                })}
-                              </tbody>
-                            </table>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col xs="auto">
-                            <DropdownButton title={("Copy from ")}>
-                              {x.parameters.map((p, idx) => {
-                                return (<DropdownItem key={idx} onClick={_ => addParameter(x.name, p.value!, p.type!)}>{p.templateValues[response.missingByOption]}</DropdownItem>)
-                              })}
-                            </DropdownButton>
-                          </Col>
-                          <Col xs="auto">
-                            <Button onClick={_ => edit(x)}>{`Edit all`}</Button>
-                          </Col>
-                        </Row>
-                      </Container>
-                    </Accordion.Body>
-                  </Accordion.Item>
+                  <Row>
+                    <Col>
+                      <Accordion.Item key={idx} eventKey={idx.toString()}>
+                        <Accordion.Header>{x.name}</Accordion.Header>
+                        <Accordion.Body>
+                          <Container>
+                            <Row>
+                              <Col>
+                                <table className="table table-bordered table-dark table-striped table-hover missing-env-table">
+                                  <thead>
+                                    <tr>
+                                      <th>{response.missingByOption}</th>
+                                      <th>Name</th>
+                                      <th>Value</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {x.parameters.map((x, idx) => {
+                                      return (<tr key={idx}>
+                                        <td>{x.templateValues[response.missingByOption]}</td>
+                                        <td>{x.name}</td>
+                                        <td className="wrap">{x.value}</td>
+                                      </tr>);
+                                    })}
+                                  </tbody>
+                                </table>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col xs="auto">
+                                <DropdownButton title={("Copy from ")}>
+                                  {x.parameters.map((p, idx) => {
+                                    return (<DropdownItem key={idx} onClick={_ => addParameter(x.name, p.value!, p.type!)}>{p.templateValues[response.missingByOption]}</DropdownItem>)
+                                  })}
+                                </DropdownButton>
+                              </Col>
+                              <Col xs="auto">
+                                <Button onClick={_ => edit(x)}>{`Edit all`}</Button>
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                    </Col>
+                  </Row>
                 );
               })}
             </Accordion>

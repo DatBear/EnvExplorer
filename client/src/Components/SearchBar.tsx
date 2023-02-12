@@ -5,7 +5,7 @@ import { useSearch } from "./Contexts/SearchContext";
 
 
 export function SearchBar() {
-  const {search, setSearch} = useSearch();
+  const { search, setSearch } = useSearch();
 
 
   return (<>
@@ -17,7 +17,7 @@ export function SearchBar() {
         aria-describedby="search"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        // ref={searchRef.current}
+      // ref={searchRef.current}
       />
     </InputGroup>
   </>);

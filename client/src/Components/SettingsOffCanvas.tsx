@@ -13,21 +13,21 @@ type SettingsOffCanvasProps = {
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const awsRegions = ['us-east-2', 'us-east-1', 'us-west-1', 'us-west-2', 
-  'af-south-1', 'ap-east-1', 'ap-south-2', 'ap-southeast-3', 'ap-southeast-4', 'ap-south-1', 'ap-northeast-3', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 
-  'ca-central-1', 'eu-central-1', 'eu-west-1', 'eu-west-2', 'eu-south-1', 'eu-west-3', 'eu-south-2', 'eu-north-1', 'eu-central-2', 'me-south-1', 'me-central-1', 'sa-east-1', 
+const awsRegions = ['us-east-2', 'us-east-1', 'us-west-1', 'us-west-2',
+  'af-south-1', 'ap-east-1', 'ap-south-2', 'ap-southeast-3', 'ap-southeast-4', 'ap-south-1', 'ap-northeast-3', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1',
+  'ca-central-1', 'eu-central-1', 'eu-west-1', 'eu-west-2', 'eu-south-1', 'eu-west-3', 'eu-south-2', 'eu-north-1', 'eu-central-2', 'me-south-1', 'me-central-1', 'sa-east-1',
   'us-gov-east-1', 'us-gov-west-1'
 ];
 
 type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
 
-function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
-  const [appSettingsContainer, setAppSettingsContainer] = useState<AppSettingsContainer>(getAppSettingsContainer() as AppSettingsContainer); 
+function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
+  const [appSettingsContainer, setAppSettingsContainer] = useState<AppSettingsContainer>(getAppSettingsContainer() as AppSettingsContainer);
   const [currentProfile, setCurrentProfile] = useState(appSettingsContainer.currentProfile);
-  const [currentAppSettings, setCurrentAppSettings] = useState(appSettingsContainer.allAppSettings[currentProfile]); 
+  const [currentAppSettings, setCurrentAppSettings] = useState(appSettingsContainer.allAppSettings[currentProfile]);
 
-  const [showAddProfileModal, setShowAddProfileModal] = useState(false);  
-  
+  const [showAddProfileModal, setShowAddProfileModal] = useState(false);
+
   const handleClose = () => setShow(false);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
       currentProfile: appSettingsContainer.currentProfile,
       profileNames: [...appSettingsContainer.profileNames]
     } as AppSettingsContainer;
-    container.allAppSettings[currentProfile] = {...currentAppSettings};
+    container.allAppSettings[currentProfile] = { ...currentAppSettings };
     container.currentProfile = currentProfile;
     container.profileNames = [...new Set([...container.profileNames, currentProfile])];
     setAppSettingsContainer(container);
@@ -55,7 +55,7 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
     setCurrentProfile(name);
   }
 
-  return(<>
+  return (<>
     <Offcanvas show={show} onHide={handleClose} placement="start">
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Settings</Offcanvas.Title>
@@ -68,27 +68,27 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
               {appSettingsContainer.profileNames.map(x => <option key={x} value={x}>{x}</option>)}
             </select>
           </Col>
-          <Col> 
+          <Col>
             <Button onClick={_ => setShowAddProfileModal(true)} variant="success" className="mt-3"><FontAwesomeIcon icon={faAdd} /></Button>
           </Col>
         </Row>
         {currentAppSettings && <>
           <Row className="mb-2">
-            <Col> 
+            <Col>
               <div><strong>AWS Access Key Id</strong></div>
-              <PasswordInput id="awsKey" placeholder="Access Key Id" value={currentAppSettings.awsAccessKeyId ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({...currentAppSettings, awsAccessKeyId: e.target.value})} />
+              <PasswordInput id="awsKey" placeholder="Access Key Id" value={currentAppSettings.awsAccessKeyId ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({ ...currentAppSettings, awsAccessKeyId: e.target.value })} />
             </Col>
           </Row>
           <Row className="mb-2">
             <Col>
               <div><strong>AWS Access Key Secret</strong></div>
-              <PasswordInput id="awsSecret" placeholder="Access Key Secret" value={currentAppSettings.awsAccessKeySecret ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({...currentAppSettings, awsAccessKeySecret: e.target.value})} />
+              <PasswordInput id="awsSecret" placeholder="Access Key Secret" value={currentAppSettings.awsAccessKeySecret ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({ ...currentAppSettings, awsAccessKeySecret: e.target.value })} />
             </Col>
           </Row>
           <Row className="mb-2">
             <Col>
               <div><strong>AWS Region</strong></div>
-              <select id="awsRegion" className="form-control" value={currentAppSettings.awsRegion ?? awsRegions[0]} onChange={e => setCurrentAppSettings({...currentAppSettings, awsRegion: e.target.value})}>
+              <select id="awsRegion" className="form-control" value={currentAppSettings.awsRegion ?? awsRegions[0]} onChange={e => setCurrentAppSettings({ ...currentAppSettings, awsRegion: e.target.value })}>
                 {awsRegions.map(x => <option key={x} value={x}>{x}</option>)}
               </select>
             </Col>
@@ -96,14 +96,14 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
           <Row className="mb-2">
             <Col>
               <div><strong>Template</strong></div>
-              <Form.Control id="template" placeholder="Template" value={currentAppSettings.template ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, template: e.target.value})} />
+              <Form.Control id="template" placeholder="Template" value={currentAppSettings.template ?? ''} onChange={e => setCurrentAppSettings({ ...currentAppSettings, template: e.target.value })} />
             </Col>
           </Row>
           <Row className="mb-2">
             <Col>
               <div><strong>Allowed Prefixes</strong></div>
               <OverlayTrigger placement='right' overlay={<Tooltip id={'tooltip-edit'}>Comma-separated list - Only parameters with these prefixes will be retrieved from parameter store. Useful for environments where access is limited to a subset of all available parameters.</Tooltip>}>
-                <Form.Control id="allowedPrefixes" placeholder="Allowed Prefixes" value={currentAppSettings.rawParameterStoreAllowedPrefixes ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreAllowedPrefixes: e.target.value})} />
+                <Form.Control id="allowedPrefixes" placeholder="Allowed Prefixes" value={currentAppSettings.rawParameterStoreAllowedPrefixes ?? ''} onChange={e => setCurrentAppSettings({ ...currentAppSettings, rawParameterStoreAllowedPrefixes: e.target.value })} />
               </OverlayTrigger>
             </Col>
           </Row>
@@ -111,7 +111,7 @@ function SettingsOffCanvas({show, setShow} : SettingsOffCanvasProps) {
             <Col>
               <div><strong>Hidden Patterns</strong></div>
               <OverlayTrigger placement='right' overlay={<Tooltip id={'tooltip-edit'}>Comma-separated list - Parameter names containing these strings will be hidden by default in lists, not exported to .env files, etc.</Tooltip>}>
-              <Form.Control id="hiddenPatterns" placeholder="Hidden Patterns" value={currentAppSettings.rawParameterStoreHiddenPatterns ?? ''} onChange={e => setCurrentAppSettings({...currentAppSettings, rawParameterStoreHiddenPatterns: e.target.value})} />
+                <Form.Control id="hiddenPatterns" placeholder="Hidden Patterns" value={currentAppSettings.rawParameterStoreHiddenPatterns ?? ''} onChange={e => setCurrentAppSettings({ ...currentAppSettings, rawParameterStoreHiddenPatterns: e.target.value })} />
               </OverlayTrigger>
             </Col>
           </Row>
@@ -129,7 +129,7 @@ type AddSettingsProfileModalProps = {
   initialAppSettingsContainer: AppSettingsContainer;
 };
 
-function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialAppSettingsContainer } : AddSettingsProfileModalProps) {
+function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialAppSettingsContainer }: AddSettingsProfileModalProps) {
   const handleClose = () => setShow(false);
 
   const { addToast } = useToasts();
@@ -138,13 +138,13 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialApp
 
   const addNewProfile = () => {
     var existingProfile = appSettingsContainer.profileNames.find(x => x === name);
-    if(existingProfile){
+    if (existingProfile) {
       addToast({ message: 'Error: profile already exists!', textColor: 'danger' });
     } else {
       const container = {
         allAppSettings: { ...appSettingsContainer.allAppSettings },
         profileNames: [...appSettingsContainer.profileNames, name]
-      } as AppSettingsContainer; 
+      } as AppSettingsContainer;
       setAppSettingsContainer(container);
       setSelectedProfile(name);
       setName('');
@@ -155,9 +155,9 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialApp
   return (<>
     <Modal show={show} onHide={handleClose} size='sm' centered>
       <Modal.Header closeButton>
-          <Row className='justify-content-md-center'>
-            <Col><strong>Add settings profile</strong></Col>
-          </Row>
+        <Row className='justify-content-md-center'>
+          <Col><strong>Add settings profile</strong></Col>
+        </Row>
       </Modal.Header>
       <Modal.Body>
         <Container>

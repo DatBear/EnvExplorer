@@ -8,14 +8,14 @@ type ParameterValueProps = {
   editAction: React.MouseEventHandler;
 }
 
-function ParameterValue({name, value, type, editAction}: ParameterValueProps) {
+function ParameterValue({ name, value, type, editAction }: ParameterValueProps) {
   const { search } = useSearch();
-  
+
   const displayValue = (value: string) => {
-    if(value === 'true') {
-      return (<span className="badge rounded-pill text-bg-success">{value}</span>)
-    } else if(value === 'false') {
-      return (<span className="badge rounded-pill text-bg-danger">{value}</span>)
+    if (value === 'true') {
+      return (<span className="badge rounded-pill text-bg-success parameter-value">{value}</span>)
+    } else if (value === 'false') {
+      return (<span className="badge rounded-pill text-bg-danger parameter-value">{value}</span>)
     }
     return value;
   }

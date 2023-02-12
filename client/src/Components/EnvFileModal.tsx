@@ -14,7 +14,7 @@ type EnvFileModalProps = {
   selectedTemplateOptions: Record<string, string>;
 }
 
-function EnvFileModal({show, setShow, group, templateOptions, selectedTemplateOptions}: EnvFileModalProps) {
+function EnvFileModal({ show, setShow, group, templateOptions, selectedTemplateOptions }: EnvFileModalProps) {
   const fileService = useMemo(() => new FileService(), []);
 
   const [fileOutput, setFileOutput] = useState('');
@@ -48,7 +48,7 @@ function EnvFileModal({show, setShow, group, templateOptions, selectedTemplateOp
           <Row>
             <Col>
               <div className="file">
-                <div style={{position: 'relative'}}>
+                <div style={{ position: 'relative' }}>
                   <div className="copy-file-button">
                     <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>Copy file to clipboard</Tooltip>}>
                       <FontAwesomeIcon icon={faCopy} onClick={_ => copyFile()} />

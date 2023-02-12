@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 
 type TemplateOptionProps = {
-    name: string;
-    values: string[];
-    isMultiple?: boolean | null;
-    setSelection?: (key: string, value: string) => void | null;
-    setMultipleSelection?: (key: string, value: string[]) => void | null;
+  name: string;
+  values: string[];
+  isMultiple?: boolean | null;
+  setSelection?: (key: string, value: string) => void | null;
+  setMultipleSelection?: (key: string, value: string[]) => void | null;
 }
 
 function TemplateOption({ name, values, isMultiple, setSelection, setMultipleSelection }: TemplateOptionProps) {
   const isSetup = useRef(false);
-  
+
   useEffect(() => {
-    if(isSetup.current) return;
+    if (isSetup.current) return;
     isSetup.current = true;
     setSelection && setSelection(name, values[0]);
     setMultipleSelection && setMultipleSelection(name, []);

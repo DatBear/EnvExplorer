@@ -15,9 +15,9 @@ type CompareParametersModalProps = {
   selectedTemplateOptions: Record<string, string>;
 }
 
-function CompareParametersModal({ response, selectedTemplateOptions, editMode } : CompareParametersModalProps) {
+function CompareParametersModal({ response, selectedTemplateOptions, editMode }: CompareParametersModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
-  
+
   const [show, setShow] = useState(true);
   const [isEditMode, setIsEditMode] = useState(editMode);
   const [showTypes, setShowTypes] = useState(false);
@@ -27,20 +27,20 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
   const toggleShowTypes = () => setShowTypes(!showTypes);
 
   const { addToast, addErrorToast } = useToasts();
-  
+
   useEffect(() => {
     setShow(true);
     setIsEditMode(editMode);
   }, [editMode, response]);
 
   const save = (parameter: TemplatedParameterValueResponse, type: string | null = null) => {
-    if(parameter.value === null || parameter.value === '') {
+    if (parameter.value === null || parameter.value === '') {
       addErrorToast('Error: invalid parameter value');
       return;
     }
     parameterStoreService.saveParameterValue(parameter.name, parameter.value, type ?? parameter.type).then(res => {
-      if(res.isSuccess){
-        addToast({ message: 'Successfully updated ' + parameter.name, textColor: 'success'});
+      if (res.isSuccess) {
+        addToast({ message: 'Successfully updated ' + parameter.name, textColor: 'success' });
       }
     }).catch(addErrorToast);
   }
@@ -56,13 +56,13 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
           <Row className='justify-content-md-center'>
             <Col><strong>{response.parameterName}</strong></Col>
             <Col xs='auto'>
-              <Button variant={showTypes ? "success" : "danger"} size="sm" onClick={_ => toggleShowTypes()}><FontAwesomeIcon icon={faKeyboard}/></Button>&nbsp;
-              <Button variant={isEditMode ? "success" : "danger"} size="sm" onClick={_ => toggleIsEditMode()}><FontAwesomeIcon icon={faPenToSquare}/></Button>
+              <Button variant={showTypes ? "success" : "danger"} size="sm" onClick={_ => toggleShowTypes()}><FontAwesomeIcon icon={faKeyboard} /></Button>&nbsp;
+              <Button variant={isEditMode ? "success" : "danger"} size="sm" onClick={_ => toggleIsEditMode()}><FontAwesomeIcon icon={faPenToSquare} /></Button>
             </Col>
           </Row>
         </Container>
-        
-        
+
+
       </Modal.Header>
       <Modal.Body>
         <Container>
@@ -89,7 +89,7 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode } 
                       <td>{x.templateValues[response.compareByOption]}</td>
                       <td>
                         {x.name}
-                        {showTypes && x.type && <><br/><Badge bg='secondary'>{x.type}</Badge></>}
+                        {showTypes && x.type && <><br /><Badge bg='secondary'>{x.type}</Badge></>}
                       </td>
                       <td className="wrap"><ParameterEditor value={x.value} isEditMode={isEditMode} onChange={v => onValueChanged(x, v)} /></td>
                       {isEditMode && <td>

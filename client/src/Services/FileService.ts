@@ -9,12 +9,12 @@ export default class FileService {
     const envFileName = opt.envFileName ?? '.env';
     let output = '';
 
-    if(!opt.revertOnly){
+    if (!opt.revertOnly) {
       output += '#!/bin/bash\n';
       output += files.map(x => {
         let file = '';
         file += `mkdir -p ${x.path}\n`;
-        if(opt.backupLocation) {
+        if (opt.backupLocation) {
           file += `mkdir -p ${opt.backupLocation}/${x.path}\n`;
           file += `cp -R ./${x.path}/${envFileName} ${opt.backupLocation}/${x.path}/${envFileName}\n`;
         }
@@ -25,29 +25,29 @@ export default class FileService {
         return file;
       }).join('\n') + '\n';
     }
-    
+
     output += this.generateRevertScript(files, opt);
     output += opt.selfDestructAfter && !opt.revertOnly ? 'rm $0\n' : '';
     return output;
   }
 
   private generateRevertScript = (files: ExportFileResponse[], opt: ScriptGenerationOptions) => {
-    if(!opt.revertScriptFilePath && !opt.revertOnly) return '';
+    if (!opt.revertScriptFilePath && !opt.revertOnly) return '';
     const envFileName = opt.envFileName ?? '.env';
     let script = '#!/bin/bash\n';
     script += !opt.revertOnly ? `cat <<EOT > ${opt.revertScriptFilePath}\n` : '';
-    
+
     script += files.map(x => {
       let file = '';
       file += `mkdir -p ${x.path}\n`;
       file += `cp -R ${opt.backupLocation}/${x.path}/${envFileName} ./${x.path}/${envFileName} \n`;
       return file;
     }).join('\n') + '\n';
-    
-    if(opt.selfDestructAfterReverting){
+
+    if (opt.selfDestructAfterReverting) {
       script += opt.revertOnly ? 'rm $0\n' : `rm ${opt.revertScriptFilePath}\n`;
     }
-    
+
     script += !opt.revertOnly ? 'EOT\n' : '';
     return script;
   }
@@ -57,10 +57,10 @@ export default class FileService {
   }
 
   public getTemplateHeader = (templateOptions: Record<string, string>) => {
-    return Object.keys(templateOptions).map(x => `#${x}: ${templateOptions[x]}`).join('\n')+'\n\n'
+    return Object.keys(templateOptions).map(x => `#${x}: ${templateOptions[x]}`).join('\n') + '\n\n'
   }
 
-  private getFileOutput = (group: ParameterGroupResponse, current: string = '') : string => {
+  private getFileOutput = (group: ParameterGroupResponse, current: string = ''): string => {
     return current + group.parameters.map(x => {
       return `${Environment.getEnvFileParameter(x.name, x.value)}\n`;
     }).join('') + group.children.map(x => this.getFileOutput(x)).join('');

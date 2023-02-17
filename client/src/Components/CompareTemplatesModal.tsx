@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
@@ -38,7 +38,8 @@ function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTempla
     for (let x = 0; x < selectedTemplateOptions.length; x++) {
       parameterStoreService.listParameters(selectedTemplateOptions[x]).then(data => {
         parameterLists[x] = data;
-        setParameterLists([...parameterLists]);
+
+        setParameterLists(_ => [...parameterLists]);
       })
     }
   }, [selectedTemplateOptions, hasTemplatesSelected]);
@@ -69,8 +70,8 @@ function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTempla
             {selectedTemplateOptions.map((i, idx) => {
               return <Col key={idx}>
                 <Row>
-                  {Object.keys(templateOptions).map((k, idx) => {
-                    return <Col key={idx} xs="auto">
+                  {Object.keys(templateOptions).map((k, optIdx) => {
+                    return <Col key={optIdx} xs="auto">
                       <strong>{k}</strong>
                       <select value={i[k]} onChange={e => onTemplateValueSelected(idx, k, e.target.value)} className="form-control">
                         {templateOptions[k].map(x => {

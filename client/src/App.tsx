@@ -7,7 +7,7 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faHistory, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { Accordion, Button, Col, Dropdown, DropdownButton, Row, Spinner } from 'react-bootstrap';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
@@ -25,6 +25,7 @@ import { searchFilterParameter, useSearch } from './Components/Contexts/SearchCo
 import CompareTemplatesModal from './Components/CompareTemplatesModal';
 import './App.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
+import ParameterHistoryModal from "./Components/ParameterHistoryModal";
 
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
@@ -42,6 +43,7 @@ function App() {
   const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showSettingsOffCanvas, setShowSettingsOffCanvas] = useState(false);
   const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 
@@ -55,7 +57,6 @@ function App() {
 
   const showError = useCallback((err: any) => {
     setHasError(true);
-    setIsRefreshing(false);
     addErrorToast(err);
   }, [addErrorToast]);
 
@@ -64,9 +65,10 @@ function App() {
     setHasError(false);
     setIsRefreshing(true);
     parameterStoreService.getTemplateOptions().then(data => {
-      setIsRefreshing(false);
       setTemplateOptions(data);
-    }).catch(showError);
+    })
+      .catch(showError)
+      .finally(() => setIsRefreshing(false));
   }, [parameterStoreService, showError]);
 
   useEffect(() => {
@@ -102,7 +104,7 @@ function App() {
     });
   }, [selectedGroup, search]);
 
-  const setSelectedOption = (key: string, value: string) => {
+  const setSelectedTemplateOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
     setSelectedTemplateOptions({ ...selectedTemplateOptions });
   };
@@ -176,7 +178,7 @@ function App() {
           <Button size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
         </div>
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
-          return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedOption} />
+          return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedTemplateOption} />
         })}
       </Row>
       <Row className="pt-3 ps-2">
@@ -206,6 +208,9 @@ function App() {
           <Button size="sm" onClick={_ => setShowCompareModal(true)}><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /></Button>
         </div>
         <div className="col-auto">
+          <Button size="sm" onClick={_ => setShowHistoryModal(true)}><FontAwesomeIcon icon={faHistory} /></Button>
+        </div>
+        <div className="col-auto">
           <SearchBar />
         </div>
         <div className="col-auto">
@@ -214,9 +219,12 @@ function App() {
       </Row>
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       <CompareTemplatesModal show={showCompareModal} setShow={setShowCompareModal} templateOptions={templateOptions} />
-      {selectedGroup && selectedGroup.name && <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />}
-      {selectedGroup && selectedGroup.name && <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />}
-      {selectedGroup && selectedGroup.name && <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion>}
+      {selectedGroup && selectedGroup.name && <>
+        <ParameterHistoryModal show={showHistoryModal} setShow={setShowHistoryModal} />
+        <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />
+        <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />
+        <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion>
+      </>}
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
       {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}

@@ -16,11 +16,8 @@ type EnvFileModalProps = {
 
 function EnvFileModal({ show, setShow, group, templateOptions, selectedTemplateOptions }: EnvFileModalProps) {
   const fileService = useMemo(() => new FileService(), []);
-
   const [fileOutput, setFileOutput] = useState('');
-
   const handleClose = () => setShow(false);
-
   const { addToast } = useToasts();
 
   useEffect(() => {

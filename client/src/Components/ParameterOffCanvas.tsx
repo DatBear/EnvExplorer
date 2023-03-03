@@ -71,8 +71,9 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
       compareByOption: option,
       parameterName: name
     };
-
+    console.log('compare request', request);
     parameterStoreService.compareParameters(request).then(res => {
+      console.log('res', res);
       updateCompareParametersResponse(res, isEditMode);
     });
   }

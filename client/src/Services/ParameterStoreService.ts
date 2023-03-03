@@ -1,4 +1,4 @@
-import { SSMClient, GetParametersByPathCommand, Parameter, PutParameterCommand } from "@aws-sdk/client-ssm";
+import { SSMClient, GetParametersByPathCommand, Parameter, ParameterHistory, PutParameterCommand, GetParameterHistoryCommand, paginateGetParameterHistory, paginateGetParametersByPath, GetParametersByPathCommandInput, GetParameterHistoryCommandInput } from "@aws-sdk/client-ssm";
 import Environment from "../Data/Environment";
 import { CachedParameter } from "../Data/Model/CachedParameter";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
@@ -24,6 +24,7 @@ export default class ParameterStoreService {
   private cachedParameters?: CachedParameter[];
   private template!: string;
 
+  private readonly wildcard = '*';
   private readonly templatePartRegex = /\{(\w+)\}/g;//REMEMBER: GLOBAL REGEX STORES STATE
 
   public __updateEnvironment() {
@@ -56,24 +57,19 @@ export default class ParameterStoreService {
 
   private async getParameters(path: string) {
     const parameters: Parameter[] = [];
-    let token: string | undefined = undefined;
 
-    do {
-      const command: GetParametersByPathCommand = new GetParametersByPathCommand({
-        Path: path,
-        NextToken: token,
-        Recursive: true,
-        WithDecryption: true
-      });
-      const res = await this.ssmClient.send(command);
-      if (res.Parameters) {
-        res.Parameters.forEach(x => {
-          parameters.push(x);
-        });
+    const commandInput: GetParametersByPathCommandInput = {
+      Path: path,
+      Recursive: true,
+      WithDecryption: true
+    }
+
+    var paginator = paginateGetParametersByPath({ client: this.ssmClient }, commandInput);
+    for await (const page of paginator) {
+      if (page.Parameters) {
+        parameters.push(...page.Parameters);
       }
-      token = res.NextToken;
-    } while (token);
-
+    }
     return parameters;
   }
 
@@ -88,12 +84,13 @@ export default class ParameterStoreService {
       name: x.Name,
       type: x.Type,
       value: x.Value,
-      isHidden: this.hiddenPatterns.find(p => x.Name!.indexOf(p) > -1) != null
+      lastModifiedDate: x.LastModifiedDate,
+      isHidden: this.hiddenPatterns.find(p => x.Name!.indexOf(p) > -1) != null,
     } as CachedParameter));
     return this.cachedParameters.filter(x => includeHidden || !x.isHidden);
   }
 
-  public async getTemplateOptions() {
+  public async getTemplateOptions(includeWildcard: boolean = false) {
     let templateOptions: Record<string, string[]> = {};
     let allParameters = await this.getCachedParameters();
 
@@ -103,23 +100,31 @@ export default class ParameterStoreService {
       let before = this.template.split(param)[0];
       var level = before.split('/').length - 1;
       let options = [...new Set(allParameters.map(x => x.name.split('/')[level]))];
-      templateOptions[param] = options;
+      templateOptions[param] = includeWildcard ? options.concat(this.wildcard) : options;
     });
     return templateOptions;
   }
 
   public async listParameters(templateValues: Record<string, string>) {
-    let search = this.formatWith(this.template, templateValues);
+    let searches = await this.templateValueSearches(templateValues);
     let allParameters = await this.getCachedParameters();
-    let foundParams = allParameters.filter(x => x.name.startsWith(search + '/'));
-    return foundParams.length ? foundParams.map(x => ({ ...x })) : [] as ParameterValueResponse[];
+    let foundParams = allParameters.filter(x => searches.find(s => x.name.startsWith(s + '/')));
+    return foundParams.length ? foundParams.map(x => ({ ...x })) : [] as CachedParameter[];
   }
 
-  public async getParameterGroup(templateValues: Record<string, string>) {
-    let search = this.formatWith(this.template, templateValues);
+  public async getParameterGroup(rawTemplateValues: Record<string, string>) {
+    let search = this.formatWith(this.template, rawTemplateValues);
     let allParameters = await this.getCachedParameters();
     let foundParams = allParameters.filter(x => x.name.startsWith(search + '/'));
     return foundParams.length ? await this.getGroupedParameters(foundParams) : {} as ParameterGroupResponse;
+  }
+
+  private async templateValueSearches(rawTemplateValues: Record<string, string>) {
+    let values: Record<string, string[]> = {};
+    for (const e of Object.entries(rawTemplateValues)) {
+      values[e[0]] = e[1] === this.wildcard ? (await this.getTemplateOptions(false))[e[0]] : [e[1]];
+    }
+    return this.getTemplateCombinations(values)
   }
 
   private async getGroupedParameters(cachedParameters: CachedParameter[]) {
@@ -239,25 +244,18 @@ export default class ParameterStoreService {
 
   public async compareParameters(request: CompareParametersRequest) {
     let cachedParams = await this.getCachedParameters();
-
-    let templateOptions = await this.getTemplateOptions();
-    let compareOptions = templateOptions[request.compareByOption];
-
-    let templatedParams = [] as TemplatedParameterValueResponse[];
     let namePart = this.removeTemplate(request.parameterName);
+    const values = { ...request.templateValues, [request.compareByOption]: this.wildcard };
+    const searches = await this.templateValueSearches(values);
 
-    for (const opt of compareOptions) {
-      let baseValues = request.templateValues;
-      baseValues[request.compareByOption] = opt;
-      let searchTemplatePart = this.formatWith(this.template, baseValues);
-      templatedParams.push({ name: searchTemplatePart, templateValues: { ...baseValues } } as TemplatedParameterValueResponse);
-    }
-
-    templatedParams.forEach(x => {
-      x.name = `${x.name}/${namePart}`;
-      let cachedParam = cachedParams.find(c => c.name === x.name);
-      x.type = cachedParam?.type ?? null;//change type here?
-      x.value = cachedParam?.value ?? null;//change type here?
+    let templatedParams = searches.map(x => `${x}/${namePart}`).map(name => {
+      let cachedParam = cachedParams.find(c => c.name === name);
+      return {
+        name,
+        type: cachedParam?.type ?? null,
+        value: cachedParam?.value ?? null,
+        templateValues: Environment.templateValuesFromPrefix(name)
+      } as TemplatedParameterValueResponse;
     });
 
     let response = {
@@ -285,6 +283,27 @@ export default class ParameterStoreService {
       }
     }
     return { files: files } as GetFileExportParametersResponse;
+  }
+
+
+  public async getParameterHistory(name: string) {
+    const history: ParameterHistory[] = [];
+    let token: string | undefined = undefined;
+
+    const commandInput: GetParameterHistoryCommandInput = {
+      Name: name,
+      NextToken: token,
+      WithDecryption: true
+    }
+
+    var paginator = paginateGetParameterHistory({ client: this.ssmClient }, commandInput);
+
+    for await (const page of paginator) {
+      if (page.Parameters) {
+        history.push(...page.Parameters);
+      }
+    }
+    return history;
   }
 
   private getTemplateCombinations(templateOptions: Record<string, string[]>) {
@@ -333,8 +352,6 @@ type MapCartesian<T extends any[][]> = {
   [P in keyof T]: T[P] extends Array<infer U> ? U : never
 }
 
-const cartesian = <T extends any[][]>(...arr: T): MapCartesian<T>[] =>
-  arr.reduce(
-    (a, b) => a.flatMap(c => b.map(d => [...c, d])),
-    [[]]
-  ) as MapCartesian<T>[];
+const cartesian = <T extends any[][]>(...arr: T): MapCartesian<T>[] => {
+  return arr.reduce((a, b) => a.flatMap(c => b.map(d => [...c, d])), [[]]) as MapCartesian<T>[];
+}

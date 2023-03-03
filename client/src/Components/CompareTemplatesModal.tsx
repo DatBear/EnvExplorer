@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import Environment from "../Data/Environment";
+import { CachedParameter } from "../Data/Model/CachedParameter";
 import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import ParameterStoreService from "../Services/ParameterStoreService";
 
@@ -13,7 +14,7 @@ type CompareTemplatesModalProps = {
 function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTemplatesModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
   const [selectedTemplateOptions, setSelectedTemplateOptions] = useState<Record<string, string>[]>([{} as Record<string, string>, {} as Record<string, string>]);
-  const [parameterLists, setParameterLists] = useState<[ParameterValueResponse[]]>([[]]);
+  const [parameterLists, setParameterLists] = useState<[CachedParameter[]]>([[]]);
   const [parameterNames, setParameterNames] = useState<string[]>([]);
 
   const handleClose = () => {
@@ -38,7 +39,6 @@ function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTempla
     for (let x = 0; x < selectedTemplateOptions.length; x++) {
       parameterStoreService.listParameters(selectedTemplateOptions[x]).then(data => {
         parameterLists[x] = data;
-
         setParameterLists(_ => [...parameterLists]);
       })
     }

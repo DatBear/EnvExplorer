@@ -31,6 +31,12 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
 
   const handleClose = () => setShow(false);
 
+  const getTemplateOptions = useCallback(() => {
+    parameterStoreService.getTemplateOptions(true).then(data => {
+      setTemplateOptions(data);
+    })
+  }, [parameterStoreService]);
+
   useEffect(() => {
     setHistory({});
 
@@ -41,12 +47,11 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
 
   useEffect(() => {
     if (!show) return;
-    console.log('opts', selectedTemplateOptions);
     parameterStoreService.listParameters(selectedTemplateOptions).then(x => {
       const filteredSorted = x.filter(x => x.lastModifiedDate && x.lastModifiedDate > utcDate).sort((a, b) => a.lastModifiedDate < b.lastModifiedDate ? 1 : -1);
       setRecentParameters(filteredSorted);
     })
-  }, [utcDate, selectedTemplateOptions]);
+  }, [show, utcDate, selectedTemplateOptions, parameterStoreService, getTemplateOptions]);
 
   useEffect(() => {
     const isLoaded = recentParameters.length > 0 && Object.keys(history).length >= recentParameters.length;
@@ -58,7 +63,7 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
       return;
     }
     getTemplateOptions();
-  }, [show]);
+  }, [show, getTemplateOptions]);
 
   const fetchParameterHistory = () => {
     setHistory({});
@@ -68,12 +73,6 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
       });
     })
   }
-
-  const getTemplateOptions = useCallback(() => {
-    parameterStoreService.getTemplateOptions(true).then(data => {
-      setTemplateOptions(data);
-    })
-  }, [parameterStoreService, show]);
 
   const setSelectedTemplateOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
@@ -113,8 +112,7 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
         </Row>
         <Row className="pt-2">
           <Col xs="auto">Show parameters modified since:</Col>
-          <Col xs="auto"><DatePicker selected={date} dateFormat="MM-dd-yyyy" onChange={d => d && updateDate(d)} /></Col>
-
+          <Col xs="auto"><DatePicker selected={date} dateFormat="MM-dd-yyyy" onChange={d => d && updateDate(d)} className="form-control" /></Col>
         </Row>
         {recentParameters?.map(x => {
           const currHistory = historySince(x.name, utcDate);

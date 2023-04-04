@@ -1,4 +1,4 @@
-import { SSMClient, GetParametersByPathCommand, Parameter, ParameterHistory, PutParameterCommand, GetParameterHistoryCommand, paginateGetParameterHistory, paginateGetParametersByPath, GetParametersByPathCommandInput, GetParameterHistoryCommandInput } from "@aws-sdk/client-ssm";
+import { SSMClient, Parameter, ParameterHistory, PutParameterCommand, paginateGetParameterHistory, paginateGetParametersByPath, GetParametersByPathCommandInput, GetParameterHistoryCommandInput } from "@aws-sdk/client-ssm";
 import Environment from "../Data/Environment";
 import { CachedParameter } from "../Data/Model/CachedParameter";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
@@ -297,7 +297,6 @@ export default class ParameterStoreService {
     }
 
     var paginator = paginateGetParameterHistory({ client: this.ssmClient }, commandInput);
-
     for await (const page of paginator) {
       if (page.Parameters) {
         history.push(...page.Parameters);

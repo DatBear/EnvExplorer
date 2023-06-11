@@ -7,8 +7,7 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faHistory, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { Accordion, Button, Col, Dropdown, DropdownButton, Row, Spinner } from 'react-bootstrap';
+import { faAdd, faChevronDown, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faHistory, faRefresh, faTextSlash } from '@fortawesome/free-solid-svg-icons';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
@@ -24,9 +23,11 @@ import SettingsOffCanvas from './Components/SettingsOffCanvas';
 import { searchFilterParameter, useSearch } from './Components/Contexts/SearchContext';
 import CompareTemplatesModal from './Components/CompareTemplatesModal';
 import './App.css';
-import 'bootstrap/dist/js/bootstrap.min.js';
 import ParameterHistoryModal from "./Components/ParameterHistoryModal";
-
+import Button from "./Components/Common/Button";
+import Spinner from "./Components/Spinner";
+import Accordion from "./Components/Common/Accordion";
+import DropdownButton, { Dropdown } from "./Components/Common/DropdownButton";
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
@@ -47,9 +48,11 @@ function App() {
   const [showSettingsOffCanvas, setShowSettingsOffCanvas] = useState(false);
   const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 
+  const [showTestModal, setShowTestModal] = useState(true);
+
   const { search } = useSearch();
   const dataFetched = useRef(false);
-  const { addErrorToast } = useToasts();
+  const { addToast, addErrorToast } = useToasts();
 
   const fetchData = useCallback(() => {
     setSelectedTemplateOptions((s) => ({ ...s }));
@@ -141,89 +144,81 @@ function App() {
     });
   };
 
-  const groupAccordions = (group: ParameterGroupResponse): Number => {
-    return group.children.filter(x => x.parameters.length > 0).length > 0 ? group.children.length : groupAccordions(group.children[0]);
-  };
-
   if (Object.keys(templateOptions).length === 0) {
-    return (<div className="container-fluid app">
-      <Row className="m-3">
-        <Col xs="auto">
-          <Button size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
-        </Col>
-        <Col xs="auto">
-          <Button variant="success" size="sm" onClick={_ => getTemplateOptions()}>
-            {isRefreshing ? <Spinner animation="border" role="status" size="sm">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
+    return (<div className="text-white min-h-screen bg-black pb-4">
+      <div className="p-3 flex flex-row gap-3">
+        <div>
+          <Button onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
+        </div>
+        <div>
+          <Button onClick={_ => getTemplateOptions()}>
+            {isRefreshing ? <Spinner /> : <FontAwesomeIcon icon={faRefresh} />}
           </Button>
-        </Col>
-      </Row>
-      {hasError && <Row>
-        <Col xs="12">
+        </div>
+      </div>
+      {hasError && <div>
+        <div>
           <div>Error loading parameters, check your settings and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
-        </Col>
-      </Row>}
+        </div>
+      </div>}
       <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
     </div>)
   }
 
   return (
-    <div className="container-fluid app">
+    <div className="bg-black text-white min-h-screen p-4">
       <header>
-        <img src={icon} className="rounded" style={{ position: 'absolute', right: '10px', top: '10px', zIndex: '-1' }} alt="Sweet EnvExplorer logo lookin fly" />
+        <img src={icon} className="absolute right-3 top-3" alt="Sweet EnvExplorer logo lookin fly" />
       </header>
-      <Row className="ps-2">
-        <div className="col-auto pt-4">
-          <Button size="sm" onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
+      <div className="pl-2 flex flex-row gap-3 items-end">
+        <div className="pt-4">
+          <Button onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
         </div>
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
           return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedTemplateOption} />
         })}
-      </Row>
-      <Row className="pt-3 ps-2">
-        <div className="col-auto">
-          <Button variant="success" size="sm" onClick={_ => refreshAll()}>
-            {isRefreshing ? <Spinner animation="border" role="status" size="sm">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner> : <FontAwesomeIcon icon={faRefresh} />}
+      </div>
+      <div className="pt-3 pl-2 flex flex-row gap-3 items-center">
+        <div className="w-max">
+          <Button onClick={_ => refreshAll()}>
+            {isRefreshing ? <Spinner /> : <FontAwesomeIcon icon={faRefresh} />}
           </Button>
         </div>
-        <div className="col-auto">
-          <DropdownButton title="Find missing in" size="sm">
+        <div className="w-max">
+          <Button onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
+        </div>
+        <div className="w-max">
+          <Button onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
+        </div>
+        <div className="w-max">
+          <Button onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
+        </div>
+        <div className="w-max">
+          <Button onClick={_ => setShowCompareModal(true)}><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /></Button>
+        </div>
+        <div className="w-max">
+          <Button onClick={_ => setShowHistoryModal(true)}><FontAwesomeIcon icon={faHistory} /></Button>
+        </div>
+        <div className="w-max flex flex-row gap-2">
+          <DropdownButton title={"Find missing in"}>
             {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => missingBy(x)}>{x}</Dropdown.Item>)}
           </DropdownButton>
         </div>
-        <div className="col-auto">
-          <Button size="sm" variant="success" onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
-        </div>
-        <div className="col-auto">
-          <Button size="sm" onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
-        </div>
-        <div className="col-auto">
-          <Button size="sm" onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
-        </div>
-
-        <div className="col-auto">
-          <Button size="sm" onClick={_ => setShowCompareModal(true)}><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /></Button>
-        </div>
-        <div className="col-auto">
-          <Button size="sm" onClick={_ => setShowHistoryModal(true)}><FontAwesomeIcon icon={faHistory} /></Button>
-        </div>
-        <div className="col-auto">
+        <div className="w-max">
           <SearchBar />
         </div>
-        <div className="col-auto">
+        <div className="w-max">
           <div className="pt-2">Showing <strong>{parameterCounts.filteredParameters}{parameterCounts.filteredParameters !== parameterCounts.parameters ? `/${parameterCounts.parameters}` : ''}</strong> parameters.</div>
         </div>
-      </Row>
+      </div>
+      {/* <Modal show={showTestModal} onHide={() => { setShowTestModal(false) }}></Modal> */}
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       <CompareTemplatesModal show={showCompareModal} setShow={setShowCompareModal} templateOptions={templateOptions} />
       {selectedGroup && selectedGroup.name && <>
         <ParameterHistoryModal show={showHistoryModal} setShow={setShowHistoryModal} />
         <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />
         <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />
-        <Accordion alwaysOpen defaultActiveKey={Array.from(Array(groupAccordions(selectedGroup)).keys()).map(x => x.toString())}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} eventKey="0" /></Accordion>
+        <div className="border-2 border-emerald-800 bg-stone-900 pb-4 m-2 rounded-xl"><Accordion defaultOpen={true}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></Accordion></div>
       </>}
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}

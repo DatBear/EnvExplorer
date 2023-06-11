@@ -5,7 +5,6 @@ import { SearchContextProvider } from './Components/Contexts/SearchContext';
 import { ToastContextProvider } from './Components/Contexts/ToastContext';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import './Styles/bootstrap.scss';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

@@ -1,5 +1,6 @@
 import React from "react";
 import { searchFilterParameter, useSearch } from "./Contexts/SearchContext";
+import clsx from "clsx";
 
 type ParameterValueProps = {
   name: string;
@@ -12,17 +13,17 @@ function ParameterValue({ name, value, type, editAction }: ParameterValueProps) 
   const { search } = useSearch();
 
   const displayValue = (value: string) => {
-    if (value === 'true') {
-      return (<span className="badge rounded-pill text-bg-success parameter-value">{value}</span>)
-    } else if (value === 'false') {
-      return (<span className="badge rounded-pill text-bg-danger parameter-value">{value}</span>)
-    }
-    return value;
+    var classes = clsx(
+      value === "true" && "px-1 rounded-lg bg-green-500 parameter-value",
+      value === "false" && "px-1 rounded-lg bg-red-500 parameter-value"
+    );
+
+    return <span className={classes}>{value}</span>
   }
 
   return (<>
     {searchFilterParameter(search, { name, value, type }) && <div>
-      <span onClick={editAction}>{name}={displayValue(value)}</span>
+      <span className="" onClick={editAction}>{name}={displayValue(value)}</span>
     </div>}
   </>);
 }

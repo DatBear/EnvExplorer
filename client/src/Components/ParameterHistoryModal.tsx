@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import { CachedParameter } from "../Data/Model/CachedParameter";
 import ParameterStoreService from "../Services/ParameterStoreService";
 import DatePicker from 'react-datepicker';
 import { ParameterHistory } from "@aws-sdk/client-ssm";
 import "react-datepicker/dist/react-datepicker.css";
 import TemplateOption from "./TemplateOption";
+import Modal from "./Common/Modal";
+import Button from "./Common/Button";
+import Table, { Td, Th } from "./Common/Table";
 
 type ParameterHistoryModalProps = {
   show: boolean;
@@ -39,7 +41,6 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
 
   useEffect(() => {
     setHistory({});
-
     const utc = new Date(date);
     utc.setUTCHours(0, 0, 0, 0);
     setUtcDate(utc);
@@ -96,68 +97,66 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
 
   return <Modal show={show} onHide={handleClose} size='xl' centered>
     <Modal.Header closeButton>
-      <Container>
-        <Row className='justify-content-md-center'>
-          <Col><strong>Parameter History</strong></Col>
-        </Row>
-      </Container>
+      <div>
+        <div className='justify-content-md-center'>
+          <div><strong>Parameter History</strong></div>
+        </div>
+      </div>
     </Modal.Header>
     <Modal.Body>
-      <Container>
-        <Row className="ps-2">
+      <div className="w-full">
+        <div className="ps-2 flex flex-row gap-3 items-end">
           {templateOptions && Object.keys(templateOptions).map((key, idx) => {
             return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedTemplateOption} />
           })}
-          {(recentParameters?.length ?? 0) > 0 && <Col xs="auto" className="pt-4"><button className="btn btn-primary" onClick={_ => fetchParameterHistory()}>Show History</button></Col>}
-        </Row>
-        <Row className="pt-2">
-          <Col xs="auto">Show parameters modified since:</Col>
-          <Col xs="auto"><DatePicker selected={date} dateFormat="MM-dd-yyyy" onChange={d => d && updateDate(d)} className="form-control" /></Col>
-        </Row>
+          {(recentParameters?.length ?? 0) > 0 && <div className="pt-4 w-max"><Button onClick={_ => fetchParameterHistory()}>Show History</Button></div>}
+        </div>
+        <div className="pt-2">
+          <div className="w-max">Show parameters modified since:</div>
+          <div className="w-max"><DatePicker selected={date} dateFormat="MM-dd-yyyy" onChange={d => d && updateDate(d)} className="bg-inherit border border-emerald-800 px-2 py-1" /></div>
+        </div>
         {recentParameters?.map(x => {
           const currHistory = historySince(x.name, utcDate);
-          return <Row key={x.name}>
-            <Col>
+          return <div key={x.name}>
+            <div className="p-1">
               <>
-                <Row>
+                <div className="flex flex-row gap-2">
                   {!isHistoryLoaded && <>
-                    <Col xs="auto">{formatDate(x.lastModifiedDate)}</Col>
-                    <Col>{x.name}</Col>
+                    <div className="w-max">{formatDate(x.lastModifiedDate)}</div>
+                    <div>{x.name}</div>
                   </>}
                   {isHistoryLoaded && <>
-                    <Col>{x.name}{currHistory?.find(x => x.Version === 1) !== undefined && <span className="badge badge-pill badge-success">Success</span>}</Col>
+                    <div>{x.name}{currHistory?.find(x => x.Version === 1) !== undefined && <span className="">New</span>}</div>
                   </>}
-                </Row>
-                {currHistory && <Row>
-                  <Col>
-                    <table className="table table-bordered inline">
+                </div>
+                {currHistory && <div>
+                  <div>
+                    <Table>
                       <thead>
                         <tr>
-                          <th>Date</th>
-                          <th>Value</th>
+                          <Th>Date</Th>
+                          <Th>Value</Th>
                         </tr>
                       </thead>
                       <tbody>
                         {currHistory.map(h => {
                           return <tr key={h.Version}>
-                            <td>{formatDate(h.LastModifiedDate)}</td>
-                            <td>{h.Value}</td>
+                            <Td className="px-2">{formatDate(h.LastModifiedDate)}</Td>
+                            <Td className="px-2 wrap max-w-4xl">{h.Value}</Td>
                           </tr>
                         })}
                       </tbody>
-                    </table>
-                  </Col>
-                </Row>}
+                    </Table>
+                  </div>
+                </div>}
               </>
-            </Col>
-          </Row>
+            </div>
+          </div>
         })}
-      </Container>
+      </div>
     </Modal.Body>
     <Modal.Footer>
-      <Button variant="secondary" onClick={handleClose}>
-        Close
-      </Button>
+      <Button onClick={handleClose}>Close</Button>
     </Modal.Footer>
   </Modal>
 }

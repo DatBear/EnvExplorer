@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Input from "./Common/Input";
 
 type ParameterEditorProps = {
   value: string | null;
@@ -17,13 +18,13 @@ function ParameterEditor({ value, isEditMode, onChange: onChangeProp }: Paramete
     onChangeProp(stateValue);
   }, [stateValue, onChangeProp])
 
-  return (<>
+  return <>
     {isEditMode && <>
-      {stateValue.length <= 25 && <input type="text" value={(stateValue ?? '')} onChange={e => setStateValue(e.target.value)} className="form-control" />}
-      {stateValue.length > 25 && <textarea value={stateValue} onChange={e => setStateValue(e.target.value)} className="form-control" rows={Math.ceil(stateValue.length / 35)} />}
+      {stateValue.length <= 25 && <Input type="text" value={(stateValue ?? '')} onChange={e => setStateValue(e.target.value)} />}
+      {stateValue.length > 25 && <textarea value={stateValue} onChange={e => setStateValue(e.target.value)} rows={Math.ceil(stateValue.length / 35)} />}
     </>}
-    {!isEditMode && <span className="parameter-value">{stateValue}</span>}
-  </>);
+    {!isEditMode && <span className="parameter-value wrap">{stateValue}</span>}
+  </>
 }
 
 export default ParameterEditor;

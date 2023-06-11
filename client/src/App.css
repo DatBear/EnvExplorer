@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 table tbody tr.missing td {
     color: red !important;
     filter: brightness(50%);

@@ -1,10 +1,12 @@
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMemo, useState, useEffect } from "react";
-import { Modal, Container, Row, Col, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import FileService from "../Services/FileService";
 import { useToasts } from "./Contexts/ToastContext";
+import Modal from "./Common/Modal";
+import Button from "./Common/Button";
+import OverlayTrigger from "./Common/OverlayTrigger";
 
 type EnvFileModalProps = {
   show: boolean;
@@ -34,32 +36,32 @@ function EnvFileModal({ show, setShow, group, templateOptions, selectedTemplateO
   return (
     <Modal show={show} onHide={handleClose} size='xl' centered>
       <Modal.Header closeButton>
-        <Container>
-          <Row className='justify-content-md-center'>
-            <Col><strong>.Env file</strong></Col>
-          </Row>
-        </Container>
+        <div>
+          <div className='justify-content-md-center'>
+            <div><strong>.Env file</strong></div>
+          </div>
+        </div>
       </Modal.Header>
       <Modal.Body>
-        <Container>
-          <Row>
-            <Col>
+        <div>
+          <div>
+            <div>
               <div className="file">
-                <div style={{ position: 'relative' }}>
+                <div className="relative">
                   <div className="copy-file-button">
-                    <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>Copy file to clipboard</Tooltip>}>
+                    <OverlayTrigger overlay={<div className="px-2">Copy file to clipboard</div>}>
                       <FontAwesomeIcon icon={faCopy} onClick={_ => copyFile()} />
                     </OverlayTrigger>
                   </div>
                 </div>
                 {fileOutput}
               </div>
-            </Col>
-          </Row>
-        </Container>
+            </div>
+          </div>
+        </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button onClick={handleClose}>
           Close
         </Button>
       </Modal.Footer>

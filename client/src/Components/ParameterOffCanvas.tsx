@@ -1,15 +1,17 @@
 import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
-import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { Dropdown, DropdownButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
 import CompareParametersResponse from "../Data/Model/CompareParametersResponse";
 import { useToasts } from "./Contexts/ToastContext";
 import ParameterStoreService from "../Services/ParameterStoreService";
 import ParameterEditor from "./ParameterEditor";
+import Offcanvas from "./Common/Offcanvas";
+import Button from "./Common/Button";
+import DropdownButton, { Dropdown } from "./Common/DropdownButton";
+import OverlayTrigger from "./Common/OverlayTrigger";
 
 type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
@@ -71,9 +73,8 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
       compareByOption: option,
       parameterName: name
     };
-    console.log('compare request', request);
+
     parameterStoreService.compareParameters(request).then(res => {
-      console.log('res', res);
       updateCompareParametersResponse(res, isEditMode);
     });
   }
@@ -84,59 +85,35 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
         <Offcanvas.Title>{parameter.name}</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>
-        <div className="row">
-          <div className="col-auto">
-            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy'}>Copy name=value</Tooltip>}>
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-row gap-3 items-center">
+            <OverlayTrigger placement='top' overlay={<>Copy name=value</>}>
               <FontAwesomeIcon icon={faCopy} onClick={_ => copy()} />
             </OverlayTrigger>
-          </div>
-          <div className="col-auto">
-            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-copy-env'}>Copy local .env value</Tooltip>}>
+            <OverlayTrigger placement='top' overlay={<>Copy local .env value</>}>
               <FontAwesomeIcon icon={faCopy} onClick={_ => copyEnv()} />
             </OverlayTrigger>
-          </div>
-          <div className="col-auto">
-            <OverlayTrigger placement='top' overlay={<Tooltip id={'tooltip-edit'}>Edit</Tooltip>}>
+            <OverlayTrigger placement='top' overlay={<>Edit</>}>
               <FontAwesomeIcon icon={faPenToSquare} onClick={_ => toggleEditMode()} />
             </OverlayTrigger>
-          </div>
-          <div className="col-auto">
             <DropdownButton title="Compare">
               {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => compareBy(x, false)}>{x}(s)</Dropdown.Item>)}
             </DropdownButton>
-          </div>
-          <div className="col-auto">
             <DropdownButton title="Edit">
               {Environment.templateOptions().map((x, idx) => <Dropdown.Item key={idx} onClick={_ => compareBy(x, true)}>{x}(s)</Dropdown.Item>)}
             </DropdownButton>
           </div>
-        </div>
-        <div className="row pt-1">
-          <div className="col">
-            Value:
-          </div>
-        </div>
-        {!isEditMode && <div className="row pt-1">
-          <div className="col-sm">
+          <span className="pt-3">Value:</span>
+          <div className="pt-1">
             <ParameterEditor value={value} isEditMode={isEditMode} onChange={v => setValue(v)} />
           </div>
-        </div>}
-        {isEditMode && <>
-          <div className="row pt-1">
-            <div className="col">
-              {value.length <= 25 && <input type="text" value={value} onChange={e => setValue(e.target.value)} className="form-control" />}
-              {value.length > 25 && <textarea value={value} onChange={e => setValue(e.target.value)} className="form-control" rows={value.length / 40} />}
+          {isEditMode && <>
+            <div className="flex flex-row gap-3 pt-2">
+              <Button onClick={_ => cancelValueEdit()}>Cancel</Button>
+              <Button onClick={_ => saveValue()}>Save</Button>
             </div>
-          </div>
-          <div className="row pt-2">
-            <div className="col">
-              <button onClick={_ => cancelValueEdit()} className="btn btn-danger form-control">Cancel</button>
-            </div>
-            <div className="col">
-              <button onClick={_ => saveValue()} className="btn btn-success form-control">Save</button>
-            </div>
-          </div>
-        </>}
+          </>}
+        </div>
       </Offcanvas.Body>
     </Offcanvas>
   );

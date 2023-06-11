@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from 'react';
+import Select from "./Common/Select";
 
 type TemplateOptionProps = {
   name: string;
   values: string[];
-  isMultiple?: boolean | null;
+  multiple?: boolean;
   setSelection?: (key: string, value: string) => void | null;
   setMultipleSelection?: (key: string, value: string[]) => void | null;
 }
 
-function TemplateOption({ name, values, isMultiple, setSelection, setMultipleSelection }: TemplateOptionProps) {
+function TemplateOption({ name, values, multiple: isMultiple, setSelection, setMultipleSelection }: TemplateOptionProps) {
   const isSetup = useRef(false);
 
   useEffect(() => {
@@ -23,12 +24,12 @@ function TemplateOption({ name, values, isMultiple, setSelection, setMultipleSel
     setMultipleSelection && setMultipleSelection(name, [...e.target.selectedOptions].map(x => x.value));
   }
 
-  return (<div className="col-auto">
+  return <div className="w-max flex flex-col gap-2">
     <b>{name}</b>
-    <select name={name} onChange={(e) => onSelectionChanged(e)} className="form-control" multiple={isMultiple ?? false}>
-      {values.map((value) => <option key={value} value={value}>{value}</option>)}
-    </select>
-  </div>);
+    <Select name={name} onChange={(e) => onSelectionChanged(e)} multiple={isMultiple ?? false}>
+      {values.map((value, idx) => <option key={idx} value={value}>{value}</option>)}
+    </Select>
+  </div>;
 }
 
 export default TemplateOption;

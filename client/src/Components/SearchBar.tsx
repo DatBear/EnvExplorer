@@ -1,24 +1,13 @@
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Form, InputGroup } from "react-bootstrap";
 import { useSearch } from "./Contexts/SearchContext";
-
 
 export function SearchBar() {
   const { search, setSearch } = useSearch();
 
-
-  return (<>
-    <InputGroup>
-      <InputGroup.Text id="search"><FontAwesomeIcon icon={faSearch} /></InputGroup.Text>
-      <Form.Control
-        placeholder="Filter parameters"
-        aria-label="Filter parameters"
-        aria-describedby="search"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-      // ref={searchRef.current}
-      />
-    </InputGroup>
-  </>);
+  return <div className="flex items-center bg-inherit rounded-md border border-emerald-800">
+    <FontAwesomeIcon icon={faSearch} className="p-2" />
+    <input className="ml-2 outline-none bg-inherit" id="search" placeholder="Filter parameters"
+      value={search} onChange={(e) => setSearch(e.target.value)} />
+  </div>
 }

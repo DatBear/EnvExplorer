@@ -1,8 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
-import { Modal, Container, Row, Col, Button, InputGroup, Form } from "react-bootstrap";
 import Environment from "../Data/Environment";
 import ParameterStoreService from "../Services/ParameterStoreService";
 import { useToasts } from "./Contexts/ToastContext";
+import Modal from "./Common/Modal";
+import Button from "./Common/Button";
+import Input from "./Common/Input";
+import Select from "./Common/Select";
+import Option from "./Common/Option";
 
 type CreateParameterModalProps = {
   show: boolean;
@@ -64,49 +68,41 @@ function CreateParameterModal({ show, setShow, templateOptions, selectedTemplate
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
-        <Container>
-          <Row className="justify-content-md-center">
-            <Col><strong>Create parameter in {Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}</strong></Col>
-          </Row>
-        </Container>
+        <div>
+          <div className="justify-content-md-center">
+            <div><strong>Create parameter in {Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}</strong></div>
+          </div>
+        </div>
       </Modal.Header>
       <Modal.Body>
-        <Container>
-          <Form>
-            <Row className="mb-3">
-              <Col>
-                <Form.Label htmlFor="paramName">Name</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text id="paramName">{Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}/</InputGroup.Text>
-                  <Form.Control placeholder="Parameter name" aria-label="Parameter name" aria-describedby="paramName" value={name} onChange={e => updateName(e.target.value)} />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col>
-                <Form.Label htmlFor="paramValue">Value</Form.Label>
-                <Form.Control id="paramValue" placeholder="Parameter value" value={value} onChange={e => setValue(e.target.value)} />
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col>
-                <Form.Label htmlFor="paramType">Type</Form.Label>
-                <Form.Select id="paramType" aria-label="Parameter type" value={type} onChange={e => setType(e.target.value)}>
-                  {availableTypes.map(x => <option key={x} value={x}>{x}</option>)}
-                </Form.Select>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col>
-                <span className="text-muted">Note: pasting a value from a local env file will fill out the name and value.</span>
-              </Col>
-            </Row>
-          </Form>
-        </Container>
+        <div>
+          <form className="text-left flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="paramName">Name</label>
+              <div className="flex flex-row">
+                <div id="paramName">{Environment.getSelectedTemplatePrefix(selectedTemplateOptions)}/</div>
+                <Input placeholder="Parameter name" value={name} onChange={e => updateName(e.target.value)} className="flex-grow" />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="paramValue">Value</label>
+              <Input id="paramValue" placeholder="Parameter value" value={value} onChange={e => setValue(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="paramType">Type</label>
+              <Select id="paramType" value={type} onChange={e => setType(e.target.value)}>
+                {availableTypes.map(x => <Option key={x} value={x}>{x}</Option>)}
+              </Select>
+            </div>
+            <div className="">
+              <span className="text-muted">Note: pasting a value from a local env file will fill out the name and value.</span>
+            </div>
+          </form>
+        </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="danger" onClick={handleClose}>Cancel</Button>
-        <Button variant="success" onClick={_ => save()}>Save</Button>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={_ => save()}>Save</Button>
       </Modal.Footer>
     </Modal>
   );

@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import { Modal, Container, Row, Col, Button } from "react-bootstrap";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Environment from "../Data/Environment";
 import { CachedParameter } from "../Data/Model/CachedParameter";
-import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import ParameterStoreService from "../Services/ParameterStoreService";
+import Modal from "./Common/Modal";
+import Button from "./Common/Button";
+import Table, { Td, Th } from "./Common/Table";
+import Select from "./Common/Select";
 
 type CompareTemplatesModalProps = {
   show: boolean;
@@ -58,58 +60,48 @@ function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTempla
   return (
     <Modal show={show} onHide={handleClose} size="xl" centered>
       <Modal.Header closeButton>
-        <Container>
-          <Row className="justify-content-md-center">
-            <Col><strong>Compare 2 templates</strong></Col>
-          </Row>
-        </Container>
+        <strong>Compare 2 templates</strong>
       </Modal.Header>
       <Modal.Body>
-        <Container>
-          {Object.keys(selectedTemplateOptions[0]).length > 0 && <Row className="mb-3">
-            {selectedTemplateOptions.map((i, idx) => {
-              return <Col key={idx}>
-                <Row>
-                  {Object.keys(templateOptions).map((k, optIdx) => {
-                    return <Col key={optIdx} xs="auto">
-                      <strong>{k}</strong>
-                      <select value={i[k]} onChange={e => onTemplateValueSelected(idx, k, e.target.value)} className="form-control">
-                        {templateOptions[k].map(x => {
-                          return <option key={x} value={x}>{x}</option>
-                        })}
-                      </select>
-                    </Col>;
+        <div>
+          {Object.keys(selectedTemplateOptions[0]).length > 0 && <div className="flex flex-row mb-3 w-full justify-around">
+            {selectedTemplateOptions.map((i, idx) => <div key={idx} className="flex flex-col gap-2">
+              {Object.keys(templateOptions).map((k, optIdx) => <div key={optIdx} className="flex flex-row justify-between gap-2">
+                <strong>{k}</strong>
+                <Select value={i[k]} onChange={e => onTemplateValueSelected(idx, k, e.target.value)} className="form-control">
+                  {templateOptions[k].map(x => {
+                    return <option key={x} value={x}>{x}</option>
                   })}
-                </Row>
-              </Col>
-            })}
-          </Row>}
-          {hasTemplatesSelected() && <Row>
-            <Col>
-              {parameterNames.length > 0 && <table className="table table-hover table-bordered">
+                </Select>
+              </div>)}
+            </div>)}
+          </div>}
+          {hasTemplatesSelected() && <div>
+            <div>
+              {parameterNames.length > 0 && <Table>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    {selectedTemplateOptions.map((x, idx) => <th key={idx}>{Environment.getSelectedTemplatePrefix(x)}</th>)}
+                    <Th>Name</Th>
+                    {selectedTemplateOptions.map((x, idx) => <Th key={idx}>{Environment.getSelectedTemplatePrefix(x)}</Th>)}
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>Total Parameters:</strong></td>
-                    {parameterLists.map((x, idx) => <td key={idx}>{x.length}</td>)}
+                    <Td><strong>Total Parameters:</strong></Td>
+                    {parameterLists.map((x, idx) => <Td key={idx}>{x.length}</Td>)}
                   </tr>
                   {parameterNames.map((name, idx) => <tr key={idx}>
-                    <td>{name}</td>
+                    <Td>{name}</Td>
                     {selectedTemplateOptions.map((x, idx) => {
                       const value = parameterLists[idx].find(p => p.name.endsWith(name))?.value;
-                      return <td key={idx} style={{ width: (100 / (selectedTemplateOptions.length + 1)) + '%' }} className={(value === '' || value === undefined ? 'bg-danger missing' : '') + ' wrap'}>{value}</td>
+                      return <Td key={idx} style={{ width: (100 / (selectedTemplateOptions.length + 1)) + '%' }} className={(value === '' || value === undefined ? 'bg-red-700 missing' : '') + ' wrap'}>{value}</Td>
                     })}
                   </tr>)}
                 </tbody>
-              </table>}
-            </Col>
-          </Row>}
-        </Container>
+              </Table>}
+            </div>
+          </div>}
+        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>Cancel</Button>

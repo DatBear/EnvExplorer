@@ -62,7 +62,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
 
   return (<>
     <Offcanvas show={show} onHide={handleClose}>
-      <Offcanvas.Header closeButton>
+      <Offcanvas.Header closeButton show={show} setShow={setShow}>
         <Offcanvas.Title>Settings</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>

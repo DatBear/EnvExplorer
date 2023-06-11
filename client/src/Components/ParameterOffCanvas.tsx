@@ -81,7 +81,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
 
   return (
     <Offcanvas show={show} onHide={handleClose}>
-      <Offcanvas.Header closeButton>
+      <Offcanvas.Header show={show} setShow={setShow} closeButton>
         <Offcanvas.Title>{parameter.name}</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>

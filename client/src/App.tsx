@@ -158,7 +158,7 @@ function App() {
       </div>
       {hasError && <div>
         <div>
-          <div>Error loading parameters, check your settings and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
+          <div className="ps-2">Error loading parameters, check your settings and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
         </div>
       </div>}
       <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />

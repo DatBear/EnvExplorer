@@ -4,7 +4,9 @@ services:
   client:
     build:
       context: .
-      dockerfile: ./docker/client/Dockerfile
-    container_name: envexplorer-client
-    ports: 
-      - "5103:80"
+      dockerfile: ./Dockerfile
+    container_name: envexplorer
+    environment:
+      - PORT=8080
+    ports:
+      - "5103:8080"

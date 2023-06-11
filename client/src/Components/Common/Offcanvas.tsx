@@ -28,12 +28,14 @@ export default function Offcanvas({ show, onHide, children }: React.PropsWithChi
 
 type OffcanvasHeaderProps = {
   closeButton?: boolean;
+  show: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-Offcanvas.Header = function ({ children }: React.PropsWithChildren<OffcanvasHeaderProps>) {
+Offcanvas.Header = function ({ show, setShow, children }: React.PropsWithChildren<OffcanvasHeaderProps>) {
   return <div className="flex flex-row justify-between">
     {children}
-    <button className="p-2"><FontAwesomeIcon icon={faClose} /></button>
+    <button onClick={() => setShow(!show)} className="p-2"><FontAwesomeIcon icon={faClose} /></button>
   </div>
 }
 

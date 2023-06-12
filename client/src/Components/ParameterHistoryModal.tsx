@@ -49,7 +49,7 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
   useEffect(() => {
     if (!show) return;
     parameterStoreService.listParameters(selectedTemplateOptions).then(x => {
-      const filteredSorted = x.filter(x => x.lastModifiedDate && x.lastModifiedDate > utcDate).sort((a, b) => a.lastModifiedDate < b.lastModifiedDate ? 1 : -1);
+      const filteredSorted = x.filter(x => x.lastModifiedDate && x.lastModifiedDate > utcDate).sort((a, b) => a.lastModifiedDate < b.lastModifiedDate ? -1 : 1);
       setRecentParameters(filteredSorted);
     })
   }, [show, utcDate, selectedTemplateOptions, parameterStoreService, getTemplateOptions]);

@@ -2,17 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-table tbody tr.missing td {
-    color: red !important;
-    filter: brightness(50%);
-    opacity: .9;
-}
-
-table tbody tr td.missing {
-    filter: brightness(50%);
-    opacity: .5;
-}
-
 .file {
     white-space: pre;
     padding: 5px;

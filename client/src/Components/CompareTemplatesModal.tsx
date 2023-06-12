@@ -6,6 +6,7 @@ import Modal from "./Common/Modal";
 import Button from "./Common/Button";
 import Table, { Td, Th } from "./Common/Table";
 import Select from "./Common/Select";
+import clsx from "clsx";
 
 type CompareTemplatesModalProps = {
   show: boolean;
@@ -94,7 +95,8 @@ function CompareTemplatesModal({ show, setShow, templateOptions }: CompareTempla
                     <Td>{name}</Td>
                     {selectedTemplateOptions.map((x, idx) => {
                       const value = parameterLists[idx].find(p => p.name.endsWith(name))?.value;
-                      return <Td key={idx} style={{ width: (100 / (selectedTemplateOptions.length + 1)) + '%' }} className={(value === '' || value === undefined ? 'bg-red-700 missing' : '') + ' wrap'}>{value}</Td>
+                      const isMissing = value === '' || value === undefined;
+                      return <Td key={idx} style={{ width: (100 / (selectedTemplateOptions.length + 1)) + '%' }} className={clsx(isMissing ? 'bg-red-700 bg-opacity-40' : '', 'wrap')}>{value}</Td>
                     })}
                   </tr>)}
                 </tbody>

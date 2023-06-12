@@ -87,7 +87,8 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
   }
 
   const historySince = (name: string, date: Date) => {
-    return history[name]?.filter(x => x.LastModifiedDate && x.LastModifiedDate > date);
+    var earliestDate = history[name]?.filter(x => x?.LastModifiedDate).sort((a, b) => a.LastModifiedDate! > b.LastModifiedDate! ? -1 : 1).find(x => x.LastModifiedDate! < date)?.LastModifiedDate;
+    return history[name]?.filter(x => x.LastModifiedDate && x.LastModifiedDate >= (earliestDate ?? date));
   }
 
   const formatDate = (date: Date | undefined) => {
@@ -126,7 +127,7 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
                     <div>{x.name}</div>
                   </>}
                   {isHistoryLoaded && <>
-                    <div>{x.name}{currHistory?.find(x => x.Version === 1) !== undefined && <span className="">New</span>}</div>
+                    <div>{x.name}{currHistory?.find(x => x.Version === 1) !== undefined && <span className="ml-2 px-1 bg-green-600 rounded-md">New</span>}</div>
                   </>}
                 </div>
                 {currHistory && <div>

@@ -17,10 +17,11 @@ import Table, { Td, Th } from "./Common/Table";
 type MissingParametersModalProps = {
   response: MissingParametersResponse;
   selectedTemplateOptions: Record<string, string>;
-  updateCompareParametersResponse: (request: CompareParametersResponse, isEditMode: boolean) => void;
+  updateCompareParametersResponse: (response: CompareParametersResponse, isEditMode: boolean) => void;
+  refreshData: () => void;
 }
 
-function MissingParametersModal({ response, selectedTemplateOptions, updateCompareParametersResponse }: MissingParametersModalProps) {
+function MissingParametersModal({ response, selectedTemplateOptions, updateCompareParametersResponse, refreshData }: MissingParametersModalProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
   const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 

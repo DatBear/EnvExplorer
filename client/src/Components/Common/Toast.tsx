@@ -17,7 +17,7 @@ export default function Toast({ autohide, duration, onClose, textColor, message 
 
     var timeout = setTimeout(onClose, duration);
     return () => clearTimeout(timeout);
-  }, [autohide, duration]);
+  }, [autohide, duration, onClose]);
 
   return <div className="bg-zinc-800 rounded-md border border-emerald-800 shadow">
     <div className="flex flex-row gap-5 items-center justify-between border-b border-stone-400 p-3">

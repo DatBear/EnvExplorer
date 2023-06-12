@@ -29,7 +29,20 @@ div.copy-file-button {
     padding: 10px;
 }
 
-td.wrap, .parameter-value, .offcanvas-header {
-    word-break: break-word; /* Chrome, Safari */
-    word-wrap: break-word; /* IE11, Firefox */
+td.wrap, .parameter-value, .offcanvas-header, .wrap {
+    word-break: break-word !important; /* Chrome, Safari */
+    word-wrap: break-word !important; /* IE11, Firefox */
+}
+
+.spin{
+  animation: 1s linear 0s infinite spin;
+}
+
+@keyframes spin {
+  from {
+      transform:rotate(0deg);
+  }
+  to {
+      transform:rotate(360deg);
+  }
 }

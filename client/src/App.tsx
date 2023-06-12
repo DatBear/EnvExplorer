@@ -7,7 +7,7 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faChevronDown, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faHistory, faRefresh, faTextSlash } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faHistory, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
@@ -28,6 +28,7 @@ import Button from "./Components/Common/Button";
 import Spinner from "./Components/Spinner";
 import Accordion from "./Components/Common/Accordion";
 import DropdownButton, { Dropdown } from "./Components/Common/DropdownButton";
+
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
@@ -48,15 +49,13 @@ function App() {
   const [showSettingsOffCanvas, setShowSettingsOffCanvas] = useState(false);
   const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
 
-  const [showTestModal, setShowTestModal] = useState(true);
-
   const { search } = useSearch();
   const dataFetched = useRef(false);
-  const { addToast, addErrorToast } = useToasts();
+  const { addErrorToast } = useToasts();
 
   const fetchData = useCallback(() => {
     setSelectedTemplateOptions((s) => ({ ...s }));
-  }, []);
+  }, [setSelectedTemplateOptions]);
 
   const showError = useCallback((err: any) => {
     setHasError(true);
@@ -92,7 +91,7 @@ function App() {
       setIsRefreshing(false);
       setSelectedGroup(data);
     }).catch(showError);
-  }, [selectedTemplateOptions, parameterStoreService]);
+  }, [selectedTemplateOptions, parameterStoreService, showError]);
 
   useEffect(() => {
     if (showCreateModal) return;
@@ -158,7 +157,7 @@ function App() {
       </div>
       {hasError && <div>
         <div>
-          <div className="pl-3">Error loading parameters, check your settings and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
+          <div className="pl-3">Error loading parameters, check your settings (<FontAwesomeIcon icon={faGear} />) and try again using <FontAwesomeIcon icon={faRefresh} />.</div>
         </div>
       </div>}
       <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
@@ -211,7 +210,6 @@ function App() {
           <div className="pt-2">Showing <strong>{parameterCounts.filteredParameters}{parameterCounts.filteredParameters !== parameterCounts.parameters ? `/${parameterCounts.parameters}` : ''}</strong> parameters.</div>
         </div>
       </div>
-      {/* <Modal show={showTestModal} onHide={() => { setShowTestModal(false) }}></Modal> */}
       <CreateParameterModal show={showCreateModal} setShow={setShowCreateModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} />
       <CompareTemplatesModal show={showCompareModal} setShow={setShowCompareModal} templateOptions={templateOptions} />
       {selectedGroup && selectedGroup.name && <>
@@ -221,8 +219,8 @@ function App() {
         <div className="border-2 border-emerald-800 bg-stone-900 pb-4 m-2 rounded-xl"><Accordion defaultOpen={true}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></Accordion></div>
       </>}
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
-      {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
-      {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} />}
+      {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} refreshData={fetchData} />}
+      {missingParametersResponse && <MissingParametersModal response={missingParametersResponse} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} refreshData={fetchData} />}
       {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} editMode={compareEditMode} />}
       <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
     </div>

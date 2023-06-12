@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
         "resizable": true,
         "title": "EnvExplorer",
-        "width": 800
+        "width": 1920,
+        "height": 1080
       }
     ]
   }

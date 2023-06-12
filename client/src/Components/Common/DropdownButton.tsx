@@ -1,7 +1,6 @@
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Menu } from "@headlessui/react";
-import Environment from "../../Data/Environment";
 import { ButtonHTMLAttributes, ReactElement } from "react";
 
 type DropdownButtonProps = {

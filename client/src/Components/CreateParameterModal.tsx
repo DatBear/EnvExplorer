@@ -24,12 +24,15 @@ function CreateParameterModal({ show, setShow, templateOptions, selectedTemplate
   const [type, setType] = useState(availableTypes[0]);
   const [value, setValue] = useState("");
 
+  const { addToast } = useToasts();
+
   const handleClose = () => {
-    reset();
+    setValue("");
+    setName("");
+    setType(availableTypes[0]);
+
     setShow(false);
   }
-
-  const { addToast } = useToasts();
 
   useEffect(() => {
 
@@ -57,12 +60,6 @@ function CreateParameterModal({ show, setShow, templateOptions, selectedTemplate
     }).catch(e => {
       addToastError(e);
     });
-  }
-
-  const reset = () => {
-    setValue("");
-    setName("");
-    setType(availableTypes[0]);
   }
 
   return (

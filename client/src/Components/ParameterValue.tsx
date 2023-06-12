@@ -23,7 +23,7 @@ function ParameterValue({ name, value, type, editAction }: ParameterValueProps) 
 
   return (<>
     {searchFilterParameter(search, { name, value, type }) && <div>
-      <span className="" onClick={editAction}>{name}={displayValue(value)}</span>
+      <span className="wrap" onClick={editAction}>{name}={displayValue(value)}</span>
     </div>}
   </>);
 }

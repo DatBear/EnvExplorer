@@ -17,9 +17,10 @@ type ParameterOffCanvasProps = {
   parameter: ParameterValueResponse;
   selectedTemplateOptions: Record<string, string>;
   updateCompareParametersResponse: (request: CompareParametersResponse, isEditMode: boolean) => void;
+  refreshData: () => void;
 }
 
-function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse }: ParameterOffCanvasProps) {
+function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareParametersResponse, refreshData }: ParameterOffCanvasProps) {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
 
   const [name, setName] = useState(parameter.name);
@@ -58,6 +59,7 @@ function ParameterOffCanvas({ parameter, selectedTemplateOptions, updateCompareP
         setValue(res.value);
       }
       setIsEditMode(false);
+      refreshData();
     });
   }
 

@@ -1,6 +1,5 @@
 import { nanoid } from "nanoid";
 import React, { createContext, useCallback, useState } from "react";
-import icon from '../../Images/icon.png';
 import Toast from "../Common/Toast";
 
 type ToastContextType = {
@@ -20,9 +19,9 @@ type ToastOptions = {
 type ToastVariant = 'success' | 'danger' | 'light' | string;
 
 const textColors: Record<ToastVariant, string> = {
-  ['success']: 'text-green-500',
-  ['danger']: 'text-red-500',
-  ['light']: 'text-white'
+  'success': 'text-green-500',
+  'danger': 'text-red-500',
+  'light': 'text-white'
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -32,7 +31,7 @@ export default ToastContext;
 export function ToastContextProvider({ children }: React.PropsWithChildren) {
   const [toasts, setToasts] = useState<Required<ToastOptions>[]>([]);
 
-  const addToast = (opt: ToastOptions) => {
+  const addToast = useCallback((opt: ToastOptions) => {
     const toast: Required<ToastOptions> = {
       ...opt,
       id: nanoid(),
@@ -42,7 +41,7 @@ export function ToastContextProvider({ children }: React.PropsWithChildren) {
       textColor: opt.textColor ?? 'light'
     };
     setToasts([...toasts, toast]);
-  }
+  }, [toasts]);
 
   const addErrorToast = useCallback((err: any) => {
     addToast({

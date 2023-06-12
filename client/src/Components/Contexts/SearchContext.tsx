@@ -31,6 +31,10 @@ export function SearchContextProvider({ children }: React.PropsWithChildren) {
 
 export function searchFilterParameter(search: string | null, param: ParameterValueResponse): boolean {
   if (search === null || search === '') return true;
+  if (isValidRegex(search)) {
+    const regex = new RegExp(search, 'i');
+    return regex.test(param.name) || regex.test(param.value);
+  }
   return param.name.toLowerCase().indexOf(search) > -1 || param.value.toLowerCase().indexOf(search) > -1;
 }
 
@@ -44,6 +48,15 @@ export function searchFilterGroup(search: string | null, group: ParameterGroupRe
 export function searchFilterMissingParameter(search: string | null, missingParam: MissingParameterResponse): boolean {
   if (search === null || search === '') return true;
   return missingParam.name.indexOf(search) >= 0 || missingParam.parameters.find(x => x.name.toLowerCase().indexOf(search) >= 0 || x.value!.toLowerCase().indexOf(search) >= 0) != null;
+}
+
+function isValidRegex(regex: string) {
+  try {
+    new RegExp(regex);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 

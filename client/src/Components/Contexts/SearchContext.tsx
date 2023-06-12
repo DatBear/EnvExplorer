@@ -40,14 +40,18 @@ export function searchFilterParameter(search: string | null, param: ParameterVal
 
 export function searchFilterGroup(search: string | null, group: ParameterGroupResponse): boolean {
   if (search === null || search === '') return true;
-  return group.children.find(x => x.name.toLowerCase().indexOf(search) >= 0) != null
+  const regex = isValidRegex(search) ? new RegExp(search, 'i') : null;
+  return group.children.find(x => regex?.test(x.name) ?? x.name.toLowerCase().indexOf(search) >= 0) != null
     || group.parameters.find(x => searchFilterParameter(search, x)) != null
     || group.children.find(x => searchFilterGroup(search, x)) != null;
 }
 
 export function searchFilterMissingParameter(search: string | null, missingParam: MissingParameterResponse): boolean {
   if (search === null || search === '') return true;
-  return missingParam.name.indexOf(search) >= 0 || missingParam.parameters.find(x => x.name.toLowerCase().indexOf(search) >= 0 || x.value!.toLowerCase().indexOf(search) >= 0) != null;
+  const regex = isValidRegex(search) ? new RegExp(search, 'i') : null;
+  return (regex?.test(missingParam.name) ?? missingParam.name.indexOf(search) >= 0)
+    || missingParam.parameters
+      .find(x => (regex?.test(x.name) ?? x.name.toLowerCase().indexOf(search) >= 0) || (regex?.test(x.value!) ?? x.value!.toLowerCase().indexOf(search) >= 0)) != null;
 }
 
 function isValidRegex(regex: string) {

@@ -29,7 +29,7 @@ export default function OverlayTrigger({ overlay, placement, children }: PropsWi
     <span ref={refs.setReference} {...getReferenceProps()}>
       {children}
     </span>
-    {isOpen && <div ref={refs.setFloating} style={{ ...floatingStyles }} {...getFloatingProps()} className="bg-stone-800 rounded-md max-w-sm border border-teal-800 p-2">
+    {isOpen && <div ref={refs.setFloating} style={{ ...floatingStyles }} {...getFloatingProps()} className="bg-secondary-800 rounded-md max-w-sm border border-teal-800 p-2">
       {overlay}
     </div>}
   </>

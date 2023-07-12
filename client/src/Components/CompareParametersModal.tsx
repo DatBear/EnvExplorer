@@ -89,7 +89,7 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode }:
                   <Td>{x.templateValues[response.compareByOption]}</Td>
                   <Td>
                     {x.name}
-                    {showTypes && x.type && <><br /><span className="bg-emerald-800 rounded-lg px-2">{x.type}</span></>}
+                    {showTypes && x.type && <><br /><span className="bg-primary-800 rounded-lg px-2">{x.type}</span></>}
                   </Td>
                   <Td className="wrap"><ParameterEditor value={x.value} isEditMode={isEditMode} onChange={v => onValueChanged(x, v)} /></Td>
                   {isEditMode && <Td>

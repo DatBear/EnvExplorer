@@ -2,6 +2,8 @@ import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
+import { getThemeClass } from "../../Data/Model/Theme";
+import clsx from "clsx";
 
 type OffcanvasProps = {
   show: boolean;
@@ -15,15 +17,15 @@ export default function Offcanvas({ show, onHide, children }: React.PropsWithChi
     setIsOpen(show);
   }, [show])
 
-  return <Dialog open={isOpen} onClose={onHide} className="z-10 text-white">
+  return <Dialog open={isOpen} onClose={onHide} className={clsx("z-10 text-white", getThemeClass())}>
     <div className="fixed inset-0 overflow-y-auto bg-black bg-opacity-60">
       <div className="flex min-h-screen justify-start">
-        <Dialog.Panel className="w-96 bg-stone-900 p-2">
+        <Dialog.Panel className="w-96 bg-secondary-900 p-2">
           {children}
         </Dialog.Panel>
       </div>
     </div>
-  </Dialog>
+  </ Dialog>
 }
 
 type OffcanvasHeaderProps = {

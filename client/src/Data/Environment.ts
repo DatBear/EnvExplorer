@@ -2,6 +2,7 @@ import { getCurrentAppSettings } from "./Model/AppSettings";
 
 class Environment {
   public static baseUrl = process.env.REACT_APP_apiBaseUrl!;
+  public static theme = '';
   public static defaultTemplate = '';
   public static awsAccessKeyId = '';
   public static awsAccessKeySecret = '';
@@ -19,6 +20,7 @@ class Environment {
 
   public static __initialize() {
     const appSettings = getCurrentAppSettings();
+    this.theme = appSettings?.theme ?? '';
     this.defaultTemplate = appSettings?.template ?? this.defaultTemplate;
     this.awsAccessKeyId = appSettings?.awsAccessKeyId;
     this.awsAccessKeySecret = appSettings?.awsAccessKeySecret;

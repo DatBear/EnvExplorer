@@ -6,6 +6,6 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export default function Button({ className, ...props }: React.PropsWithChildren<ButtonProps>) {
-  const classes = clsx(className, "p-1 px-2 rounded-md bg-emerald-800 hover:bg-emerald-700 text-white")
+  const classes = clsx(className, "p-1 px-2 rounded-md bg-primary-800 hover:bg-primary-700 text-white")
   return <button {...props} className={classes}>{props.children}</button>
 }

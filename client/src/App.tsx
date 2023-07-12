@@ -28,6 +28,8 @@ import Button from "./Components/Common/Button";
 import Spinner from "./Components/Spinner";
 import Accordion from "./Components/Common/Accordion";
 import DropdownButton, { Dropdown } from "./Components/Common/DropdownButton";
+import { getThemeClass, themes } from "./Data/Model/Theme";
+import clsx from "clsx";
 
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
@@ -143,8 +145,10 @@ function App() {
     });
   };
 
+
+
   if (Object.keys(templateOptions).length === 0) {
-    return (<div className="text-white min-h-screen bg-black pb-4">
+    return (<div className={clsx("text-white min-h-screen bg-black pb-4", getThemeClass())}>
       <div className="p-3 flex flex-row gap-3">
         <div>
           <Button onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
@@ -165,7 +169,7 @@ function App() {
   }
 
   return (
-    <div className="bg-black text-white min-h-screen p-4">
+    <div className={clsx('bg-black text-white min-h-screen p-4', getThemeClass())}>
       <header>
         <img src={icon} className="absolute right-3 top-3" alt="Sweet EnvExplorer logo lookin fly" />
       </header>
@@ -216,7 +220,7 @@ function App() {
         <ParameterHistoryModal show={showHistoryModal} setShow={setShowHistoryModal} />
         <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />
         <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />
-        <div className="border-2 border-emerald-800 bg-stone-900 pb-4 m-2 rounded-xl"><Accordion defaultOpen={true}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></Accordion></div>
+        <div className="border-2 border-primary-800 bg-secondary-900 pb-4 m-2 rounded-xl"><Accordion defaultOpen={true}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></Accordion></div>
       </>}
       {selectedGroup && !selectedGroup.name && <div className="pt-3">No parameters found for this configuration.</div>}
       {offCanvasParameter && <ParameterOffCanvas parameter={offCanvasParameter} selectedTemplateOptions={selectedTemplateOptions} updateCompareParametersResponse={updateCompareParametersResponse} refreshData={fetchData} />}

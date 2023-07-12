@@ -1,6 +1,7 @@
 import { getAppSettingsContainer } from "./AppSettingsContainer";
 
 export type AppSettings = {
+  theme?: string;
   awsAccessKeyId: string;
   awsAccessKeySecret: string;
   awsRegion: string;

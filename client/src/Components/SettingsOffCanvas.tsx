@@ -1,8 +1,8 @@
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Environment from "../Data/Environment";
-import { AppSettings } from "../Data/Model/AppSettings";
+import { AppSettings, getCurrentAppSettings } from "../Data/Model/AppSettings";
 import { AppSettingsContainer, getAppSettingsContainer } from "../Data/Model/AppSettingsContainer";
 import { useToasts } from "./Contexts/ToastContext";
 import PasswordInput from "./PasswordInput";
@@ -12,6 +12,7 @@ import Button from "./Common/Button";
 import Select from "./Common/Select";
 import Input from "./Common/Input";
 import OverlayTrigger from "./Common/OverlayTrigger";
+import { themes } from "../Data/Model/Theme";
 
 type SettingsOffCanvasProps = {
   show: boolean;
@@ -27,6 +28,9 @@ const awsRegions = ['us-east-2', 'us-east-1', 'us-west-1', 'us-west-2',
 type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
 
 function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
+  const [, updateState] = useState({});
+  const forceUpdate = useCallback(() => updateState({}), []);
+
   const [appSettingsContainer, setAppSettingsContainer] = useState<AppSettingsContainer>(getAppSettingsContainer() as AppSettingsContainer);
   const [currentProfile, setCurrentProfile] = useState(appSettingsContainer.currentProfile);
   const [currentAppSettings, setCurrentAppSettings] = useState(appSettingsContainer.allAppSettings[currentProfile]);
@@ -38,6 +42,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
   useEffect(() => {
     localStorage.setItem("appSettingsContainer", JSON.stringify(appSettingsContainer));
     Environment.__initialize();
+    forceUpdate();
   }, [appSettingsContainer]);
 
   useEffect(() => {
@@ -49,6 +54,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
     container.allAppSettings[currentProfile] = { ...currentAppSettings };
     container.currentProfile = currentProfile;
     container.profileNames = [...new Set([...container.profileNames, currentProfile])];
+
     setAppSettingsContainer(container);
   }, [currentAppSettings, currentProfile])
 
@@ -78,6 +84,12 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
           </div>
         </div>
         {currentAppSettings && <div className="flex flex-col gap-3">
+          <div>
+            <div>Theme</div>
+            <Select id="theme" className="w-full" value={currentAppSettings.theme ?? themes[0]?.name} onChange={e => setCurrentAppSettings({ ...currentAppSettings, theme: e.target.value })}>
+              {themes.map(x => <option key={x.name} value={x.name}>{x.name}</option>)}
+            </Select>
+          </div>
           <div>
             <div><strong>AWS Access Key Id</strong></div>
             <PasswordInput id="awsKey" placeholder="Access Key Id" value={currentAppSettings.awsAccessKeyId ?? ''} onChange={(e: React.ChangeEvent<FormControlElement>) => setCurrentAppSettings({ ...currentAppSettings, awsAccessKeyId: e.target.value })} />

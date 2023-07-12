@@ -19,13 +19,13 @@ export default function Toast({ autohide, duration, onClose, textColor, message 
     return () => clearTimeout(timeout);
   }, [autohide, duration, onClose]);
 
-  return <div className="bg-zinc-800 rounded-md border border-emerald-800 shadow">
-    <div className="flex flex-row gap-5 items-center justify-between border-b border-stone-400 p-3">
+  return <div className="bg-zinc-800 rounded-md border border-primary-800 shadow">
+    <div className="flex flex-row gap-5 items-center justify-between border-b border-secondary-400 p-3">
       <div className="flex flex-row gap-1 align-middle items-center">
         <img src={icon} className="rounded mr-2" style={{ width: '20px', height: '20px' }} alt="Sweet EnvExplorer logo" />
-        <span className="text-stone-400">EnvExplorer</span>
+        <span className="text-secondary-400">EnvExplorer</span>
       </div>
-      <FontAwesomeIcon icon={faX} className="text-stone-400 px-2 -mx-2" onClick={onClose} />
+      <FontAwesomeIcon icon={faX} className="text-secondary-400 px-2 -mx-2" onClick={onClose} />
     </div>
     <div className="max-w-sm p-3">
       <span className={textColor}>{message}</span>

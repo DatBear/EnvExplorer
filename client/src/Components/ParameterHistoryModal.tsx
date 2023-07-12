@@ -114,7 +114,7 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
         </div>
         <div className="pt-2">
           <div className="w-max">Show parameters modified since:</div>
-          <div className="w-max"><DatePicker selected={date} dateFormat="MM-dd-yyyy" onChange={d => d && updateDate(d)} className="bg-inherit border border-emerald-800 px-2 py-1" /></div>
+          <div className="w-max"><DatePicker selected={date} dateFormat="MM-dd-yyyy" onChange={d => d && updateDate(d)} className="bg-inherit border border-primary-800 px-2 py-1" /></div>
         </div>
         {recentParameters?.map(x => {
           const currHistory = historySince(x.name, utcDate);

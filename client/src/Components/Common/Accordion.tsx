@@ -26,7 +26,7 @@ type AccordionButtonProps = {
 }
 
 Accordion.Button = function ({ open, children }: React.PropsWithChildren<AccordionButtonProps>) {
-  return <Disclosure.Button className={clsx(open ? "text-emerald-300" : "text-gray-400", "w-full flex flex-row gap-2 items-center px-4 pt-4 text-left")} as="button">
+  return <Disclosure.Button className={clsx(open ? "text-primary-300" : "text-secondary-400", "w-full flex flex-row gap-2 items-center px-4 pt-4 text-left")} as="button">
     {!open && <FontAwesomeIcon icon={faChevronRight} className="-ml-1" size="sm" />}
     {open && <FontAwesomeIcon icon={faChevronDown} className="-ml-1" size="sm" />}
     <span className="pl-2">{children}</span>
@@ -34,5 +34,5 @@ Accordion.Button = function ({ open, children }: React.PropsWithChildren<Accordi
 }
 
 Accordion.Panel = function ({ children }: React.PropsWithChildren) {
-  return <Disclosure.Panel className="mx-4 px-1 py-3 border-emerald-800 border-l-2 w-full text-white"><div className="px-5">{children}</div></Disclosure.Panel>
+  return <Disclosure.Panel className="mx-4 px-1 py-3 border-primary-800 border-l-2 w-full text-white"><div className="px-5">{children}</div></Disclosure.Panel>
 }

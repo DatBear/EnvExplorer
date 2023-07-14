@@ -27,8 +27,8 @@ type AccordionButtonProps = {
 
 Accordion.Button = function ({ open, children }: React.PropsWithChildren<AccordionButtonProps>) {
   return <Disclosure.Button className={clsx(open ? "text-primary-300" : "text-secondary-400", "w-full flex flex-row gap-2 items-center px-4 pt-4 text-left")} as="button">
-    {!open && <FontAwesomeIcon icon={faChevronRight} className="-ml-1" size="sm" />}
-    {open && <FontAwesomeIcon icon={faChevronDown} className="-ml-1" size="sm" />}
+    {!open && <FontAwesomeIcon icon={faChevronRight} className="-ml-[.4rem]" size="sm" />}
+    {open && <FontAwesomeIcon icon={faChevronDown} className="-ml-[.4rem]" size="sm" />}
     <span className="pl-2">{children}</span>
   </Disclosure.Button>
 }

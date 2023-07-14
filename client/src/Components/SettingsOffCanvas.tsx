@@ -11,6 +11,7 @@ import Modal from "./Common/Modal";
 import Button from "./Common/Button";
 import Select from "./Common/Select";
 import Input from "./Common/Input";
+import Option from "./Common/Option";
 import OverlayTrigger from "./Common/OverlayTrigger";
 import { themes } from "../Data/Model/Theme";
 
@@ -77,7 +78,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
             <strong>Settings Profile</strong>
             <div className="flex flex-row items-center gap-3">
               <Select value={currentProfile} onChange={e => setSelectedProfile(e.target.value)} className="w-full">
-                {appSettingsContainer.profileNames.map(x => <option key={x} value={x}>{x}</option>)}
+                {appSettingsContainer.profileNames.map(x => <Option key={x} value={x}>{x}</Option>)}
               </Select>
               <Button onClick={_ => setShowAddProfileModal(true)} variant="success"><FontAwesomeIcon icon={faAdd} /></Button>
             </div>
@@ -87,7 +88,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
           <div>
             <div>Theme</div>
             <Select id="theme" className="w-full" value={currentAppSettings.theme ?? themes[0]?.name} onChange={e => setCurrentAppSettings({ ...currentAppSettings, theme: e.target.value })}>
-              {themes.map(x => <option key={x.name} value={x.name}>{x.name}</option>)}
+              {themes.map(x => <Option key={x.name} value={x.name}>{x.name}</Option>)}
             </Select>
           </div>
           <div>
@@ -101,7 +102,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
           <div>
             <div><strong>AWS Region</strong></div>
             <Select id="awsRegion" className="w-full" value={currentAppSettings.awsRegion ?? awsRegions[0]} onChange={e => setCurrentAppSettings({ ...currentAppSettings, awsRegion: e.target.value })}>
-              {awsRegions.map(x => <option key={x} value={x}>{x}</option>)}
+              {awsRegions.map(x => <Option key={x} value={x}>{x}</Option>)}
             </Select>
           </div>
           <div>

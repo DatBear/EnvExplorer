@@ -148,7 +148,7 @@ function App() {
 
 
   if (Object.keys(templateOptions).length === 0) {
-    return (<div className={clsx("text-white min-h-screen bg-black pb-4", getThemeClass())}>
+    return (<div className={clsx("text-white min-h-screen bg-secondary-black pb-4", getThemeClass())}>
       <div className="p-3 flex flex-row gap-3">
         <div>
           <Button onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
@@ -169,7 +169,7 @@ function App() {
   }
 
   return (
-    <div className={clsx('bg-black text-white min-h-screen p-4', getThemeClass())}>
+    <div className={clsx('bg-secondary-black text-white min-h-screen p-4', getThemeClass())}>
       <header>
         <img src={icon} className="absolute right-3 top-3" alt="Sweet EnvExplorer logo lookin fly" />
       </header>

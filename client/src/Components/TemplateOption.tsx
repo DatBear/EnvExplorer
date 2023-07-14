@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Select from "./Common/Select";
+import Option from "./Common/Option";
 
 type TemplateOptionProps = {
   name: string;
@@ -26,8 +27,8 @@ function TemplateOption({ name, values, multiple: isMultiple, setSelection, setM
 
   return <div className="w-max flex flex-col gap-2">
     <b>{name}</b>
-    <Select name={name} onChange={(e) => onSelectionChanged(e)} multiple={isMultiple ?? false}>
-      {values.map((value, idx) => <option key={idx} value={value}>{value}</option>)}
+    <Select name={name} onChange={(e) => onSelectionChanged(e)} multiple={isMultiple ?? false} className="text-white">
+      {values.map((value, idx) => <Option key={idx} value={value}>{value}</Option>)}
     </Select>
   </div>;
 }

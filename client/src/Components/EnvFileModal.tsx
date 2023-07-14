@@ -43,21 +43,20 @@ function EnvFileModal({ show, setShow, group, templateOptions, selectedTemplateO
         </div>
       </Modal.Header>
       <Modal.Body>
-        <div>
-          <div>
-            <div>
-              <div className="file">
-                <div className="relative">
-                  <div className="copy-file-button">
-                    <OverlayTrigger overlay={<div className="px-2">Copy file to clipboard</div>}>
-                      <FontAwesomeIcon icon={faCopy} onClick={_ => copyFile()} />
-                    </OverlayTrigger>
-                  </div>
-                </div>
-                {fileOutput}
+        <div className="flex flex-col gap-3">
+          <div className="file">
+            <div className="relative">
+              <div className="copy-file-button">
+                <OverlayTrigger overlay={<div className="px-2">Copy file to clipboard</div>}>
+                  <FontAwesomeIcon icon={faCopy} onClick={_ => copyFile()} />
+                </OverlayTrigger>
               </div>
             </div>
+            {fileOutput}
           </div>
+          <Button className="w-max self-center">
+            <a href={`data:application/octet-stream;base64,${btoa(fileOutput)}`} download={fileService.getFileName(selectedTemplateOptions)}>Download ({fileService.getFileName(selectedTemplateOptions)})</a>
+          </Button>
         </div>
       </Modal.Body>
       <Modal.Footer>

@@ -60,6 +60,10 @@ export default class FileService {
     return Object.keys(templateOptions).map(x => `#${x}: ${templateOptions[x]}`).join('\n') + '\n\n'
   }
 
+  public getFileName = (templateOptions: Record<string, string>) => {
+    return Object.keys(templateOptions).map(x => `${templateOptions[x]}`).join('_') + '.env';
+  }
+
   private getFileOutput = (group: ParameterGroupResponse, current: string = ''): string => {
     return current + group.parameters.map(x => {
       return `${Environment.getEnvFileParameter(x.name, x.value)}\n`;

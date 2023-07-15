@@ -1,8 +1,8 @@
-import { faAdd } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useCallback, useEffect, useState } from "react";
 import Environment from "../Data/Environment";
-import { AppSettings, getCurrentAppSettings } from "../Data/Model/AppSettings";
+import { AppSettings } from "../Data/Model/AppSettings";
 import { AppSettingsContainer, getAppSettingsContainer } from "../Data/Model/AppSettingsContainer";
 import { useToasts } from "./Contexts/ToastContext";
 import PasswordInput from "./PasswordInput";
@@ -37,6 +37,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
   const [currentAppSettings, setCurrentAppSettings] = useState(appSettingsContainer.allAppSettings[currentProfile]);
 
   const [showAddProfileModal, setShowAddProfileModal] = useState(false);
+  const [showRemoveProfileModal, setShowRemoveProfileModal] = useState(false);
 
   const handleClose = () => setShow(false);
 
@@ -67,7 +68,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
     setCurrentProfile(name);
   }
 
-  return (<>
+  return <>
     <Offcanvas show={show} onHide={handleClose}>
       <Offcanvas.Header closeButton show={show} setShow={setShow}>
         <Offcanvas.Title>Settings</Offcanvas.Title>
@@ -81,6 +82,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
                 {appSettingsContainer.profileNames.map(x => <Option key={x} value={x}>{x}</Option>)}
               </Select>
               <Button onClick={_ => setShowAddProfileModal(true)} variant="success"><FontAwesomeIcon icon={faAdd} /></Button>
+              {Object.keys(appSettingsContainer.allAppSettings).length > 1 && <Button onClick={_ => setShowRemoveProfileModal(true)} variant="danger"><FontAwesomeIcon icon={faTrash} /></Button>}
             </div>
           </div>
         </div>
@@ -125,7 +127,8 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
       </Offcanvas.Body>
     </Offcanvas>
     <AddSettingsProfileModal show={showAddProfileModal} setShow={setShowAddProfileModal} setSelectedProfile={setSelectedProfile} initialAppSettingsContainer={appSettingsContainer} />
-  </>);
+    <RemoveSettingsProfileModal show={showRemoveProfileModal} setShow={setShowRemoveProfileModal} setSelectedProfile={setSelectedProfile} appSettingsContainer={appSettingsContainer} setAppSettingsContainer={setAppSettingsContainer} profileToRemove={appSettingsContainer.currentProfile} />
+  </>;
 }
 
 type AddSettingsProfileModalProps = {
@@ -180,5 +183,66 @@ function AddSettingsProfileModal({ show, setShow, setSelectedProfile, initialApp
     </Modal.Footer>
   </Modal>
 }
+
+type RemoveSettingsProfileModalProps = {
+  show: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedProfile: (name: string) => void;
+  appSettingsContainer: AppSettingsContainer;
+  setAppSettingsContainer: (container: AppSettingsContainer) => void;
+  profileToRemove: string;
+};
+
+function RemoveSettingsProfileModal({ show, setShow, setSelectedProfile, appSettingsContainer, setAppSettingsContainer, profileToRemove }: RemoveSettingsProfileModalProps) {
+  const handleClose = () => setShow(false);
+
+  const { addToast } = useToasts();
+  const [name, setName] = useState('');
+
+  const removeProfile = () => {
+    var existingProfile = appSettingsContainer.profileNames.find(x => x === name);
+    if (!existingProfile) {
+      addToast({ message: 'Error: profile not found!', textColor: 'danger' });
+    }
+    else if (name !== profileToRemove) {
+      addToast({ message: `Error: name doesn't match "${profileToRemove}!`, textColor: 'danger' });
+    }
+    else {
+      delete appSettingsContainer.allAppSettings[profileToRemove];
+      const container = {
+        allAppSettings: { ...appSettingsContainer.allAppSettings },
+        profileNames: [...appSettingsContainer.profileNames.filter(x => x !== profileToRemove)]
+      } as AppSettingsContainer;
+      setAppSettingsContainer(container);
+      setSelectedProfile(Object.keys(appSettingsContainer.allAppSettings)[0]);
+      setName('');
+      handleClose();
+    }
+  }
+
+  return <Modal show={show} onHide={handleClose} centered>
+    <Modal.Header closeButton>
+      <div className='justify-content-md-center'>
+        <div><strong>Remove settings profile</strong></div>
+      </div>
+    </Modal.Header>
+    <Modal.Body>
+      <div>
+        <div>
+          <div>
+            <div><strong>Profile Name</strong></div>
+            <Input id="profileName" placeholder={profileToRemove} value={name} onChange={e => setName(e.target.value)} />
+            <div>Type the name of the profile ({profileToRemove}) to permanently remove this profile.</div>
+          </div>
+        </div>
+      </div>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="danger" onClick={handleClose}>Cancel</Button>
+      <Button variant="success" onClick={removeProfile}>Remove profile</Button>
+    </Modal.Footer>
+  </Modal>
+}
+
 
 export default SettingsOffCanvas;

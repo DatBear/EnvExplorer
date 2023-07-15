@@ -81,7 +81,6 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
   };
 
   const updateDate = (selected: Date) => {
-    console.log(selected.toUTCString());
     selected.setHours(0, 0, 0, 0);
     setDate(selected);
   }

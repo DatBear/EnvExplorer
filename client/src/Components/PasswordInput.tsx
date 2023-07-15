@@ -1,8 +1,12 @@
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { InputHTMLAttributes, useState } from "react";
 
-function PasswordInput({ ...props }) {
+type PasswordInputProps = InputHTMLAttributes<HTMLInputElement> & {
+
+};
+
+function PasswordInput({ ...props }: PasswordInputProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (

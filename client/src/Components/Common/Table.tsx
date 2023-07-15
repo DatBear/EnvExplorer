@@ -11,8 +11,12 @@ export function Th({ children }: React.PropsWithChildren) {
   return <th className="border border-primary-300 border-opacity-40 p-2">{children}</th>
 }
 
-export function Tr({ children }: React.PropsWithChildren) {
-  return <tr>{children}</tr>
+type TrProps = {
+  className?: string;
+}
+
+export function Tr({ children, ...props }: React.PropsWithChildren<TrProps>) {
+  return <tr {...props}>{children}</tr>
 }
 
 type TdProps = {

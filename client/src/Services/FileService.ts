@@ -1,7 +1,9 @@
+import { Parameter } from "@aws-sdk/client-ssm";
 import Environment from "../Data/Environment";
 import ExportFileResponse from "../Data/Model/ExportFileResponse";
 import ParameterGroupResponse from "../Data/Model/ParameterGroupResponse";
 import ScriptGenerationOptions from "../Data/Model/ScriptGenerationOptions";
+import UploadedFile from "../Data/Model/UploadedFile";
 
 export default class FileService {
 
@@ -68,5 +70,23 @@ export default class FileService {
     return current + group.parameters.map(x => {
       return `${Environment.getEnvFileParameter(x.name, x.value)}\n`;
     }).join('') + group.children.map(x => this.getFileOutput(x)).join('');
+  }
+
+
+  public parseFile(templateOptions: Record<string, string>, content: string) {
+    let lines = content.replaceAll('\r', '').split('\n').filter(x => !x.startsWith('#') && x.length > 0 && x.indexOf('=') > -1);
+    let prefix = Environment.getSelectedTemplatePrefix(templateOptions);
+    let params = lines.map(x => ({
+      LastModifiedDate: new Date(),
+      Name: `${prefix}/${x.substring(0, x.indexOf('=')).replaceAll('__', '/')}`,
+      Value: x.substring(x.indexOf('=') + 1),
+    } as Parameter));
+
+    let file: UploadedFile = {
+      templateOptions,
+      parameters: params
+    };
+
+    return file;
   }
 }

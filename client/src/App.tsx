@@ -7,7 +7,7 @@ import ParameterOffCanvas from './Components/ParameterOffCanvas';
 import CompareParametersResponse from './Data/Model/CompareParametersResponse';
 import CompareParametersModal from './Components/CompareParametersModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faDownLeftAndUpRightToCenter, faFile, faFileExport, faGear, faHistory, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faDownLeftAndUpRightToCenter, faFile, faFileExport, faFileUpload, faGear, faHistory, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Environment from './Data/Environment';
 import MissingParametersRequest from './Data/Model/MissingParametersRequest';
 import MissingParametersResponse from './Data/Model/MissingParametersResponse';
@@ -28,8 +28,9 @@ import Button from "./Components/Common/Button";
 import Spinner from "./Components/Spinner";
 import Accordion from "./Components/Common/Accordion";
 import DropdownButton, { Dropdown } from "./Components/Common/DropdownButton";
-import { getThemeClass, themes } from "./Data/Model/Theme";
+import { getThemeClass } from "./Data/Model/Theme";
 import clsx from "clsx";
+import UploadEnvFileModal from "./Components/UploadEnvFileModal";
 
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
@@ -44,6 +45,7 @@ function App() {
   const [compareEditMode, setCompareEditMode] = useState(false);
   const [missingParametersResponse, setMissingParametersResponse] = useState<MissingParametersResponse>();
   const [showFileModal, setShowFileModal] = useState(false);
+  const [showUploadFileModal, setShowUploadFileModal] = useState(false);
   const [showFileExportModal, setShowFileExportModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
@@ -194,6 +196,9 @@ function App() {
           <Button onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
         </div>
         <div className="w-max">
+          <Button onClick={_ => setShowUploadFileModal(true)}><FontAwesomeIcon icon={faFileUpload} /></Button>
+        </div>
+        <div className="w-max">
           <Button onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
         </div>
         <div className="w-max">
@@ -219,6 +224,7 @@ function App() {
       {selectedGroup && selectedGroup.name && <>
         <ParameterHistoryModal show={showHistoryModal} setShow={setShowHistoryModal} />
         <EnvFileModal show={showFileModal} setShow={setShowFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} group={selectedGroup} />
+        <UploadEnvFileModal show={showUploadFileModal} setShow={setShowUploadFileModal} templateOptions={templateOptions} selectedTemplateOptions={selectedTemplateOptions} setSelectedTemplateOptions={setSelectedTemplateOptions} group={selectedGroup} />
         <FileExportModal show={showFileExportModal} setShow={setShowFileExportModal} templateOptions={templateOptions} />
         <div className="border-2 border-primary-800 bg-secondary-900 pb-4 m-2 rounded-xl"><Accordion defaultOpen={true}><ParameterGroup group={selectedGroup} updateSelectedParameter={updateSelectedParameter} /></Accordion></div>
       </>}

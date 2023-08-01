@@ -1,6 +1,6 @@
 import { faAdd, faFileExport, faShareFromSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import Environment from "../Data/Environment";
 import { AppSettings } from "../Data/Model/AppSettings";
 import { AppSettingsContainer, getAppSettingsContainer } from "../Data/Model/AppSettingsContainer";
@@ -30,8 +30,7 @@ const awsRegions = ['us-east-2', 'us-east-1', 'us-west-1', 'us-west-2',
 type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
 
 function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
-  const [, updateState] = useState({});
-  const forceUpdate = useCallback(() => updateState({}), []);
+  const forceUpdate = useReducer(() => ({}), {})[1];
 
   const [appSettingsContainer, setAppSettingsContainer] = useState<AppSettingsContainer>(getAppSettingsContainer() as AppSettingsContainer);
   const [currentProfile, setCurrentProfile] = useState(appSettingsContainer.currentProfile);
@@ -71,7 +70,7 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
   }
 
   return <>
-    <Offcanvas show={show} onHide={handleClose}>
+    <Offcanvas show={show} onHide={() => { }}>
       <Offcanvas.Header closeButton show={show} setShow={setShow}>
         <Offcanvas.Title>Settings</Offcanvas.Title>
       </Offcanvas.Header>

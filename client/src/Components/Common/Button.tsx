@@ -7,7 +7,8 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<string, string> = {
   'success': 'bg-primary-800 hover:bg-primary-700',
-  'danger': 'bg-red-800 hover:bg-red-700'
+  'danger': 'bg-red-800 hover:bg-red-700',
+  'secondary': 'bg-secondary-900 hover:bg-secondary-600'
 }
 
 export default function Button({ className, variant, ...props }: React.PropsWithChildren<ButtonProps>) {

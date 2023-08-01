@@ -121,7 +121,7 @@ function MissingParametersModal({ response, selectedTemplateOptions, updateCompa
       </div>
     </Modal.Body>
     <Modal.Footer>
-      <Button variant="secondary" onClick={handleClose}>Close</Button>
+      <Button variant="danger" onClick={handleClose}>Close</Button>
     </Modal.Footer>
   </Modal>
 }

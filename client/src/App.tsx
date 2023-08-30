@@ -31,6 +31,8 @@ import DropdownButton, { Dropdown } from "./Components/Common/DropdownButton";
 import { getThemeClass } from "./Data/Model/Theme";
 import clsx from "clsx";
 import UploadEnvFileModal from "./Components/UploadEnvFileModal";
+import ParameterStoreUpdateEvent from "./Data/Events/ParameterStoreUpdateEvent";
+import FixedProgressBar from "./Components/Common/FixedProgressBar";
 
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
@@ -52,6 +54,8 @@ function App() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showSettingsOffCanvas, setShowSettingsOffCanvas] = useState(false);
   const [parameterCounts, setParameterCounts] = useState({ parameters: 0, filteredParameters: 0 });
+
+  const [parameterStoreUpdate, setParameterStoreUpdate] = useState<ParameterStoreUpdateEvent>();
 
   const { search } = useSearch();
   const dataFetched = useRef(false);
@@ -110,6 +114,15 @@ function App() {
     });
   }, [selectedGroup, search]);
 
+  useEffect(() => {
+    var updateListener = (e: ParameterStoreUpdateEvent) => {
+      setParameterStoreUpdate({ ...e });
+    }
+
+    ParameterStoreService.updateEventEmitter.on(updateListener);
+    return () => ParameterStoreService.updateEventEmitter.off(updateListener);
+  }, []);
+
   const setSelectedTemplateOption = (key: string, value: string) => {
     selectedTemplateOptions[key] = value;
     setSelectedTemplateOptions({ ...selectedTemplateOptions });
@@ -147,6 +160,12 @@ function App() {
     });
   };
 
+  let loadingPrefix = (() => {
+    if (!parameterStoreUpdate) return null;
+    let key = Object.keys(parameterStoreUpdate.prefixes).find(x => !parameterStoreUpdate?.prefixes[x].isComplete && parameterStoreUpdate?.prefixes[x].current > 0);
+    if (!key) return null;
+    return parameterStoreUpdate.prefixes[key];
+  })();
 
 
   if (Object.keys(templateOptions).length === 0) {
@@ -170,7 +189,7 @@ function App() {
     </div>)
   }
 
-  return (
+  return <>
     <div className={clsx('bg-secondary-black text-white min-h-screen p-4', getThemeClass())}>
       <header>
         <img src={icon} className="absolute right-3 top-3" alt="Sweet EnvExplorer logo lookin fly" />
@@ -234,7 +253,11 @@ function App() {
       {compareParametersResponse && <CompareParametersModal response={compareParametersResponse} selectedTemplateOptions={selectedTemplateOptions} editMode={compareEditMode} />}
       <SettingsOffCanvas show={showSettingsOffCanvas} setShow={setShowSettingsOffCanvas} />
     </div>
-  );
+    {parameterStoreUpdate && !parameterStoreUpdate.isComplete && <div className="bg-secondary-800 fixed h-8 top-0 w-full">
+      {loadingPrefix && <FixedProgressBar className="top-0" name={loadingPrefix.prefix} current={loadingPrefix.current} total={loadingPrefix.total} />}
+      <FixedProgressBar className="top-4" name="Total" current={parameterStoreUpdate.parametersRetrieved} total={parameterStoreUpdate.totalParameters} />
+    </div>}
+  </>;
 }
 
 export default App;

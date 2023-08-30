@@ -14,9 +14,12 @@ import ParameterValueResponse from "../Data/Model/ParameterValueResponse";
 import TemplatedParameterValueResponse from "../Data/Model/TemplatedParameterValueResponse";
 import UpdateParameterValueRequest from "../Data/Model/UpdateParameterValueRequest";
 import UpdateParameterValueResponse from "../Data/Model/UpdateParameterValueResponse";
+import ParameterStoreUpdateEvent, { ProgressUpdateEvent } from "../Data/Events/ParameterStoreUpdateEvent";
+import { TypedEvent } from "./TypedEvent";
 
 export default class ParameterStoreService {
   public static instance: ParameterStoreService = new ParameterStoreService();
+  public static updateEventEmitter: TypedEvent<ParameterStoreUpdateEvent> = new TypedEvent<ParameterStoreUpdateEvent>();
 
   private ssmClient!: SSMClient;
   private parameterPrefixes!: string[];
@@ -47,30 +50,71 @@ export default class ParameterStoreService {
 
   private async getAllParameters() {
     const parameters: Parameter[] = [];
-    for (const prefix of this.parameterPrefixes) {
-      const params = await this.getParameters(prefix);
-      params.forEach(x => parameters.push(x));
-    }
 
+    const firstEvent = await this.emitNextUpdateEvent();
+    let currentEvent: ParameterStoreUpdateEvent | null = null;
+    for (const prefix of this.parameterPrefixes) {
+      let response: GetParametersResponse = await this.getParameters(prefix, currentEvent ?? firstEvent);
+      currentEvent = response.currentEvent;
+      parameters.push(...response.parameters);
+    }
+    ParameterStoreService.updateEventEmitter.emit({ ...currentEvent!, isComplete: true });
     return parameters;
   }
 
-  private async getParameters(path: string) {
+  private async getNextUpdateEvent(currentEvent?: ParameterStoreUpdateEvent, path?: string, retrieved?: number, isComplete?: boolean): Promise<ParameterStoreUpdateEvent> {
+    if (!currentEvent) {
+      let prefixes: Record<string, ProgressUpdateEvent> = {};
+      this.parameterPrefixes.forEach(x => {
+        prefixes[x] = { current: 0, total: this.cachedParameters?.filter(p => p.name.startsWith(x)).length ?? 0, isComplete: false, prefix: x };
+      });
+
+      return {
+        totalParameters: this.cachedParameters?.length ?? 0,
+        parametersRetrieved: 0,
+        prefixes,
+        isComplete: this.cachedParameters?.length === 0
+      };
+    }
+
+    if (currentEvent && path && retrieved != null) {
+      currentEvent.prefixes[path].current = retrieved;
+      currentEvent.prefixes[path].isComplete = isComplete ?? false;
+      currentEvent.parametersRetrieved = Object.keys(currentEvent.prefixes)
+        .map(x => currentEvent.prefixes[x].current)
+        .reduce((t, a) => t + a, 0);
+    }
+
+    return currentEvent;
+  }
+
+  private async emitNextUpdateEvent(currentEvent?: ParameterStoreUpdateEvent, path?: string, retrieved?: number, isComplete?: boolean) {
+    let e = await this.getNextUpdateEvent(currentEvent, path, retrieved, isComplete);
+    ParameterStoreService.updateEventEmitter.emit(e);
+    return e;
+  }
+
+  private async getParameters(prefix: string, currentEvent: ParameterStoreUpdateEvent)
+    : Promise<GetParametersResponse> {
     const parameters: Parameter[] = [];
 
     const commandInput: GetParametersByPathCommandInput = {
-      Path: path,
+      Path: prefix,
       Recursive: true,
       WithDecryption: true
-    }
+    };
 
+    let nextEvent: ParameterStoreUpdateEvent | null = null;
     var paginator = paginateGetParametersByPath({ client: this.ssmClient }, commandInput);
     for await (const page of paginator) {
       if (page.Parameters) {
         parameters.push(...page.Parameters);
+        nextEvent = await this.emitNextUpdateEvent(currentEvent, prefix, parameters.length);
       }
     }
-    return parameters;
+
+    nextEvent = await this.emitNextUpdateEvent(currentEvent, prefix, parameters.length, true);
+    return { parameters, currentEvent: nextEvent ?? currentEvent };
   }
 
   public async getCachedParameters(includeHidden: boolean = false) {
@@ -353,4 +397,9 @@ type MapCartesian<T extends any[][]> = {
 
 const cartesian = <T extends any[][]>(...arr: T): MapCartesian<T>[] => {
   return arr.reduce((a, b) => a.flatMap(c => b.map(d => [...c, d])), [[]]) as MapCartesian<T>[];
+}
+
+type GetParametersResponse = {
+  parameters: Parameter[];
+  currentEvent: ParameterStoreUpdateEvent;
 }

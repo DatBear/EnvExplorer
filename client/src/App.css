@@ -23,6 +23,11 @@ td.wrap, .parameter-value, .offcanvas-header, .wrap {
     word-wrap: break-word !important; /* IE11, Firefox */
 }
 
+td.nowrap {
+  word-break: initial !important;
+  word-wrap: initial !important;
+}
+
 .spin{
   animation: 1s linear 0s infinite spin;
 }

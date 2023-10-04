@@ -10,6 +10,7 @@ import Modal from "./Common/Modal";
 import Button from "./Common/Button";
 import Table, { Td, Th } from "./Common/Table";
 import DropdownButton, { Dropdown } from "./Common/DropdownButton";
+import OverlayTrigger from "./Common/OverlayTrigger";
 
 type CompareParametersModalProps = {
   response: CompareParametersResponse;
@@ -64,8 +65,12 @@ function CompareParametersModal({ response, selectedTemplateOptions, editMode }:
           <div className="flex flex-row items-center justify-between">
             <strong>{response.parameterName}</strong>
             <div>
-              <Button variant={showTypes ? "success" : "danger"} onClick={_ => toggleShowTypes()}><FontAwesomeIcon icon={faKeyboard} /></Button>&nbsp;
-              <Button variant={isEditMode ? "success" : "danger"} onClick={_ => toggleIsEditMode()}><FontAwesomeIcon icon={faPenToSquare} /></Button>
+              <OverlayTrigger overlay={<div className="px-2">{(!showTypes ? 'Show' : 'Hide')} parameter types</div>}>
+                <Button variant={showTypes ? "success" : "danger"} onClick={_ => toggleShowTypes()}><FontAwesomeIcon icon={faKeyboard} /></Button>&nbsp;
+              </OverlayTrigger>
+              <OverlayTrigger overlay={<div className="px-2">Toggle edit mode</div>}>
+                <Button variant={isEditMode ? "success" : "danger"} onClick={_ => toggleIsEditMode()}><FontAwesomeIcon icon={faPenToSquare} /></Button>
+              </OverlayTrigger>
             </div>
           </div>
         </div>

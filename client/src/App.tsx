@@ -33,6 +33,7 @@ import clsx from "clsx";
 import UploadEnvFileModal from "./Components/UploadEnvFileModal";
 import ParameterStoreUpdateEvent from "./Data/Events/ParameterStoreUpdateEvent";
 import FixedProgressBar from "./Components/Common/FixedProgressBar";
+import OverlayTrigger from "./Components/Common/OverlayTrigger";
 
 function App() {
   const parameterStoreService = useMemo(() => ParameterStoreService.instance, []);
@@ -196,7 +197,7 @@ function App() {
       </header>
       <div className="pl-2 flex flex-row gap-3 items-end">
         <div className="pt-4">
-          <Button onClick={_ => setShowSettingsOffCanvas(true)}><FontAwesomeIcon icon={faGear} /></Button>
+          <Button onClick={_ => setShowSettingsOffCanvas(true)} title="Settings"><FontAwesomeIcon icon={faGear} /></Button>
         </div>
         {templateOptions && Object.keys(templateOptions).map((key, idx) => {
           return <TemplateOption key={idx} name={key} values={Object.values(templateOptions)[idx]} setSelection={setSelectedTemplateOption} />
@@ -204,27 +205,27 @@ function App() {
       </div>
       <div className="pt-3 pl-2 flex flex-row gap-3 items-center">
         <div className="w-max">
-          <Button onClick={_ => refreshAll()}>
+          <Button onClick={_ => refreshAll()} title="Refresh">
             {isRefreshing ? <Spinner /> : <FontAwesomeIcon icon={faRefresh} />}
           </Button>
         </div>
         <div className="w-max">
-          <Button onClick={_ => setShowCreateModal(true)}><FontAwesomeIcon icon={faAdd} /></Button>
+          <Button onClick={_ => setShowCreateModal(true)} title="Add a parameter"><FontAwesomeIcon icon={faAdd} /></Button>
         </div>
         <div className="w-max">
-          <Button onClick={_ => setShowFileModal(true)}><FontAwesomeIcon icon={faFile} /></Button>
+          <Button onClick={_ => setShowFileModal(true)} title="Export to file"><FontAwesomeIcon icon={faFile} /></Button>
         </div>
         <div className="w-max">
-          <Button onClick={_ => setShowUploadFileModal(true)}><FontAwesomeIcon icon={faFileUpload} /></Button>
+          <Button onClick={_ => setShowUploadFileModal(true)} title="Import from file"><FontAwesomeIcon icon={faFileUpload} /></Button>
         </div>
         <div className="w-max">
-          <Button onClick={_ => setShowFileExportModal(true)}><FontAwesomeIcon icon={faFileExport} /></Button>
+          <Button onClick={_ => setShowFileExportModal(true)} title="Generate export script"><FontAwesomeIcon icon={faFileExport} /></Button>
         </div>
         <div className="w-max">
-          <Button onClick={_ => setShowCompareModal(true)}><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /></Button>
+          <Button onClick={_ => setShowCompareModal(true)} title="Compare parameters"><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /></Button>
         </div>
         <div className="w-max">
-          <Button onClick={_ => setShowHistoryModal(true)}><FontAwesomeIcon icon={faHistory} /></Button>
+          <Button onClick={_ => setShowHistoryModal(true)} title="History"><FontAwesomeIcon icon={faHistory} /></Button>
         </div>
         <div className="w-max flex flex-row gap-2">
           <DropdownButton title={"Find missing in"}>

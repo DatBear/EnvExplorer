@@ -82,9 +82,9 @@ function SettingsOffCanvas({ show, setShow }: SettingsOffCanvasProps) {
               <Select value={currentProfile} onChange={e => setSelectedProfile(e.target.value)} className="w-full">
                 {appSettingsContainer.profileNames.map(x => <Option key={x} value={x}>{x}</Option>)}
               </Select>
-              <Button onClick={_ => setShowAddProfileModal(true)} variant="success"><FontAwesomeIcon icon={faAdd} /></Button>
-              <Button onClick={_ => setShowShareModal(true)} variant="success"><FontAwesomeIcon icon={faShareFromSquare} /></Button>
-              {Object.keys(appSettingsContainer.allAppSettings).length > 1 && <Button onClick={_ => setShowRemoveProfileModal(true)} variant="danger"><FontAwesomeIcon icon={faTrash} /></Button>}
+              <Button onClick={_ => setShowAddProfileModal(true)} variant="success" title="Add a profile"><FontAwesomeIcon icon={faAdd} /></Button>
+              <Button onClick={_ => setShowShareModal(true)} variant="success" title="Share settings"><FontAwesomeIcon icon={faShareFromSquare} /></Button>
+              {Object.keys(appSettingsContainer.allAppSettings).length > 1 && <Button onClick={_ => setShowRemoveProfileModal(true)} variant="danger" title="Delete profile"><FontAwesomeIcon icon={faTrash} /></Button>}
             </div>
           </div>
         </div>

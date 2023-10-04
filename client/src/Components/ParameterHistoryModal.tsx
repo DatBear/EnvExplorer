@@ -131,10 +131,10 @@ export default function ParameterHistoryModal({ show, setShow }: ParameterHistor
                 </div>
                 {currHistory && <div>
                   <div>
-                    <Table>
+                    <Table className="table-fixed">
                       <thead>
                         <tr>
-                          <Th>Date</Th>
+                          <Th className="w-24">Date</Th>
                           <Th>Value</Th>
                         </tr>
                       </thead>

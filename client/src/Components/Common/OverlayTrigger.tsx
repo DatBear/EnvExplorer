@@ -1,4 +1,4 @@
-import { Placement, autoUpdate, useDismiss, useFloating, useFocus, useHover, useInteractions, useRole, flip, shift, offset } from "@floating-ui/react";
+import { Placement, autoUpdate, useDismiss, useFloating, useFocus, useHover, useInteractions, useRole, flip, shift, offset, FloatingDelayGroup } from "@floating-ui/react";
 import { PropsWithChildren, ReactElement, useState } from "react"
 
 
@@ -15,10 +15,10 @@ export default function OverlayTrigger({ overlay, placement, children }: PropsWi
     onOpenChange: setIsOpen,
     whileElementsMounted: autoUpdate,
     placement: placement ?? 'top',
-    middleware: [offset(3), flip(), shift()],
+    middleware: [offset(10)],
   });
 
-  const hover = useHover(context, { move: false });
+  const hover = useHover(context, { move: true, delay: 350, restMs: 100 });
   const focus = useFocus(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'tooltip' });

@@ -1,14 +1,23 @@
 import clsx from "clsx";
 import { CSSProperties } from "react";
 
-export default function Table({ children }: React.PropsWithChildren) {
-  return <table className="border border-primary-300 border-opacity-40 p-2 w-full">
+type TableProps = {
+  className?: string;
+}
+export default function Table({ className, children }: React.PropsWithChildren<TableProps>) {
+  const classes = clsx(className, "border border-primary-300 border-opacity-40 p-2 w-full");
+  return <table className={classes}>
     {children}
   </table>
 }
 
-export function Th({ children }: React.PropsWithChildren) {
-  return <th className="border border-primary-300 border-opacity-40 p-2">{children}</th>
+
+type ThProps = {
+  className?: string;
+}
+export function Th({ className, children }: React.PropsWithChildren<ThProps>) {
+  const classes = clsx(className, "border border-primary-300 border-opacity-40 p-2 wrap");
+  return <th className={classes}>{children}</th>
 }
 
 type TrProps = {

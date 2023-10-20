@@ -1,4 +1,4 @@
-import { SSMClient, Parameter, ParameterHistory, PutParameterCommand, paginateGetParameterHistory, paginateGetParametersByPath, GetParametersByPathCommandInput, GetParameterHistoryCommandInput } from "@aws-sdk/client-ssm";
+import { SSMClient, Parameter, ParameterHistory, PutParameterCommand, paginateGetParameterHistory, paginateGetParametersByPath, GetParametersByPathCommandInput, GetParameterHistoryCommandInput, ParameterType } from "@aws-sdk/client-ssm";
 import Environment from "../Data/Environment";
 import { CachedParameter } from "../Data/Model/CachedParameter";
 import CompareParametersRequest from "../Data/Model/CompareParametersRequest";
@@ -203,7 +203,7 @@ export default class ParameterStoreService {
     await this.ssmClient.send(new PutParameterCommand({
       Name: request.name,
       Value: request.value,
-      Type: request.type,
+      Type: request.type as ParameterType,
       Overwrite: true
     }));
 

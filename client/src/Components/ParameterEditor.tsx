@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Input from "./Common/Input";
+import TextArea from "./Common/TextArea";
 
 type ParameterEditorProps = {
   value: string | null;
@@ -7,7 +8,7 @@ type ParameterEditorProps = {
   onChange: (value: string) => void;
 }
 
-function ParameterEditor({ value, isEditMode, onChange: onChangeProp }: ParameterEditorProps) {
+function ParameterEditor({ value, isEditMode, onChange }: ParameterEditorProps) {
   const [stateValue, setStateValue] = useState(value ?? '');
 
   useEffect(() => {
@@ -15,13 +16,13 @@ function ParameterEditor({ value, isEditMode, onChange: onChangeProp }: Paramete
   }, [value]);
 
   useEffect(() => {
-    onChangeProp(stateValue);
-  }, [stateValue, onChangeProp])
+    onChange(stateValue);
+  }, [stateValue])
 
   return <>
     {isEditMode && <>
       {stateValue.length <= 25 && <Input type="text" value={(stateValue ?? '')} onChange={e => setStateValue(e.target.value)} />}
-      {stateValue.length > 25 && <textarea value={stateValue} onChange={e => setStateValue(e.target.value)} rows={Math.ceil(stateValue.length / 35)} />}
+      {stateValue.length > 25 && <TextArea value={stateValue} onChange={e => setStateValue(e.target.value)} rows={Math.ceil(stateValue.length / 35)} />}
     </>}
     {!isEditMode && <span className="parameter-value wrap">{stateValue}</span>}
   </>
